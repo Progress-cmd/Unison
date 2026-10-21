@@ -2,4 +2,4 @@
 .env
 vendor/
 var/
-musics_storages/
+musics_storage/
