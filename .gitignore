@@ -1,0 +1,5 @@
+*.local*
+.env
+vendor/
+var/
+musics_storages/
