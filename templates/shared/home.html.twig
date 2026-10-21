@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-
+    <h2>Bonjour {{ app.user.getUsername() }}</h2>
 {% endblock %}
