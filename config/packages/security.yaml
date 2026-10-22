@@ -19,6 +19,7 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            login_throttling: null
 
             form_login:
                 login_path: app_login
