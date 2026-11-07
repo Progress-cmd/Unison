@@ -32,7 +32,9 @@ final class ImportTrackCommand
                 ['Pochette' => $metadata['thumbnail'] ?? '-']
             );
 
-            $io->success('Metadata successfully extracted!');
+            $fileName = $this->ytDlpClient->downloadAudio($url);
+
+            $io->success('Audio téléchargé sous le nom de '.$fileName);
 
             return Command::SUCCESS;
         } catch (\RuntimeException|\JsonException $e) {
