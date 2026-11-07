@@ -4,7 +4,7 @@
 EXEC = docker compose exec -u www-data app
 
 .DEFAULT_GOAL := aide
-.PHONY: aide up down build logs sh console composer db droits
+.PHONY: aide up down build logs sh console composer db droits worker-logs worker-restart
 
 aide: ## Affiche cette aide
 	@grep -E '^[a-z]+:.*## ' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  make %-10s %s\n", $$1, $$2}'
@@ -35,3 +35,9 @@ db: ## Ouvre le client SQL
 
 droits: ## Rend le projet à ton utilisateur (si des fichiers sont à root)
 	docker compose exec -u root app chown -R $$(id -u):$$(id -g) /var/www/html
+
+worker-logs: ## Suit les logs du worker
+	docker compose logs -f worker
+
+worker-restart: ## Redémarre le worker
+	$(EXEC) php bin/console messenger:stop-workers
