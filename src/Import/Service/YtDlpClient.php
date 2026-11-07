@@ -57,7 +57,7 @@ class YtDlpClient
 
     public function __construct(
         #[Autowire('%env(resolve:MUSIC_DIR)%')]
-        private readonly string $musicDir
+        private readonly string $musicDir,
     ) {}
 
     public function fetchMetadata(string $url): array

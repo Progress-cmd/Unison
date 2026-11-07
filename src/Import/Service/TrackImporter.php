@@ -1,0 +1,83 @@
+<?php
+
+namespace App\Import\Service;
+
+use App\Account\Entity\User;
+use App\Library\Entity\Artist;
+use App\Library\Entity\Track;
+use App\Library\Repository\TrackRepository;
+use App\Library\Repository\ArtistRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+
+class TrackImporter
+{
+    public function __construct(
+        private readonly YtDlpClient $ytDlpClient,
+        private readonly WaveformGenerator $waveformGenerator,
+        private readonly TrackRepository $trackRepository,
+        private readonly ArtistRepository $artistRepository,
+        private readonly EntityManagerInterface $em,
+        #[Autowire('%env(resolve:MUSIC_DIR)%')]
+        private readonly string $musicDir,
+    ) {}
+
+    public function import(string $url, User $user): Track
+    {
+        $metadata = $this->ytDlpClient->fetchMetadata($url);
+        $title = $metadata['track'] ?? $metadata['title'];
+
+        if ($this->trackRepository->findOneBy(['sourceUrl' => $metadata['webpage_url']])) {
+            throw new \RuntimeException("Ce morceau est déjà dans la bibliothèque : ".$title);
+        }
+
+        $fileName = $this->ytDlpClient->downloadAudio($metadata['webpage_url']);
+        $waveform = $this->waveformGenerator->generate($this->musicDir . '/' . $fileName);
+
+        $track = new Track();
+        $track->setTitle(mb_substr($title, 0, 255));
+        $track->setDuration((int) $metadata['duration']);
+        $track->setWaveform($waveform);
+        $track->setFileName($fileName);
+        $track->setSourceUrl($metadata['webpage_url']);
+        $track->setCover($metadata['thumbnail'] ?? null);
+        $track->setAddedBy($user);
+
+        foreach ($this->artistNames($metadata) as $name) {
+            $artist = $this->artistRepository->findOneBy(['name' => $name]);
+
+            if (null === $artist) {
+                $artist = new Artist();
+
+                $artist->setName($name);
+                $this->em->persist($artist);
+            }
+
+            $track->addArtist($artist);
+        }
+
+        $this->em->persist($track);
+        $this->em->flush();
+
+        return $track;
+    }
+
+    private function artistNames(array $metadata): array
+    {
+        if (isset($metadata['artists'])) {
+            $names = $metadata['artists'];
+        } elseif (isset($metadata['artist'])) {
+            $names = explode(',', $metadata['artist']);
+        } else {
+            $names = [preg_replace('/\s*-\s*Topic$/i', '', $metadata['channel'] ?? '')];
+        }
+
+        $names = array_map('trim', $names);
+        $names = array_filter($names);
+        $names = array_map(fn ($name) => mb_substr($name, 0, 100), $names);
+        $names = array_unique($names);
+        $names = array_values($names);
+
+        return $names;
+    }
+}
