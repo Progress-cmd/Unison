@@ -3,6 +3,7 @@
 namespace App\Import\Command;
 
 use App\Import\Service\YtDlpClient;
+use App\Import\Service\WaveformGenerator;
 use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -13,7 +14,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class ImportTrackCommand
 {
     public function __construct(
-        private readonly YtDlpClient $ytDlpClient
+        private readonly YtDlpClient $ytDlpClient,
+        private readonly WaveformGenerator $waveformGenerator
     ) {}
 
     public function __invoke(
@@ -35,6 +37,10 @@ final class ImportTrackCommand
             $fileName = $this->ytDlpClient->downloadAudio($url);
 
             $io->success('Audio téléchargé sous le nom de '.$fileName);
+
+            $waveform = $this->waveformGenerator->generate('musics_storage/' . $fileName);
+
+            $io->writeln($waveform ?? "pas de forme d'onde");
 
             return Command::SUCCESS;
         } catch (\RuntimeException|\JsonException $e) {
