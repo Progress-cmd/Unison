@@ -3,6 +3,7 @@
 namespace App\Import\Service;
 
 use App\Account\Entity\User;
+use App\Import\Exception\TrackAlreadyImportedException;
 use App\Library\Entity\Artist;
 use App\Library\Entity\Track;
 use App\Library\Repository\TrackRepository;
@@ -28,7 +29,7 @@ class TrackImporter
         $title = $metadata['track'] ?? $metadata['title'];
 
         if ($this->trackRepository->findOneBy(['sourceUrl' => $metadata['webpage_url']])) {
-            throw new \RuntimeException("Ce morceau est déjà dans la bibliothèque : ".$title);
+            throw new TrackAlreadyImportedException("Ce morceau est déjà dans la bibliothèque : ".$title);
         }
 
         $fileName = $this->ytDlpClient->downloadAudio($metadata['webpage_url']);

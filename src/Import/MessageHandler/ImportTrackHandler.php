@@ -3,6 +3,7 @@
 namespace App\Import\MessageHandler;
 
 use App\Account\Repository\UserRepository;
+use App\Import\Exception\TrackAlreadyImportedException;
 use App\Import\Message\ImportTrack;
 use App\Import\Service\TrackImporter;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -24,6 +25,10 @@ class ImportTrackHandler
             throw new UnrecoverableMessageHandlingException("Utilisateur introuvable : ".$message->userId);
         }
 
-        $this->trackImporter->import($message->url, $user);
+        try {
+            $this->trackImporter->import($message->url, $user);
+        } catch (TrackAlreadyImportedException $e) {
+            throw new UnrecoverableMessageHandlingException($e->getMessage(), previous: $e);
+        }
     }
 }
