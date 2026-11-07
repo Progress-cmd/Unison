@@ -1,14 +1,23 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Unison - Sign in{% endblock %}
+{% block title %}Unison - Connexion{% endblock %}
 
-{% block notif %}{% if error %}<p>{{ error.messageKey }}</p>{% endif %}{% endblock %}
+{% block notif %}
+    {% if error %}
+        {# Security messages are in English: only the throttling one is shown apart #}
+        {% if error.messageKey starts with 'Too many' %}
+            <p>Trop de tentatives de connexion. Réessayez dans {{ error.messageData['%minutes%'] }} minute(s).</p>
+        {% else %}
+            <p>Identifiants invalides.</p>
+        {% endif %}
+    {% endif %}
+{% endblock %}
 
 {% block body %}
     <form method="post">
-        <label>Email <input type="email" name="_username" value="{{ last_username }}" required autofocus></label>
-        <label>Password <input type="password" name="_password" required></label>
+        <label>Adresse e-mail <input type="email" name="_username" value="{{ last_username }}" required autofocus></label>
+        <label>Mot de passe <input type="password" name="_password" required></label>
         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-        <button type="submit">Sign in</button>
+        <button type="submit">Se connecter</button>
     </form>
 {% endblock %}
