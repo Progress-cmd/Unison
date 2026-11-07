@@ -9,10 +9,19 @@ ARG GID=1000
 #   pdo_mysql : parler à MariaDB
 #   intl      : dates, langues et formats (utilisé par Symfony)
 #   zip       : Composer télécharge plus vite les archives
+#   ffmpeg    : l'audio et la forme d'onde
+#   python3   : yt-dlp est écrit en Python
+#   quickjs   : Youtube chiffre les URL des flux, il faut permettre à yt-dlp de les déchiffrer
 RUN apt-get update && apt-get install -y --no-install-recommends \
       unzip libicu-dev libzip-dev \
+      ffmpeg python3 quickjs curl \
  && docker-php-ext-install pdo_mysql intl zip \
  && rm -rf /var/lib/apt/lists/*
+
+# on prend la release GitHub plutôt que le paquet Debian, parce que yt-dlp doit suivre les changements de YouTube de très près.
+RUN curl -fL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
+    -o /usr/local/bin/yt-dlp \
+    && chmod +x /usr/local/bin/yt-dlp
 
 # Apache tourne sous l'identité de ton utilisateur.
 RUN groupmod -g ${GID} www-data && usermod -u ${UID} www-data
