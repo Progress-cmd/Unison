@@ -3,17 +3,18 @@
 namespace App\Import\Command;
 
 use App\Account\Repository\UserRepository;
-use App\Import\Service\TrackImporter;
+use App\Import\Message\ImportTrack;
 use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsCommand(name: 'app:import:track', description: 'Imports a track from YouTube')]
 final class ImportTrackCommand
 {
     public function __construct(
-        private readonly TrackImporter $trackImporter,
+        private readonly MessageBusInterface $messageBus,
         private readonly UserRepository $userRepository,
     ) {}
 
@@ -31,17 +32,9 @@ final class ImportTrackCommand
                 return Command::FAILURE;
             }
 
-            $track = $this->trackImporter->import($url, $user);
+            $this->messageBus->dispatch(new ImportTrack($url, $user->getId()));
 
-            $artists = $track->getArtists()->map(fn ($artist) => $artist->getName());
-            $artists = $artists->toArray();
-            $artists = implode(', ', $artists);
-
-            $io->definitionList(
-                ['Id' => $track->getId()],
-                ['Titre' => $track->getTitle()],
-                ['Artistes' => $artists],
-            );
+            $io->success('Import ajouté à la file d\'attente.');
 
             return Command::SUCCESS;
         } catch (\RuntimeException|\JsonException $e) {
