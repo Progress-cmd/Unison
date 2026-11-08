@@ -3,10 +3,9 @@
 {% block title %}Unison - Importation{% endblock %}
 
 {% block body %}
-<div>
-    {{ form_start(form) }}
-        {{ form_row(form.url) }}
-        <button type="submit">Importer</button>
-    {{ form_end(form) }}
-</div>
+<h1>Importer</h1>
+{{ form_start(form, {attr: {class: 'form'}}) }}
+    {{ form_row(form.url) }}
+    <button type="submit" class="btn">Importer</button>
+{{ form_end(form) }}
 {% endblock %}

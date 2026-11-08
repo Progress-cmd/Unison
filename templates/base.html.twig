@@ -29,7 +29,7 @@
         <main>
             <div class="notif">
                 {% for message in app.flashes('success') %}
-                    <p>{{ message }}</p>
+                    <p class="alert alert-success">{{ message }}</p>
                 {% endfor %}
                 {% block notif %}{% endblock %}
             </div>

@@ -2,22 +2,21 @@
 
 {% block title %}Unison - Connexion{% endblock %}
 
-{% block notif %}
+{% block body %}
+<div class="login">
+    <h1>Unison</h1>
     {% if error %}
-        {# Security messages are in English: only the throttling one is shown apart #}
         {% if error.messageKey starts with 'Too many' %}
-            <p>Trop de tentatives de connexion. Réessayez dans {{ error.messageData['%minutes%'] }} minute(s).</p>
+            <p class="alert alert-error">Trop de tentatives de connexion. Réessayez dans {{ error.messageData['%minutes%'] }} minute(s).</p>
         {% else %}
-            <p>Identifiants invalides.</p>
+            <p class="alert alert-error">Identifiants invalides.</p>
         {% endif %}
     {% endif %}
-{% endblock %}
-
-{% block body %}
-    <form method="post">
+    <form method="post" class="form">
         <label>Adresse e-mail <input type="email" name="_username" value="{{ last_username }}" required autofocus></label>
         <label>Mot de passe <input type="password" name="_password" required></label>
         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-        <button type="submit">Se connecter</button>
+        <button type="submit" class="btn">Se connecter</button>
     </form>
+</div>
 {% endblock %}
