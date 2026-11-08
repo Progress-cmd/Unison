@@ -3,9 +3,11 @@
 namespace App\Import\Service;
 
 use App\Account\Entity\User;
+use App\Import\Message\ImportTrack;
 use App\Library\Entity\Album;
 use App\Library\Repository\AlbumRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class PlaylistImporter
 {
@@ -13,6 +15,7 @@ class PlaylistImporter
         private readonly YtDlpClient $ytDlpClient,
         private readonly AlbumRepository $albumRepository,
         private readonly EntityManagerInterface $em,
+        private readonly MessageBusInterface $messageBus,
     ) {}
 
     public function import(string $url, User $user): void
@@ -20,20 +23,17 @@ class PlaylistImporter
         $playlist = $this->ytDlpClient->fetchPlaylist($url);
         $title = $this->albumTitle($playlist['title']);
 
-        if (null === $title) {
-            return;
+        $album = null;
+
+        if (null !== $title) {
+            $album = $this->findOrCreateAlbum($title, $playlist['webpage_url'], $user);
         }
 
-        $album = $this->albumRepository->findOneBy(['sourceUrl' => $playlist['webpage_url']]);
-
-        if (null === $album) {
-            $album = new Album();
-            $album->setTitle(mb_substr($title, 0, 255));
-            $album->setSourceUrl($playlist['webpage_url']);
-            $album->setAddedBy($user);
-
-            $this->em->persist($album);
-            $this->em->flush();
+        foreach ($playlist['entries'] as $index => $entry) {
+            if (in_array($entry['title'], ['[Private video]', '[Deleted video]'], true)) {
+                continue;
+            }
+            $this->messageBus->dispatch(new ImportTrack($entry['url'], $user->getId(), $album?->getId(), null !== $album ? $index + 1 : null));
         }
     }
 
@@ -44,5 +44,22 @@ class PlaylistImporter
         }
 
         return trim($matches[1]);
+    }
+
+    private function findOrCreateAlbum(string $title, string $sourceUrl, User $user): Album
+    {
+        $album = $this->albumRepository->findOneBy(['sourceUrl' => $sourceUrl]);
+
+        if (null === $album) {
+            $album = new Album();
+            $album->setTitle(mb_substr($title, 0, 255));
+            $album->setSourceUrl($sourceUrl);
+            $album->setAddedBy($user);
+
+            $this->em->persist($album);
+            $this->em->flush();
+        }
+
+        return $album;
     }
 }
