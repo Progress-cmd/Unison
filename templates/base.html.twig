@@ -17,6 +17,7 @@
             <nav class="navbar">
                 <div class="nav-brand desktop-only">Unison</div>
                 <a class="nav-item" href="{{ path('app_home') }}">Accueil</a>
+                <a class="nav-item" href="{{ path('app_library') }}">Bibliothèque</a>
                 <a class="nav-item" href="{{ path('app_import') }}">Importer</a>
                 <div class="username desktop-only">{{ app.user.username }}</div>
                 <form action="{{ path('app_logout') }}" method="post">

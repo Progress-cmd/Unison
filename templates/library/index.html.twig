@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - Bibliothèque{% endblock %}
+
+{% block body %}
+<h1>Bibliothèque</h1>
+<ul>
+    {% for track in tracks %}
+        <li>{{ track.title }} - {{ track.artists|map(artist => artist.name)|join(', ') }}</li>
+    {% else %}
+        <li>Aucun morceau pour l'instant.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
