@@ -6,7 +6,7 @@ export default class extends Controller
 
     play(event)
     {
-        const tracks = this.trackTargets.map(row => ({ url: row.dataset.url, title: row.dataset.title }));
+        const tracks = this.trackTargets.map(row => ({ url: row.dataset.url, title: row.dataset.title, waveform: row.dataset.waveform }));
         this.dispatch('play', { detail: { tracks: tracks, index: event.params.index } });
     }
 }

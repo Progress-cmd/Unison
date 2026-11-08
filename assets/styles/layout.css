@@ -60,9 +60,13 @@ main {
 }
 
 .player-progress {
-    flex: 1;
-    min-width: 0;
-    accent-color: var(--color-accent);
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
 }
 
 .player-time {
@@ -72,6 +76,38 @@ main {
     font-size: 14px;
     color: var(--color-text-muted);
     font-variant-numeric: tabular-nums;
+}
+
+.player-wave {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    height: 40px;
+}
+
+.player-bars {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    height: 100%;
+}
+
+.player-bars span {
+    flex: 1;
+    background: var(--color-text-muted);
+    border-radius: 1px;
+}
+
+.player-bars span.is-played {
+    background: var(--color-accent);
+}
+
+.player-bars span:not(:nth-child(3n)) {
+    display: none;
+}
+
+.player-wave:has(.player-progress:focus-visible) {
+    outline: 2px solid var(--color-accent);
 }
 
 @media (min-width: 1024px) {
@@ -117,5 +153,9 @@ main {
     .player {
         bottom: 0;
         left: var(--sidebar-width);
+    }
+
+    .player-bars span:not(:nth-child(3n)) {
+        display: block;
     }
 }

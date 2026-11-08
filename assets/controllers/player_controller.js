@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller
 {
-    static targets = ['audio', 'title', 'toggle', 'elapsed', 'duration', 'progress'];
+    static targets = ['audio', 'title', 'toggle', 'elapsed', 'duration', 'progress', 'bars'];
     queue = [];
     index = 0;
 
@@ -57,6 +57,11 @@ export default class extends Controller
     {
         this.progressTarget.value = this.audioTarget.currentTime;
         this.elapsedTarget.textContent = this.formatTime(this.audioTarget.currentTime);
+
+        const bars = Array.from(this.barsTarget.children);
+        const played = bars.length * this.audioTarget.currentTime / this.audioTarget.duration;
+        
+        bars.forEach((bar, index) => bar.classList.toggle('is-played', index < played));
     }
 
     seek()
@@ -70,6 +75,8 @@ export default class extends Controller
 
         this.audioTarget.src = track.url;
         this.titleTarget.textContent = track.title;
+
+        this.renderWaveform(track.waveform);
 
         this.audioTarget.play();
     }
@@ -93,5 +100,21 @@ export default class extends Controller
         this.index--;
         
         this.loadCurrent();
+    }
+
+    createBar(peak)
+    {
+        const bar = document.createElement('span');
+
+        bar.style.height = `${Math.max(peak / 255 * 100, 8)}%`;
+
+        return bar;
+    }
+
+    renderWaveform(waveform)
+    {
+        const peaks = waveform ? Array.from(atob(waveform), char => char.charCodeAt(0)) : new Array(120).fill(0);
+
+        this.barsTarget.replaceChildren(...peaks.map(peak => this.createBar(peak)));
     }
 }
