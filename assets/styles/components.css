@@ -111,13 +111,13 @@
     flex-direction: column;
 }
 
-.track-title et .track-artists {
+.track-title, .track-artists {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.track-artists et .track-duration {
+.track-artists, .track-duration {
     font-size: 14px;
     color: var(--color-text-muted);
 }
