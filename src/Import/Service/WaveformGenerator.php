@@ -38,28 +38,26 @@ class WaveformGenerator
             return null;
         }
 
-        $peaks = [];
+        $levels = [];
 
         for ($i = 0; $i < self::POINTS; $i++) {
             $extract = substr($output, $i * $sliceSize * 2, $sliceSize * 2);
             $values = unpack('s*', $extract) ?: [];
-            $peak = 0;
+            $sum = 0;
 
             foreach ($values as $value) {
-                if (abs($value) > $peak) {
-                    $peak = abs($value);
-                }
+                $sum += $value * $value;
             }
 
-            array_push($peaks, $peak);
+            $levels[] = sqrt($sum / max(1, count($values)));
         }
 
-        $max = max(1, ...$peaks);
+        $max = max(1, ...$levels);
 
         $waveform = '';
 
-        foreach ($peaks as $peak) {
-            $waveform .= chr((int) round($peak / $max * 255));
+        foreach ($levels as $level) {
+            $waveform .= chr((int) round($level / $max * 255));
         }
 
         return base64_encode($waveform);
