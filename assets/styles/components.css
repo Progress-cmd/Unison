@@ -26,6 +26,21 @@
     color: var(--color-link);
 }
 
+.player-play {
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--color-accent);
+    color: white;
+}
+
+.player-play:hover {
+    background: var(--color-accent-hover);
+    color: white;
+}
+
 .icon-pause {
     display: none;
 }

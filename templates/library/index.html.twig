@@ -6,8 +6,9 @@
 <h1>Bibliothèque</h1>
 <ul class="track-list" data-controller="track-list">
     {% for track in tracks %}
-        <li class="track" data-track-list-target="track" data-url="{{ path('app_track_stream', {id: track.id}) }}" data-title="{{ track.title }}" data-waveform="{{ track.waveform }}">
-            <button type="button" class="icon-btn" data-action="track-list#play" aria-label="Lire {{ track.title }}" data-action="track-list#play" data-track-list-index-param="{{ loop.index0 }}">{{ ux_icon('material-symbols:play-arrow') }}</button>
+        {% set artists = track.artists|map(artist => artist.name)|join(', ') %}
+        <li class="track" data-track-list-target="track" data-url="{{ path('app_track_stream', {id: track.id}) }}" data-title="{{ track.title }}" data-waveform="{{ track.waveform }}" data-cover="{{ track.cover }}" data-artists="{{ artists }}">
+            <button type="button" class="icon-btn" data-action="track-list#play" aria-label="Lire {{ track.title }}" data-track-list-index-param="{{ loop.index0 }}">{{ ux_icon('material-symbols:play-arrow') }}</button>
             {% if track.cover %}
                 <img class="track-cover" src="{{ track.cover }}" alt="" loading="lazy">
             {% else %}
@@ -15,7 +16,7 @@
             {% endif %}
             <div class="track-info">
                 <span class="track-title">{{ track.title }}</span>
-                <span class="track-artists">{{ track.artists|map(artist => artist.name)|join(', ') }}</span>
+                <span class="track-artists">{{ artists }}</span>
             </div>
             <span class="track-duration">{{ track.duration|duration }}</span>
         </li>

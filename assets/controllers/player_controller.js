@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller
 {
-    static targets = ['audio', 'title', 'toggle', 'elapsed', 'duration', 'progress', 'bars'];
+    static targets = ['audio', 'title', 'toggle', 'elapsed', 'duration', 'progress', 'bars', 'artists', 'cover'];
     queue = [];
     index = 0;
 
@@ -75,6 +75,8 @@ export default class extends Controller
 
         this.audioTarget.src = track.url;
         this.titleTarget.textContent = track.title;
+        this.artistsTarget.textContent = track.artists;
+        this.coverTarget.src = track.cover;
 
         this.renderWaveform(track.waveform);
 
@@ -117,5 +119,10 @@ export default class extends Controller
         const peaks = waveform ? Array.from(atob(waveform), char => char.charCodeAt(0)) : new Array(120).fill(0);
 
         this.barsTarget.replaceChildren(...peaks.map(peak => this.createBar(peak)));
+    }
+
+    setVolume(event)
+    {
+        this.audioTarget.volume = event.target.value;
     }
 }
