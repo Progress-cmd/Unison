@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - Importation{% endblock %}
+
+{% block body %}
+<div>
+    {{ form_start(form) }}
+        {{ form_row(form.url) }}
+        <button type="submit">Importer</button>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

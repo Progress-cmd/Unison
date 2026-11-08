@@ -17,12 +17,18 @@
             <header>
                 <a href="{{ path('app_home') }}">Unison</a>
                 <div class="username">{{ app.user.username }}</div>
+                <a href="{{ path('app_import') }}">Importer</a>
                 <a href="{{ path('app_logout') }}">Déconnexion</a>
             </header>
         {% endif %}
 
         <main>
-            <div class="notif">{% block notif %}{% endblock %}</div>
+            <div class="notif">
+                {% for message in app.flashes('success') %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+                {% block notif %}{% endblock %}
+            </div>
             {% block body %}{% endblock %}
         </main>
         {% if app.user %}
