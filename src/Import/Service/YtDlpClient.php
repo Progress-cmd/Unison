@@ -72,6 +72,18 @@ class YtDlpClient
         return json_decode($output, true, 512, JSON_THROW_ON_ERROR);
     }
 
+    public function fetchPlaylist(string $url): array
+    {
+        $output = $this->run([
+            '--flat-playlist', 
+            '--dump-single-json', 
+            '--yes-playlist', 
+            $url
+        ]);
+
+        return json_decode($output, true, 512, JSON_THROW_ON_ERROR);  
+    }
+
     public function downloadAudio(string $url): string
     {
         $fileName = $this->run([
