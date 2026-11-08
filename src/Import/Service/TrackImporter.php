@@ -35,9 +35,11 @@ class TrackImporter
             if (null === $album) {
                 throw new TrackAlreadyImportedException("Ce morceau est déjà dans la bibliothèque : ".$title);
             }
-            
+
             $existing->setAlbum($album);
             $existing->setTrackNumber($trackNumber);
+
+            $this->completeAlbum($album, $existing, $metadata);
 
             $this->em->flush();
 
@@ -72,6 +74,10 @@ class TrackImporter
             $track->addArtist($artist);
         }
 
+        if (null !== $album) {
+            $this->completeAlbum($album, $track, $metadata);
+        }
+
         $this->em->persist($track);
         $this->em->flush();
 
@@ -95,5 +101,20 @@ class TrackImporter
         $names = array_values($names);
 
         return $names;
+    }
+
+    private function completeAlbum(Album $album, Track $track, array $metadata): void
+    {
+        if (null === $album->getCover()) {
+            $album->setCover($track->getCover());
+        }
+
+        if (null === $album->getYear() && isset($metadata['release_year'])) {
+            $album->setYear((int) $metadata['release_year']);
+        }
+
+        foreach ($track->getArtists() as $artist) {
+            $album->addArtist($artist);
+        }
     }
 }
