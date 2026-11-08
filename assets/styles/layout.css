@@ -52,9 +52,26 @@ main {
     border-top: 1px solid var(--color-border);
 }
 
-.player audio {
+.player-title {
+    flex: 0 0 30%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.player-progress {
     flex: 1;
     min-width: 0;
+    accent-color: var(--color-accent);
+}
+
+.player-time {
+    flex: none;
+    width: 5ch;
+    text-align: center;
+    font-size: 14px;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
 }
 
 @media (min-width: 1024px) {
