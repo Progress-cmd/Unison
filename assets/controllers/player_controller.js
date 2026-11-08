@@ -2,9 +2,22 @@ import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller
 {
-    static targets = ['audio', 'title', 'toggle', 'elapsed', 'duration', 'progress', 'bars', 'artists', 'cover'];
+    static targets = [
+        'audio',
+        'cover',
+        'title',
+        'artists',
+        'toggle',
+        'elapsed',
+        'duration',
+        'progress',
+        'bars',
+    ];
+
     queue = [];
     index = 0;
+
+    // --- Actions, called from the HTML ---
 
     play(event)
     {
@@ -27,6 +40,39 @@ export default class extends Controller
         }
     }
 
+    next()
+    {
+        if (this.index >= this.queue.length - 1) {
+            return;
+        }
+
+        this.index++;
+        this.loadCurrent();
+    }
+
+    previous()
+    {
+        if (this.audioTarget.currentTime > 3 || this.index === 0) {
+            this.audioTarget.currentTime = 0;
+            return;
+        }
+
+        this.index--;
+        this.loadCurrent();
+    }
+
+    seek()
+    {
+        this.audioTarget.currentTime = this.progressTarget.value;
+    }
+
+    setVolume(event)
+    {
+        this.audioTarget.volume = event.target.value;
+    }
+
+    // --- Reactions to the <audio> element ---
+
     showPlaying()
     {
         this.element.classList.add('is-playing');
@@ -37,14 +83,6 @@ export default class extends Controller
     {
         this.element.classList.remove('is-playing');
         this.toggleTarget.setAttribute('aria-label', 'Lecture');
-    }
-
-    formatTime(seconds)
-    {
-        const minutes = Math.floor(seconds / 60);
-        const rest = Math.floor(seconds % 60);
-
-        return `${minutes}:${String(rest).padStart(2, '0')}`;
     }
 
     updateDuration()
@@ -60,48 +98,33 @@ export default class extends Controller
 
         const bars = Array.from(this.barsTarget.children);
         const played = bars.length * this.audioTarget.currentTime / this.audioTarget.duration;
-        
+
         bars.forEach((bar, index) => bar.classList.toggle('is-played', index < played));
     }
 
-    seek()
-    {
-        this.audioTarget.currentTime = this.progressTarget.value;
-    }
+    // --- Internal helpers ---
 
     loadCurrent()
     {
         const track = this.queue[this.index];
 
         this.audioTarget.src = track.url;
+        this.coverTarget.src = track.cover;
         this.titleTarget.textContent = track.title;
         this.artistsTarget.textContent = track.artists;
-        this.coverTarget.src = track.cover;
 
         this.renderWaveform(track.waveform);
 
         this.audioTarget.play();
     }
 
-    next()
+    renderWaveform(waveform)
     {
-        if (this.index >= this.queue.length - 1) {
-            return;
-        }
-        this.index++;
-        
-        this.loadCurrent();
-    }
+        const peaks = waveform
+            ? Array.from(atob(waveform), char => char.charCodeAt(0))
+            : new Array(120).fill(0);
 
-    previous()
-    {
-        if (this.audioTarget.currentTime > 3 || this.index === 0) {
-            this.audioTarget.currentTime = 0;
-            return;
-        }
-        this.index--;
-        
-        this.loadCurrent();
+        this.barsTarget.replaceChildren(...peaks.map(peak => this.createBar(peak)));
     }
 
     createBar(peak)
@@ -114,15 +137,11 @@ export default class extends Controller
         return bar;
     }
 
-    renderWaveform(waveform)
+    formatTime(seconds)
     {
-        const peaks = waveform ? Array.from(atob(waveform), char => char.charCodeAt(0)) : new Array(120).fill(0);
+        const minutes = Math.floor(seconds / 60);
+        const rest = Math.floor(seconds % 60);
 
-        this.barsTarget.replaceChildren(...peaks.map(peak => this.createBar(peak)));
-    }
-
-    setVolume(event)
-    {
-        this.audioTarget.volume = event.target.value;
+        return `${minutes}:${String(rest).padStart(2, '0')}`;
     }
 }

@@ -1,3 +1,5 @@
+/* --- Buttons --- */
+
 .btn {
     padding: 10px 18px;
     border: none;
@@ -26,32 +28,7 @@
     color: var(--color-link);
 }
 
-.player-play {
-    width: 44px;
-    height: 44px;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: var(--color-accent);
-    color: white;
-}
-
-.player-play:hover {
-    background: var(--color-accent-hover);
-    color: white;
-}
-
-.icon-pause {
-    display: none;
-}
-
-.is-playing .icon-play {
-    display: none;
-}
-
-.is-playing .icon-pause {
-    display: block;
-}
+/* --- Forms --- */
 
 .form {
     display: flex;
@@ -59,11 +36,13 @@
     gap: 16px;
     max-width: 420px;
 }
+
 .form label {
     display: block;
     font-size: 14px;
     color: var(--color-text-muted);
 }
+
 .form input:not([type="hidden"]) {
     display: block;
     width: 100%;
@@ -93,6 +72,8 @@
     font-size: 14px;
 }
 
+/* --- Alerts --- */
+
 .alert {
     margin: 0 0 16px;
     padding: 12px 16px;
@@ -109,6 +90,8 @@
     color: var(--color-error);
 }
 
+/* --- Login card --- */
+
 .login {
     max-width: 380px;
     margin: 10vh auto 0;
@@ -118,50 +101,6 @@
     border-radius: 12px;
 }
 
-.login h1{
+.login h1 {
     text-align: center;
-}
-
-.track-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.track {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px;
-}
-
-.track-cover {
-    width: 48px;
-    height: 48px;
-    flex: none;
-    object-fit: cover;
-    border-radius: 6px;
-    background: var(--color-border);
-}
-
-.track-info {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-}
-
-.track-title, .track-artists {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.track-artists, .track-duration {
-    font-size: 14px;
-    color: var(--color-text-muted);
-}
-
-.track-duration {
-    font-variant-numeric: tabular-nums;
 }

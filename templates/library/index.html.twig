@@ -6,20 +6,7 @@
 <h1>Bibliothèque</h1>
 <ul class="track-list" data-controller="track-list">
     {% for track in tracks %}
-        {% set artists = track.artists|map(artist => artist.name)|join(', ') %}
-        <li class="track" data-track-list-target="track" data-url="{{ path('app_track_stream', {id: track.id}) }}" data-title="{{ track.title }}" data-waveform="{{ track.waveform }}" data-cover="{{ track.cover }}" data-artists="{{ artists }}">
-            <button type="button" class="icon-btn" data-action="track-list#play" aria-label="Lire {{ track.title }}" data-track-list-index-param="{{ loop.index0 }}">{{ ux_icon('material-symbols:play-arrow') }}</button>
-            {% if track.cover %}
-                <img class="track-cover" src="{{ track.cover }}" alt="" loading="lazy">
-            {% else %}
-                <div class="track-cover"></div>
-            {% endif %}
-            <div class="track-info">
-                <span class="track-title">{{ track.title }}</span>
-                <span class="track-artists">{{ artists }}</span>
-            </div>
-            <span class="track-duration">{{ track.duration|duration }}</span>
-        </li>
+        {% include 'library/_track.html.twig' with {index: loop.index0} %}
     {% else %}
         <li>Aucun morceau pour l'instant.</li>
     {% endfor %}

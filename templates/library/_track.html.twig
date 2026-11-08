@@ -1,0 +1,34 @@
+{% set artists = track.artists|map(artist => artist.name)|join(', ') %}
+
+<li
+    class="track"
+    data-track-list-target="track"
+    data-url="{{ path('app_track_stream', {id: track.id}) }}"
+    data-title="{{ track.title }}"
+    data-artists="{{ artists }}"
+    data-cover="{{ track.cover }}"
+    data-waveform="{{ track.waveform }}"
+>
+    <button
+        type="button"
+        class="icon-btn"
+        aria-label="Lire {{ track.title }}"
+        data-action="track-list#play"
+        data-track-list-index-param="{{ index }}"
+    >
+        {{ ux_icon('material-symbols:play-arrow') }}
+    </button>
+
+    {% if track.cover %}
+        <img class="track-cover" src="{{ track.cover }}" alt="" loading="lazy">
+    {% else %}
+        <div class="track-cover"></div>
+    {% endif %}
+
+    <div class="track-info">
+        <span class="track-title">{{ track.title }}</span>
+        <span class="track-artists">{{ artists }}</span>
+    </div>
+
+    <span class="track-duration">{{ track.duration|duration }}</span>
+</li>
