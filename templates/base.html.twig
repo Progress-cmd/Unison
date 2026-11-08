@@ -38,8 +38,9 @@
         </main>
         {% if app.user %}
             <div id="player" class="player" data-controller="player" data-action="track:play@window->player#play" data-turbo-permanent>
+                <button type="button" data-player-target="toggle" data-action="player#toggle" aria-label="Lecture">▶</button>
                 <span data-player-target="title"></span>
-                <audio data-player-target="audio" controls></audio>
+                <audio data-player-target="audio" data-action="play->player#showPlaying pause->player#showPaused"></audio>
             </div>
         {% endif %}
     </body>
