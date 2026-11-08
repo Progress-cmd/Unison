@@ -37,7 +37,10 @@
             {% block body %}{% endblock %}
         </main>
         {% if app.user %}
-            <div id="player" data-turbo-permanent></div>
+            <div id="player" class="player" data-controller="player" data-action="track:play@window->player#play" data-turbo-permanent>
+                <span data-player-target="title"></span>
+                <audio data-player-target="audio" controls></audio>
+            </div>
         {% endif %}
     </body>
 </html>

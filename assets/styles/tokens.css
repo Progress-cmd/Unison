@@ -30,4 +30,7 @@
     /* --- Navbarre --- */
     --nav-height: 64px;
     --sidebar-width: 240px;
+
+    /* --- Player --- */
+    --player-height: 64px;
 }
