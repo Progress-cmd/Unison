@@ -27,13 +27,13 @@ export default class extends Controller
 
     showPlaying()
     {
-        this.toggleTarget.textContent = '⏸';
+        this.element.classList.add('is-playing');
         this.toggleTarget.setAttribute('aria-label', 'Pause');
     }
 
     showPaused()
     {
-        this.toggleTarget.textContent = '▶';
+        this.element.classList.remove('is-playing');
         this.toggleTarget.setAttribute('aria-label', 'Lecture');
     }
 }

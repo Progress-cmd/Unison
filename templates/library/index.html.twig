@@ -7,7 +7,7 @@
 <ul class="track-list">
     {% for track in tracks %}
         <li class="track" data-controller="track" data-track-url-value="{{ path('app_track_stream', {id: track.id}) }}" data-track-title-value="{{ track.title }}">
-            <button type="button" data-action="track#play" aria-label="Lire {{ track.title }}">▶</button>
+            <button type="button" class="icon-btn" data-action="track#play" aria-label="Lire {{ track.title }}">{{ ux_icon('material-symbols:play-arrow') }}</button>
             {% if track.cover %}
                 <img class="track-cover" src="{{ track.cover }}" alt="" loading="lazy">
             {% else %}

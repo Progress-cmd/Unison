@@ -13,6 +13,31 @@
     background: var(--color-accent-hover);
 }
 
+.icon-btn {
+    display: flex;
+    padding: 0;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.icon-btn:hover {
+    color: var(--color-link);
+}
+
+.icon-pause {
+    display: none;
+}
+
+.is-playing .icon-play {
+    display: none;
+}
+
+.is-playing .icon-pause {
+    display: block;
+}
+
 .form {
     display: flex;
     flex-direction: column;
