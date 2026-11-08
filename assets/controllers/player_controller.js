@@ -3,13 +3,15 @@ import { Controller } from '@hotwired/stimulus';
 export default class extends Controller
 {
     static targets = ['audio', 'title', 'toggle', 'elapsed', 'duration', 'progress'];
+    queue = [];
+    index = 0;
 
     play(event)
     {
-        this.audioTarget.src = event.detail.url;
-        this.titleTarget.textContent = event.detail.title;
+        this.queue = event.detail.tracks;
+        this.index = event.detail.index;
 
-        this.audioTarget.play();
+        this.loadCurrent();
     }
 
     toggle()
@@ -60,5 +62,36 @@ export default class extends Controller
     seek()
     {
         this.audioTarget.currentTime = this.progressTarget.value;
+    }
+
+    loadCurrent()
+    {
+        const track = this.queue[this.index];
+
+        this.audioTarget.src = track.url;
+        this.titleTarget.textContent = track.title;
+
+        this.audioTarget.play();
+    }
+
+    next()
+    {
+        if (this.index >= this.queue.length - 1) {
+            return;
+        }
+        this.index++;
+        
+        this.loadCurrent();
+    }
+
+    previous()
+    {
+        if (this.audioTarget.currentTime > 3 || this.index === 0) {
+            this.audioTarget.currentTime = 0;
+            return;
+        }
+        this.index--;
+        
+        this.loadCurrent();
     }
 }
