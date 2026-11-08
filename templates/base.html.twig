@@ -5,8 +5,8 @@
         <title>{% block title %}Unison{% endblock %}</title>
         <link rel="icon" href="{{ asset('images/icons/favicon.svg') }}">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        {% block stylesheets %}
-        {% endblock %}
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=DM+Sans:wght@400;500&display=swap">
+        {% block stylesheets %}{% endblock %}
 
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
@@ -14,12 +14,16 @@
     </head>
     <body>
         {% if app.user %}
-            <header>
-                <a href="{{ path('app_home') }}">Unison</a>
-                <div class="username">{{ app.user.username }}</div>
-                <a href="{{ path('app_import') }}">Importer</a>
-                <a href="{{ path('app_logout') }}">Déconnexion</a>
-            </header>
+            <nav class="navbar">
+                <div class="nav-brand desktop-only">Unison</div>
+                <a class="nav-item" href="{{ path('app_home') }}">Accueil</a>
+                <a class="nav-item" href="{{ path('app_import') }}">Importer</a>
+                <div class="username desktop-only">{{ app.user.username }}</div>
+                <form action="{{ path('app_logout') }}" method="post">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                    <button class="nav-item" type="submit">Déconnexion</button>
+                </form>
+            </nav>
         {% endif %}
 
         <main>
