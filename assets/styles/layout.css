@@ -88,14 +88,15 @@ main {
 .player-bars {
     display: flex;
     align-items: center;
-    gap: 1px;
     height: 100%;
 }
 
 .player-bars span {
     flex: 1;
-    background: var(--color-text-muted);
-    border-radius: 1px;
+    background: color-mix(in srgb, var(--color-text-muted) 40%, transparent);
+    border-radius: 99px;
+    transform: scaleX(0.65);
+    transition: background-color 0.2s;
 }
 
 .player-bars span.is-played {

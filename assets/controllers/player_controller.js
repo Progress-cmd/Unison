@@ -105,8 +105,9 @@ export default class extends Controller
     createBar(peak)
     {
         const bar = document.createElement('span');
+        const level = Math.pow(peak / 255, 1.5);
 
-        bar.style.height = `${Math.max(peak / 255 * 100, 8)}%`;
+        bar.style.height = `${Math.max(level * 100, 6)}%`;
 
         return bar;
     }
