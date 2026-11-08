@@ -81,3 +81,47 @@
 .login h1{
     text-align: center;
 }
+
+.track-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.track {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+}
+
+.track-cover {
+    width: 48px;
+    height: 48px;
+    flex: none;
+    object-fit: cover;
+    border-radius: 6px;
+    background: var(--color-border);
+}
+
+.track-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.track-title et .track-artists {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.track-artists et .track-duration {
+    font-size: 14px;
+    color: var(--color-text-muted);
+}
+
+.track-duration {
+    font-variant-numeric: tabular-nums;
+}

@@ -4,9 +4,20 @@
 
 {% block body %}
 <h1>Bibliothèque</h1>
-<ul>
+<ul class="track-list">
     {% for track in tracks %}
-        <li>{{ track.title }} - {{ track.artists|map(artist => artist.name)|join(', ') }}</li>
+        <li class="track">
+            {% if track.cover %}
+                <img class="track-cover" src="{{ track.cover }}" alt="" loading="lazy">
+            {% else %}
+                <div class="track-cover"></div>
+            {% endif %}
+            <div class="track-info">
+                <span class="track-title">{{ track.title }}</span>
+                <span class="track-artists">{{ track.artists|map(artist => artist.name)|join(', ') }}</span>
+            </div>
+            <span class="track-duration">{{ track.duration|duration }}</span>
+        </li>
     {% else %}
         <li>Aucun morceau pour l'instant.</li>
     {% endfor %}
