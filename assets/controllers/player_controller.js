@@ -15,6 +15,8 @@ export default class extends Controller
         'expand',
         'repeat',
         'shuffle',
+        'upcoming',
+        'upcomingRow',
     ];
 
     queue = [];
@@ -108,6 +110,15 @@ export default class extends Controller
         this.shuffleTarget.setAttribute('aria-pressed', this.shuffle);
         
         this.arrangeQueue();
+
+        this.renderUpcoming();
+    }
+
+    jumpTo(event)
+    {
+        this.index = event.params.index;
+
+        this.loadCurrent();
     }
 
     // --- Reactions to the <audio> element ---
@@ -167,6 +178,8 @@ export default class extends Controller
         this.artistsTarget.textContent = track.artists;
 
         this.renderWaveform(track.waveform);
+
+        this.renderUpcoming();
 
         this.dispatch('change', { detail: { url: track.url } });
 
@@ -244,5 +257,24 @@ export default class extends Controller
             [result[i], result[j]] = [result[j], result[i]];
         }
         return result;
+    }
+    
+    renderUpcoming()
+    {
+        const first = this.index + 1;
+        const rows = this.queue.slice(first).map((track, offset) => this.createUpcomingRow(track, first + offset));
+
+        this.upcomingTarget.replaceChildren(...rows);
+    }
+
+    createUpcomingRow(track, index)
+    {
+        const row = this.upcomingRowTarget.content.cloneNode(true);
+
+        row.querySelector('.track-title').textContent = track.title;
+        row.querySelector('.track-artists').textContent = track.artists;
+        row.querySelector('button').dataset.playerIndexParam = index;
+
+        return row;
     }
 }

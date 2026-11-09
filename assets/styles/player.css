@@ -63,6 +63,10 @@
     display: none;
 }
 
+.player-upcoming {
+    display: none;
+}
+
 .icon-pause {
     display: none;
 }
@@ -86,8 +90,6 @@
 .player-option[data-mode="one"] .icon-repeat-one {
     display: block;
 }
-
-
 
 /* --- Progress --- */
 
@@ -163,13 +165,16 @@
         "track track track"
         "wave wave wave"
         "elapsed . duration"
-        "controls controls controls";
-    align-content: center;
+        "controls controls controls"
+        "upcoming upcoming upcoming";
+    align-content: safe center;
     gap: 16px;
     padding: 24px;
     background: black;
     color: white;
     border-top: none;
+    max-height: 100dvh;
+    overflow-y: auto;
 }
 
 .player.is-expanded .player-close {
@@ -250,6 +255,47 @@
     display: none;
 }
 
+.player.is-expanded .player-upcoming {
+    display: block;
+    grid-area: upcoming;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.player.is-expanded .player-upcoming:has(.player-queue:empty) {
+    display: none;
+}
+
+.player-upcoming h2 {
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.player-queue {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.player-queue-row {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 6px 8px;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.player-queue-row:hover {
+    background: rgb(255 255 255 / 10%);
+}
+
 /* --- Responsive --- */
 
 @media (min-width: 1024px) {
@@ -262,6 +308,7 @@
         inset: auto 20px 20px auto;
         width: 340px;
         border-radius: 20px;
+        max-height: calc(100dvh - 40px);
     }
 
     .player-track {

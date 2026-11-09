@@ -117,6 +117,19 @@
         >
     </div>
 
+    <section class="player-upcoming">
+        <h2>À suivre</h2>
+        <ol class="player-queue" data-player-target="upcoming"></ol>
+        <template data-player-target="upcomingRow">
+            <li>
+                <button type="button" class="player-queue-row" data-action="player#jumpTo">
+                    <span class="track-title"></span>
+                    <span class="track-artists"></span>
+                </button>
+            </li>
+        </template>
+    </section>
+
     <audio
         data-player-target="audio"
         data-action="
