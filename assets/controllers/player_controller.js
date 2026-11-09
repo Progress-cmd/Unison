@@ -12,6 +12,7 @@ export default class extends Controller
         'duration',
         'progress',
         'bars',
+        'expand',
     ];
 
     queue = [];
@@ -69,6 +70,16 @@ export default class extends Controller
     setVolume(event)
     {
         this.audioTarget.volume = event.target.value;
+    }
+
+    toggleExpanded()
+    {
+        this.setExpanded(!this.element.classList.contains('is-expanded'));
+    }
+
+    collapse()
+    {
+        this.setExpanded(false);
     }
 
     // --- Reactions to the <audio> element ---
@@ -146,5 +157,11 @@ export default class extends Controller
         const rest = Math.floor(seconds % 60);
 
         return `${minutes}:${String(rest).padStart(2, '0')}`;
+    }
+
+    setExpanded(expanded)
+    {
+        this.element.classList.toggle('is-expanded', expanded);
+        this.expandTarget.setAttribute('aria-expanded', expanded);
     }
 }

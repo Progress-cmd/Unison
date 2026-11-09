@@ -2,16 +2,35 @@
     id="player"
     class="player"
     data-controller="player"
-    data-action="track-list:play@window->player#play"
+    data-action="
+        track-list:play@window->player#play
+        keydown.esc@window->player#collapse
+    "
     data-turbo-permanent
 >
-    <div class="player-track">
+    <button
+        type="button"
+        class="icon-btn player-close"
+        aria-label="Fermer le lecteur détaillé"
+        data-action="player#collapse"
+    >
+        {{ ux_icon('material-symbols:keyboard-arrow-down') }}
+    </button>
+
+    <button
+        type="button"
+        class="player-track"
+        aria-label="Lecteur détaillé"
+        aria-expanded="false"
+        data-player-target="expand"
+        data-action="player#toggleExpanded"
+    >
         <img class="track-cover desktop-only" data-player-target="cover" alt="">
-        <div class="track-info">
+        <span class="track-info">
             <span class="track-title" data-player-target="title"></span>
             <span class="track-artists" data-player-target="artists"></span>
-        </div>
-    </div>
+        </span>
+    </button>
 
     <div class="player-controls">
         <button
@@ -44,7 +63,7 @@
         </button>
     </div>
 
-    <span class="player-time desktop-only" data-player-target="elapsed">0:00</span>
+    <span class="player-time desktop-only player-elapsed " data-player-target="elapsed">0:00</span>
 
     <div class="player-wave">
         <div class="player-bars" data-player-target="bars"></div>
@@ -61,7 +80,7 @@
         >
     </div>
 
-    <span class="player-time desktop-only" data-player-target="duration">0:00</span>
+    <span class="player-time desktop-only player-duration" data-player-target="duration">0:00</span>
 
     <div class="player-volume">
         {{ ux_icon('material-symbols:volume-up') }}

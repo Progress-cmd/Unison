@@ -20,6 +20,13 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    padding: 0;
+    background: none;
+    border: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
 }
 
 /* --- Controls --- */
@@ -45,6 +52,11 @@
 .player-play:hover {
     background: var(--color-accent-hover);
     color: white;
+}
+
+/* Only shown in the detailed card. Must also stay after components.css. */
+.player-close {
+    display: none;
 }
 
 .icon-pause {
@@ -120,12 +132,110 @@
     display: none;
 }
 
+/* --- Detailed card --- */
+
+.player.is-expanded {
+    inset: 0;
+    z-index: 10;
+    height: auto;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+        "close close close"
+        "track track track"
+        "wave wave wave"
+        "elapsed . duration"
+        "controls controls controls";
+    align-content: center;
+    gap: 16px;
+    padding: 24px;
+    background: black;
+    color: white;
+    border-top: none;
+}
+
+.player.is-expanded .player-close {
+    display: flex;
+    grid-area: close;
+    justify-self: end;
+}
+
+.player.is-expanded .player-track {
+    grid-area: track;
+    flex-direction: column;
+    text-align: center;
+}
+
+.player.is-expanded .track-cover {
+    display: block;
+    width: 220px;
+    height: 220px;
+    border-radius: 12px;
+}
+
+.player.is-expanded .track-info {
+    flex: none;
+    width: 100%;
+}
+
+.player.is-expanded .track-artists,
+.player.is-expanded .player-time {
+    color: rgb(255 255 255 / 70%);
+}
+
+.player.is-expanded .player-time {
+    display: block;
+}
+
+.player.is-expanded .player-elapsed {
+    grid-area: elapsed;
+    text-align: left;
+}
+
+.player.is-expanded .player-duration {
+    grid-area: duration;
+    text-align: right;
+}
+
+.player.is-expanded .player-wave {
+    grid-area: wave;
+    height: 64px;
+}
+
+.player.is-expanded .player-bars span {
+    background: rgb(255 255 255 / 35%);
+}
+
+.player.is-expanded .player-bars span.is-played {
+    background: var(--color-accent);
+}
+
+.player.is-expanded .player-bars span:not(:nth-child(3n)) {
+    display: block;
+}
+
+.player.is-expanded .player-controls {
+    grid-area: controls;
+    justify-content: center;
+    gap: 24px;
+}
+
+.player.is-expanded .player-volume {
+    display: none;
+}
+
 /* --- Responsive --- */
 
 @media (min-width: 1024px) {
     .player {
         bottom: 0;
         left: var(--sidebar-width);
+    }
+
+    .player.is-expanded {
+        inset: auto 20px 20px auto;
+        width: 340px;
+        border-radius: 20px;
     }
 
     .player-track {
