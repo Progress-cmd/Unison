@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus';
+import SoundAnalyser from '../player/sound_analyser.js';
 
 export default class extends Controller
 {
@@ -24,6 +25,11 @@ export default class extends Controller
     repeat = 'off';
     shuffle = false;
     sourceQueue = [];
+
+    initialize()
+    {
+        this.sound = new SoundAnalyser(this.audioTarget, 120);
+    }
 
     // --- Actions, called from the HTML ---
 
@@ -121,18 +127,27 @@ export default class extends Controller
         this.loadCurrent();
     }
 
+    wakeSound()
+    {
+        this.sound.wake();
+    }
+
     // --- Reactions to the <audio> element ---
 
     showPlaying()
     {
         this.element.classList.add('is-playing');
         this.toggleTarget.setAttribute('aria-label', 'Pause');
+
+        this.startAnimation();
     }
 
     showPaused()
     {
         this.element.classList.remove('is-playing');
         this.toggleTarget.setAttribute('aria-label', 'Lecture');
+
+        this.stopAnimation();
     }
 
     updateDuration()
@@ -199,8 +214,10 @@ export default class extends Controller
     {
         const bar = document.createElement('span');
         const level = Math.pow(peak / 255, 1.5);
+        const height = `${Math.max(level * 100, 6)}%`;
 
-        bar.style.height = `${Math.max(level * 100, 6)}%`;
+        bar.style.height = height;
+        bar.dataset.height = height;
 
         return bar;
     }
@@ -276,5 +293,26 @@ export default class extends Controller
         row.querySelector('button').dataset.playerIndexParam = index;
 
         return row;
+    }
+
+    startAnimation()
+    {
+        cancelAnimationFrame(this.frame);
+        this.frame = requestAnimationFrame(() => this.drawLevels());
+    }
+
+    drawLevels()
+    {
+        const bars = this.barsTarget.children;
+
+        this.sound.levels().forEach((level, index) => { bars[index].style.height = `${Math.max(level * 100, 6)}%`; });
+        this.startAnimation();
+    }
+
+    stopAnimation()
+    {
+        cancelAnimationFrame(this.frame);
+
+        Array.from(this.barsTarget.children).forEach(bar => { bar.style.height = bar.dataset.height; });
     }
 }
