@@ -3,6 +3,7 @@
 namespace App\Import\Service;
 
 use App\Account\Entity\User;
+use App\Import\Entity\ImportJob;
 use App\Import\Message\ImportTrack;
 use App\Library\Entity\Album;
 use App\Library\Repository\AlbumRepository;
@@ -18,7 +19,7 @@ class PlaylistImporter
         private readonly MessageBusInterface $messageBus,
     ) {}
 
-    public function import(string $url, User $user): void
+    public function import(string $url, User $user): string
     {
         $playlist = $this->ytDlpClient->fetchPlaylist($url);
         $title = $this->albumTitle($playlist['title']);
@@ -33,8 +34,15 @@ class PlaylistImporter
             if (in_array($entry['title'], ['[Private video]', '[Deleted video]'], true)) {
                 continue;
             }
-            $this->messageBus->dispatch(new ImportTrack($entry['url'], $user->getId(), $album?->getId(), null !== $album ? $index + 1 : null));
+            $job = new ImportJob($entry['url'], $user);
+
+            $this->em->persist($job);
+
+            $this->em->flush();
+
+            $this->messageBus->dispatch(new ImportTrack($entry['url'], $user->getId(), $album?->getId(), null !== $album ? $index + 1 : null, $job->getId()));
         }
+        return $playlist['title'];
     }
 
     private function albumTitle(string $playlistTitle): ?string
