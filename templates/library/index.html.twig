@@ -4,7 +4,11 @@
 
 {% block body %}
 <h1>Bibliothèque</h1>
-<ul class="track-list" data-controller="track-list">
+<ul 
+    class="track-list"
+    data-controller="track-list"
+    data-action="player:change@window->track-list#highlight"
+>
     {% for track in tracks %}
         {% include 'library/_track.html.twig' with {index: loop.index0} %}
     {% else %}

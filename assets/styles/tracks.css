@@ -43,3 +43,12 @@
 .track-duration {
     font-variant-numeric: tabular-nums;
 }
+
+.track[aria-current="true"] {
+    background: var(--color-accent-soft);
+    border-radius: 8px;
+}
+
+.track[aria-current="true"] .track-title {
+    font-weight: 500;
+}

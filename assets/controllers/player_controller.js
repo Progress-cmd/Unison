@@ -108,12 +108,15 @@ export default class extends Controller
     {
         const track = this.queue[this.index];
 
+        document.documentElement.dataset.currentUrl = track.url;
         this.audioTarget.src = track.url;
         this.coverTarget.src = track.cover;
         this.titleTarget.textContent = track.title;
         this.artistsTarget.textContent = track.artists;
 
         this.renderWaveform(track.waveform);
+
+        this.dispatch('change', { detail: { url: track.url } });
 
         this.audioTarget.play();
     }
