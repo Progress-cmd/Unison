@@ -8,4 +8,17 @@
     {{ form_row(form.urls) }}
     <button type="submit" class="btn">Importer</button>
 {{ form_end(form) }}
+{% set statusLabels = {pending: 'En attente', done: 'Terminé', duplicate: 'Déjà présent', failed: 'Échoué'} %}
+<h2>Imports récents</h2>
+<ul class="import-list">
+    {% for job in jobs %}
+        <li class="import-item">
+            <span class="import-url">{{ job.title ?? job.url }}</span>
+            <span class="import-date">{{ job.createdAt|date('d/m H:i') }}</span>
+            <span class="import-status">{{ statusLabels[job.status.value] }}</span>
+        </li>
+    {% else %}
+        <li>Aucun import pour l'instant.</li>
+    {% endfor %}
+</ul>
 {% endblock %}
