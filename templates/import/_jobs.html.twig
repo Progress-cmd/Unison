@@ -1,0 +1,64 @@
+{% set statusLabels = {pending: 'En attente', done: 'Terminé', duplicate: 'Déjà présent', failed: 'Échoué'} %}
+{% set statusIcons = {
+    pending: 'material-symbols:progress-activity',
+    done: 'material-symbols:check-circle-outline',
+    duplicate: 'material-symbols:check-circle-outline',
+    failed: 'material-symbols:cancel-outline',
+} %}
+
+{% set pendingCount = jobs|filter(job => job.status.value == 'pending')|length %}
+{% set failedCount = jobs|filter(job => job.status.value == 'failed')|length %}
+
+{% set summary = [] %}
+{% if pendingCount %}
+    {% set summary = summary|merge([pendingCount ~ ' en cours']) %}
+{% endif %}
+{% if failedCount %}
+    {% set summary = summary|merge([failedCount ~ (failedCount > 1 ? ' échoués' : ' échoué')]) %}
+{% endif %}
+
+{% set today = 'now'|date('Y-m-d') %}
+{% set yesterday = '-1 day'|date('Y-m-d') %}
+{% set previousDay = '' %}
+
+<turbo-frame id="import-jobs">
+    <div class="import-card">
+        <header class="import-card-header">
+            <h2 class="import-heading">Imports récents</h2>
+            {% if summary %}
+                <span class="import-summary">{{ summary|join(' · ') }}</span>
+            {% endif %}
+        </header>
+
+        <ul class="import-list" {% if pendingCount %}data-controller="auto-reload"{% endif %}>
+            {% for job in jobs %}
+                {% set day = job.createdAt|date('Y-m-d') %}
+                {% if day != previousDay %}
+                    <li class="import-day">{{ day == today ? "Aujourd'hui" : (day == yesterday ? 'Hier' : job.createdAt|date('d/m/Y')) }}</li>
+                {% endif %}
+                {% set previousDay = day %}
+
+                <li class="import-item import-item--{{ job.status.value }}">
+                    <span
+                        class="import-icon"
+                        role="img"
+                        title="{{ statusLabels[job.status.value] }}"
+                        aria-label="{{ statusLabels[job.status.value] }}"
+                    >
+                        {{ ux_icon(statusIcons[job.status.value]) }}
+                    </span>
+                    <span class="import-url">{{ job.title ?? job.url }}</span>
+                    {% if job.status.value == 'duplicate' %}
+                        <span class="import-note">Déjà présent</span>
+                    {% endif %}
+                    <time class="import-date" datetime="{{ job.createdAt|date('c') }}">{{ job.createdAt|date('H:i') }}</time>
+                    {% if job.error %}
+                        <span class="import-error">{{ job.error }}</span>
+                    {% endif %}
+                </li>
+            {% else %}
+                <li class="import-empty">Aucun import pour l'instant.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</turbo-frame>

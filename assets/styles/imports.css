@@ -1,0 +1,140 @@
+/* --- Page --- */
+
+.import-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+    align-items: start;
+}
+
+.import-submit {
+    align-self: flex-end;
+}
+
+/* --- Card --- */
+
+.import-card {
+    padding: 16px 20px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+}
+
+.import-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.import-heading {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 500;
+}
+
+.import-summary,
+.import-date,
+.import-note,
+.import-empty {
+    font-size: 14px;
+    color: var(--color-text-muted);
+}
+
+/* --- List --- */
+
+.import-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.import-day {
+    padding: 14px 0 4px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+}
+
+.import-empty {
+    padding-top: 12px;
+}
+
+.import-item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 2px 10px;
+    padding: 6px 0;
+}
+
+.import-url {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Without "Déjà présent", the time must stay in the last column. */
+.import-date {
+    grid-column: -2;
+}
+
+.import-error {
+    grid-column: 2 / -1;
+    font-size: 14px;
+    color: var(--color-error);
+}
+
+/* --- Status icons --- */
+
+.import-icon {
+    display: flex;
+    color: var(--color-text-muted);
+}
+
+.import-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.import-item--done .import-icon {
+    color: var(--color-success);
+}
+
+.import-item--pending .import-icon {
+    color: var(--color-accent);
+}
+
+.import-item--failed .import-icon {
+    color: var(--color-error);
+}
+
+.import-item--pending .import-url {
+    color: var(--color-text-muted);
+}
+
+.import-item--pending .import-icon svg {
+    animation: import-spin 1s linear infinite;
+}
+
+@keyframes import-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* --- Responsive --- */
+
+@media (prefers-reduced-motion: reduce) {
+    .import-item--pending .import-icon svg {
+        animation: none;
+    }
+}
+
+@media (min-width: 1024px) {
+    .import-page {
+        grid-template-columns: 460px minmax(0, 1fr);
+    }
+}

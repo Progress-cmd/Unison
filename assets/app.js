@@ -12,3 +12,4 @@ import './styles/components.css';
 import './styles/navbar.css';
 import './styles/player.css';
 import './styles/tracks.css';
+import './styles/imports.css';

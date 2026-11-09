@@ -19,7 +19,7 @@ use Doctrine\ORM\EntityManagerInterface;
 final class ImportController extends AbstractController
 {
     #[Route('/import', name: 'app_import')]
-    public function index(Request $request, MessageBusInterface $messageBus, #[CurrentUser] User $user, EntityManagerInterface $em, ImportJobRepository $importJobRepository): Response
+    public function index(Request $request, MessageBusInterface $messageBus, #[CurrentUser] User $user, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(ImportType::class);
 
@@ -55,6 +55,13 @@ final class ImportController extends AbstractController
 
         return $this->render('import/index.html.twig', [
             'form' => $form,
+        ]);
+    }
+
+    #[Route('/import/jobs', name: 'app_import_jobs')]
+    public function jobs(ImportJobRepository $importJobRepository, #[CurrentUser] User $user): Response
+    {
+        return $this->render('import/_jobs.html.twig', [
             'jobs' => $importJobRepository->findRecentFor($user),
         ]);
     }
