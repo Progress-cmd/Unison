@@ -13,10 +13,12 @@ export default class extends Controller
         'progress',
         'bars',
         'expand',
+        'repeat',
     ];
 
     queue = [];
     index = 0;
+    repeat = 'off';
 
     // --- Actions, called from the HTML ---
 
@@ -43,11 +45,15 @@ export default class extends Controller
 
     next()
     {
-        if (this.index >= this.queue.length - 1) {
+        if (!this.queue.length) {
             return;
         }
 
-        this.index++;
+        if (this.index >= this.queue.length - 1 && this.repeat === 'off') {
+            return;
+        }
+
+        this.index = (this.index + 1) % this.queue.length;
         this.loadCurrent();
     }
 
@@ -82,6 +88,13 @@ export default class extends Controller
         this.setExpanded(false);
     }
 
+    toggleRepeat()
+    {
+        const nextMode = { off: 'all', all: 'one', one: 'off' };
+
+        this.setRepeat(nextMode[this.repeat]);
+    }
+
     // --- Reactions to the <audio> element ---
 
     showPlaying()
@@ -111,6 +124,19 @@ export default class extends Controller
         const played = bars.length * this.audioTarget.currentTime / this.audioTarget.duration;
 
         bars.forEach((bar, index) => bar.classList.toggle('is-played', index < played));
+    }
+
+    trackEnded()
+    {
+        if (this.repeat === 'one') {
+            this.setRepeat('off');
+
+            this.audioTarget.currentTime = 0;
+            this.audioTarget.play();
+
+            return;
+        }
+        this.next();
     }
 
     // --- Internal helpers ---
@@ -163,5 +189,16 @@ export default class extends Controller
     {
         this.element.classList.toggle('is-expanded', expanded);
         this.expandTarget.setAttribute('aria-expanded', expanded);
+    }
+
+    setRepeat(mode)
+    {
+        const labels = { off: 'Répéter', all: 'Répéter tous les morceaux', one: 'Répéter ce morceau une fois' };
+
+        this.repeat = mode;
+        this.repeatTarget.dataset.mode = mode;
+
+        this.repeatTarget.setAttribute('aria-pressed', mode !== 'off');
+        this.repeatTarget.setAttribute('aria-label', labels[mode]);
     }
 }

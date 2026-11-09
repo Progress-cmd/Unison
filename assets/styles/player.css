@@ -59,6 +59,10 @@
     display: none;
 }
 
+.player-option {
+    display: none;
+}
+
 .icon-pause {
     display: none;
 }
@@ -70,6 +74,20 @@
 .is-playing .icon-pause {
     display: block;
 }
+
+.icon-repeat-one {
+    display: none;
+}
+
+.player-option[data-mode="one"] .icon-repeat {
+    display: none;
+}
+
+.player-option[data-mode="one"] .icon-repeat-one {
+    display: block;
+}
+
+
 
 /* --- Progress --- */
 
@@ -158,6 +176,14 @@
     display: flex;
     grid-area: close;
     justify-self: end;
+}
+
+.player.is-expanded .player-option {
+    display: flex;
+}
+
+.player.is-expanded .player-option[aria-pressed="true"] {
+    color: var(--color-accent);
 }
 
 .player.is-expanded .player-track {

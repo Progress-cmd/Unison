@@ -61,6 +61,18 @@
         >
             {{ ux_icon('material-symbols:skip-next') }}
         </button>
+
+        <button
+            type="button"
+            class="icon-btn player-option"
+            aria-label="Répéter"
+            aria-pressed="false"
+            data-player-target="repeat"
+            data-action="player#toggleRepeat"
+        >
+            {{ ux_icon('material-symbols:repeat', {class: 'icon-repeat'}) }}
+            {{ ux_icon('material-symbols:repeat-one', {class: 'icon-repeat-one'}) }}
+        </button>
     </div>
 
     <span class="player-time desktop-only player-elapsed " data-player-target="elapsed">0:00</span>
@@ -102,7 +114,7 @@
             pause->player#showPaused
             loadedmetadata->player#updateDuration
             timeupdate->player#updateProgress
-            ended->player#next
+            ended->player#trackEnded
         "
     ></audio>
 </div>
