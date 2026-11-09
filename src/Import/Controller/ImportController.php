@@ -23,15 +23,17 @@ final class ImportController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $url = $form->get('url')->getData();
+            $urls = $form->get('urls')->getData();
 
-            if ($this->isPlaylist($url)) {
-                $messageBus->dispatch(new ImportPlaylist($url, $user->getId()));
-            } else {
-                $messageBus->dispatch(new ImportTrack($url, $user->getId()));
+            foreach ($urls as $url) {
+                if ($this->isPlaylist($url)) {
+                    $messageBus->dispatch(new ImportPlaylist($url, $user->getId()));
+                } else {
+                    $messageBus->dispatch(new ImportTrack($url, $user->getId()));
+                }
             }
 
-            $this->addFlash('success', 'Import ajouté à la file d\'attente.');
+            $this->addFlash('success', 'Imports ajoutés à la file d\'attente.');
 
             return $this->redirectToRoute('app_import');
         }
