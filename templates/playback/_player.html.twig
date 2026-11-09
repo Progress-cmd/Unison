@@ -35,6 +35,16 @@
     <div class="player-controls">
         <button
             type="button"
+            class="icon-btn player-option"
+            aria-label="Lecture aléatoire"
+            aria-pressed="false"
+            data-player-target="shuffle"
+            data-action="player#toggleShuffle"
+        >
+            {{ ux_icon('material-symbols:shuffle') }}
+        </button>
+        <button
+            type="button"
             class="icon-btn"
             aria-label="Morceau précédent"
             data-action="player#previous"

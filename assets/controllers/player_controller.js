@@ -14,18 +14,24 @@ export default class extends Controller
         'bars',
         'expand',
         'repeat',
+        'shuffle',
     ];
 
     queue = [];
     index = 0;
     repeat = 'off';
+    shuffle = false;
+    sourceQueue = [];
 
     // --- Actions, called from the HTML ---
 
     play(event)
     {
+        this.sourceQueue = event.detail.tracks;
         this.queue = event.detail.tracks;
         this.index = event.detail.index;
+
+        this.arrangeQueue();
 
         this.loadCurrent();
     }
@@ -93,6 +99,15 @@ export default class extends Controller
         const nextMode = { off: 'all', all: 'one', one: 'off' };
 
         this.setRepeat(nextMode[this.repeat]);
+    }
+
+    toggleShuffle()
+    {
+        this.shuffle = !this.shuffle;
+
+        this.shuffleTarget.setAttribute('aria-pressed', this.shuffle);
+        
+        this.arrangeQueue();
     }
 
     // --- Reactions to the <audio> element ---
@@ -200,5 +215,34 @@ export default class extends Controller
 
         this.repeatTarget.setAttribute('aria-pressed', mode !== 'off');
         this.repeatTarget.setAttribute('aria-label', labels[mode]);
+    }
+
+    arrangeQueue()
+    {
+        if (!this.queue.length) {
+            return; 
+        }
+        const current = this.queue[this.index];
+
+        if (this.shuffle) {
+            const others = this.sourceQueue.filter(track => track !== current);
+            
+            this.queue = [current, ...this.shuffled(others)];
+            this.index = 0;
+        } else {
+            this.queue = this.sourceQueue;
+            this.index = this.sourceQueue.indexOf(current);
+        }
+    }
+
+    shuffled(tracks)
+    {
+        const result = [...tracks];
+        
+        for (let i = result.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [result[i], result[j]] = [result[j], result[i]];
+        }
+        return result;
     }
 }
