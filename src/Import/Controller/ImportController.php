@@ -28,16 +28,25 @@ final class ImportController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $urls = $form->get('urls')->getData();
 
-            foreach ($urls as $url) {
-                $em->persist(new ImportJob($url, $user));
+            $jobs = [];
 
-                if ($this->isPlaylist($url)) {
-                    $messageBus->dispatch(new ImportPlaylist($url, $user->getId()));
-                } else {
-                    $messageBus->dispatch(new ImportTrack($url, $user->getId()));
-                }
+            foreach ($urls as $url) {
+                $job = new ImportJob($url, $user);
+
+                $em->persist($job);
+
+                $jobs[] = $job;
+
             }
             $em->flush();
+
+            foreach ($jobs as $job) {
+                if ($this->isPlaylist($job->getUrl())) {
+                    $messageBus->dispatch(new ImportPlaylist($job->getUrl(), $user->getId(), $job->getId()));
+                } else {
+                    $messageBus->dispatch(new ImportTrack($job->getUrl(), $user->getId(), jobId: $job->getId()));
+                }
+            }
 
             $this->addFlash('success', 'Imports ajoutés à la file d\'attente.');
 

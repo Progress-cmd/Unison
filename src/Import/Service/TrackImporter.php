@@ -33,7 +33,7 @@ class TrackImporter
 
         if (null !== $existing) {
             if (null === $album) {
-                throw new TrackAlreadyImportedException("Ce morceau est déjà dans la bibliothèque : ".$title);
+                throw new TrackAlreadyImportedException($title);
             }
 
             $existing->setAlbum($album);

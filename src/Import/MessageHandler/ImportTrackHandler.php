@@ -3,10 +3,13 @@
 namespace App\Import\MessageHandler;
 
 use App\Account\Repository\UserRepository;
+use App\Import\Enum\ImportStatus;
 use App\Import\Exception\TrackAlreadyImportedException;
 use App\Import\Message\ImportTrack;
 use App\Import\Service\TrackImporter;
+use App\Import\Repository\ImportJobRepository;
 use App\Library\Repository\AlbumRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 
@@ -17,6 +20,8 @@ class ImportTrackHandler
         private readonly UserRepository $userRepository,
         private readonly TrackImporter $trackImporter,
         private readonly AlbumRepository $albumRepository,
+        private readonly ImportJobRepository $importJobRepository,
+        private readonly EntityManagerInterface $em,
     ) {}
 
     public function __invoke(ImportTrack $message): void
@@ -37,10 +42,17 @@ class ImportTrackHandler
             }
         }
 
+        $job = null !== $message->jobId ? $this->importJobRepository->find($message->jobId) : null;
+
         try {
-            $this->trackImporter->import($message->url, $user, $album, $message->trackNumber);
+            $track = $this->trackImporter->import($message->url, $user, $album, $message->trackNumber);
+            
+            $job?->setStatus(ImportStatus::Done);
+            $job?->setTitle($track->getTitle());
         } catch (TrackAlreadyImportedException $e) {
-            throw new UnrecoverableMessageHandlingException($e->getMessage(), previous: $e);
+            $job?->setStatus(ImportStatus::Duplicate);
+            $job?->setTitle($e->trackTitle);
         }
+        $this->em->flush();
     }
 }

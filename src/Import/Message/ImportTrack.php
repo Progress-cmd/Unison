@@ -12,5 +12,6 @@ final readonly class ImportTrack
         public int $userId,
         public ?int $albumId = null,
         public ?int $trackNumber = null,
+        public ?int $jobId = null,
     ) {}
 }

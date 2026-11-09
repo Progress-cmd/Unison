@@ -10,5 +10,6 @@ final readonly class ImportPlaylist
     public function __construct(
         public string $url,
         public int $userId,
+        public ?int $jobId = null,
     ) {}
 }
