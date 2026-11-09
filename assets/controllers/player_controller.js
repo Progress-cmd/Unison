@@ -305,7 +305,9 @@ export default class extends Controller
     {
         const bars = this.barsTarget.children;
 
-        this.sound.levels().forEach((level, index) => { bars[index].style.height = `${Math.max(level * 100, 6)}%`; });
+        this.sound.levels().forEach((level, index) => {
+            bars[index].style.height = `${Math.max(level * 100, 6)}%`;
+        });
         this.startAnimation();
     }
 
