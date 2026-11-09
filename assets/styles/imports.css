@@ -7,6 +7,11 @@
     align-items: start;
 }
 
+/* .form is limited to 420px: here it fills its half of the page. */
+.import-page .form {
+    max-width: none;
+}
+
 .import-submit {
     align-self: flex-end;
 }
@@ -125,16 +130,60 @@
     }
 }
 
+/* --- Preview under the field --- */
+
+.import-preview:empty {
+    display: none;
+}
+
+.import-preview-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 3px 0;
+    font-size: 14px;
+}
+
+.import-preview-row .import-icon svg {
+    display: none;
+}
+
+.import-preview-row[data-state="ok"] .icon-ok,
+.import-preview-row[data-state="loading"] .icon-loading,
+.import-preview-row[data-state="playlist"] .icon-playlist,
+.import-preview-row[data-state="invalid"] .icon-failed,
+.import-preview-row[data-state="unknown"] .icon-failed {
+    display: block;
+}
+
+.import-preview-row[data-state="ok"] .import-icon {
+    color: var(--color-success);
+}
+
+.import-preview-row[data-state="loading"] .import-icon {
+    color: var(--color-accent);
+}
+
+.import-preview-row[data-state="loading"] .icon-loading {
+    animation: import-spin 1s linear infinite;
+}
+
+.import-preview-row[data-state="invalid"] .import-icon,
+.import-preview-row[data-state="invalid"] .import-url {
+    color: var(--color-error);
+}
+
 /* --- Responsive --- */
 
 @media (prefers-reduced-motion: reduce) {
-    .import-item--pending .import-icon svg {
+    .import-item--pending .import-icon svg,
+    .import-preview-row[data-state="loading"] .icon-loading {
         animation: none;
     }
 }
 
 @media (min-width: 1024px) {
     .import-page {
-        grid-template-columns: 460px minmax(0, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }

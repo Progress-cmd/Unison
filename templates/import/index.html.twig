@@ -5,8 +5,22 @@
 {% block body %}
 <h1>Importer</h1>
 <div class="import-page">
-    {{ form_start(form, {attr: {class: 'form'}}) }}
+    {{ form_start(form, {attr: {class: 'form', 'data-controller': 'import-preview'}}) }}
         {{ form_row(form.urls) }}
+
+        <ol class="import-list import-preview" data-import-preview-target="list"></ol>
+        <template data-import-preview-target="row">
+            <li class="import-preview-row">
+                <span class="import-icon">
+                    {{ ux_icon('material-symbols:check-circle-outline', {class: 'icon-ok'}) }}
+                    {{ ux_icon('material-symbols:progress-activity', {class: 'icon-loading'}) }}
+                    {{ ux_icon('material-symbols:playlist-play', {class: 'icon-playlist'}) }}
+                    {{ ux_icon('material-symbols:cancel-outline', {class: 'icon-failed'}) }}
+                </span>
+                <span class="import-url"></span>
+            </li>
+        </template>
+
         <button type="submit" class="btn import-submit">Importer</button>
     {{ form_end(form) }}
 

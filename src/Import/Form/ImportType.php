@@ -20,7 +20,12 @@ class ImportType extends AbstractType
                 ],
                 'label' => 'Liens YouTube',
                 'help' => 'Un lien par ligne. Les playlists sont acceptées.',
-                'attr' => ['rows' => 6, 'wrap' => 'off'],
+                'attr' => [
+                    'rows' => 6,
+                    'wrap' => 'off',
+                    'data-import-preview-target' => 'input',
+                    'data-action' => 'input->import-preview#refresh',
+                ],
             ])
         ;
         $builder->get('urls')->addModelTransformer(new CallbackTransformer(
