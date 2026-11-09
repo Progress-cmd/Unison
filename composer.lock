@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4ea83d6ee72f7c75cd87ac8dc0fd7f14",
+    "content-hash": "ac1901d2bdd19a4fa85fad5e11dada2e",
     "packages": [
         {
             "name": "composer/semver",
@@ -3286,7 +3286,8 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-11-04T08:27:22+00:00"
+            "time": "2026-11-04T08:27:22+00:00",
+            "published-time": "2026-11-04T11:28:32+00:00"
         },
         {
             "name": "symfony/http-client-contracts",

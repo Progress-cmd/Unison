@@ -8,6 +8,7 @@ use App\Import\Form\ImportType;
 use App\Import\Message\ImportPlaylist;
 use App\Import\Message\ImportTrack;
 use App\Import\Repository\ImportJobRepository;
+use App\Import\Service\YouTubeOEmbed;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +20,7 @@ use Doctrine\ORM\EntityManagerInterface;
 final class ImportController extends AbstractController
 {
     #[Route('/import', name: 'app_import')]
-    public function index(Request $request, MessageBusInterface $messageBus, #[CurrentUser] User $user, EntityManagerInterface $em): Response
+    public function index(Request $request, MessageBusInterface $messageBus, #[CurrentUser] User $user, EntityManagerInterface $em, YouTubeOEmbed $youTubeOEmbed): Response
     {
         $form = $this->createForm(ImportType::class);
 
@@ -32,6 +33,8 @@ final class ImportController extends AbstractController
 
             foreach ($urls as $url) {
                 $job = new ImportJob($url, $user);
+
+                $job->setTitle($youTubeOEmbed->fetchTitle($url));
 
                 $em->persist($job);
 

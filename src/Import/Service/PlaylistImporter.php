@@ -36,6 +36,8 @@ class PlaylistImporter
             }
             $job = new ImportJob($entry['url'], $user);
 
+            $job->setTitle(mb_substr($entry['title'], 0, 255));
+            
             $this->em->persist($job);
 
             $this->em->flush();
