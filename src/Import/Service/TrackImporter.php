@@ -26,6 +26,11 @@ class TrackImporter
 
     public function import(string $url, User $user, ?Album $album = null, ?int $trackNumber = null): Track
     {
+        $existing = $this->findExisting($url);
+        
+        if (null !== $existing && (null === $album || $existing->getAlbum() === $album)) {
+            throw new TrackAlreadyImportedException($existing->getTitle());
+        }
         $metadata = $this->ytDlpClient->fetchMetadata($url);
         $title = $metadata['track'] ?? $metadata['title'];
 
@@ -116,5 +121,15 @@ class TrackImporter
         foreach ($track->getArtists() as $artist) {
             $album->addArtist($artist);
         }
+    }
+
+    private function findExisting(string $url): ?Track
+    {
+        if (1 !== preg_match('#(?:[?&]v=|youtu\.be/)([\w-]{11})#', $url, $matches)) {
+            return null;
+        }
+        return $this->trackRepository->findOneBy([
+            'sourceUrl' => 'https://www.youtube.com/watch?v='.$matches[1]
+        ]);
     }
 }
