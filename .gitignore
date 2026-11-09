@@ -6,5 +6,6 @@ musics_storage/
 
 ###> symfony/asset-mapper ###
 /public/assets/
+/public/covers/
 /assets/vendor/
 ###< symfony/asset-mapper ###

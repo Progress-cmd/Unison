@@ -22,6 +22,7 @@ class TrackImporter
         private readonly EntityManagerInterface $em,
         #[Autowire('%env(resolve:MUSIC_DIR)%')]
         private readonly string $musicDir,
+        private readonly CoverDownloader $coverDownloader,
     ) {}
 
     public function import(string $url, User $user, ?Album $album = null, ?int $trackNumber = null): Track
@@ -53,6 +54,11 @@ class TrackImporter
 
         $fileName = $this->ytDlpClient->downloadAudio($metadata['webpage_url']);
         $waveform = $this->waveformGenerator->generate($this->musicDir . '/' . $fileName);
+        $cover = $metadata['thumbnail'] ?? null;
+
+        if (null !== $cover) {
+            $cover = $this->coverDownloader->download($cover, $metadata['id']) ?? $cover;
+        }
 
         $track = new Track();
         $track->setTitle(mb_substr($title, 0, 255));
@@ -60,7 +66,7 @@ class TrackImporter
         $track->setWaveform($waveform);
         $track->setFileName($fileName);
         $track->setSourceUrl($metadata['webpage_url']);
-        $track->setCover($metadata['thumbnail'] ?? null);
+        $track->setCover($cover);
         $track->setAddedBy($user);
         $track->setAlbum($album);
         $track->setSourceAlbum($album);
