@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - Playlist{% endblock %}
+
+{% block body %}
+<h1>{{ playlist.name }}</h1>
+{% include 'library/_tabs.html.twig' with {active: 'playlists'} %}
+<ul 
+    class="track-list"
+    data-controller="track-list"
+    data-action="player:change@window->track-list#highlight"
+>
+    {% for playlistTrack in playlist.playlistTracks %}
+        {% include 'library/_track.html.twig' with {index: loop.index0, track: playlistTrack.track} %}
+    {% else %}
+        <li>Aucun morceau pour l'instant.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

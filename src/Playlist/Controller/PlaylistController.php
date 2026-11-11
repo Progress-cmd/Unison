@@ -40,4 +40,12 @@ final class PlaylistController extends AbstractController
             'mine' => $mine,
         ]);
     }
+
+    #[Route('/playlists/{id}', name: 'app_playlist_show', requirements: ['id' => '[0-9]+'])]
+    public function show(Playlist $playlist): Response
+    {
+        return $this->render('playlist/show.html.twig', [
+            'playlist' => $playlist
+        ]);
+    }
 }
