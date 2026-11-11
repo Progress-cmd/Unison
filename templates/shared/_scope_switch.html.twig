@@ -1,0 +1,17 @@
+{% set scope = app.session.get('scope', 'all') %}
+
+<form class="segmented" action="{{ path('app_scope') }}" method="post">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('scope') }}">
+    <button
+        type="submit"
+        name="scope"
+        value="all"
+        aria-pressed="{{ scope == 'all' ? 'true' : 'false' }}"
+    >Nous</button>
+    <button
+        type="submit"
+        name="scope"
+        value="mine"
+        aria-pressed="{{ scope == 'mine' ? 'true' : 'false' }}"
+    >Moi</button>
+</form>

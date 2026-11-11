@@ -28,6 +28,11 @@
         {% endif %}
 
         <main>
+            {% if app.user %}
+                <header class="topbar">
+                    {% include "shared/_scope_switch.html.twig" %}
+                </header>
+            {% endif %}
             <div class="notif">
                 {% for message in app.flashes('success') %}
                     <p class="alert alert-success">{{ message }}</p>

@@ -36,11 +36,12 @@ class Playlist
     #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $playlistTracks;
 
-    public function __construct()
+    public function __construct(User $createdBy)
     {
         $this->playlistTracks = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->createdBy = $createdBy;
     }
 
     public function getId(): ?int

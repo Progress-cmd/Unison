@@ -4,6 +4,7 @@
 
 {% block body %}
 <h1>Bibliothèque</h1>
+{% include 'library/_tabs.html.twig' with {active: 'tracks'} %}
 <ul 
     class="track-list"
     data-controller="track-list"

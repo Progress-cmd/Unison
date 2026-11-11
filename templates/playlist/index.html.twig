@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - Playlists{% endblock %}
+
+{% block body %}
+<h1>Playlists</h1>
+{% include 'library/_tabs.html.twig' with {active: 'playlists'} %}
+{{ form_start(form, {attr: {class: 'form'}}) }}
+    {{ form_row(form.name) }}
+    <button type="submit" class="btn">Créer</button>
+{{ form_end(form) }}
+<h2>{% if mine %}Mes playlists{% else %}Nos playlists{% endif %}</h2>
+<ul>
+    {% for playlist in playlists %}
+        <li>{{ playlist.name }} - {{ playlist.createdBy.username }}</li>
+    {% else %}
+        <li>{% if mine %}Aucune playlist possédée{% else %}Aucune playlist{% endif %}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

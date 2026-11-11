@@ -12,6 +12,13 @@ main {
     display: none;
 }
 
+/* App-wide settings at the top right of the content. Floated so the page
+   title stays on the same line instead of being pushed down. */
+.topbar {
+    float: right;
+    margin: 4px 0 0 16px;
+}
+
 @media (min-width: 1024px) {
     .navbar ~ main {
         margin-left: var(--sidebar-width);
