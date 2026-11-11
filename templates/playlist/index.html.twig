@@ -5,14 +5,32 @@
 {% block body %}
 <h1>Playlists</h1>
 {% include 'library/_tabs.html.twig' with {active: 'playlists'} %}
-{{ form_start(form, {attr: {class: 'form'}}) }}
+{{ form_start(form, {attr: {class: 'form playlist-create'}}) }}
     {{ form_row(form.name) }}
     <button type="submit" class="btn">Créer</button>
 {{ form_end(form) }}
 <h2>{% if mine %}Mes playlists{% else %}Nos playlists{% endif %}</h2>
-<ul>
+<ul class="playlist-list">
     {% for playlist in playlists %}
-        <li>{{ playlist.name }} - {{ playlist.createdBy.username }}</li>
+        <li>
+            <a href="#" class="playlist-row">
+                <span class="playlist-cover">
+                    {{ ux_icon('material-symbols:queue-music') }}
+                </span>
+                <span class="playlist-info">
+                    <span class="playlist-name">
+                        {{ playlist.name }}
+                    </span>
+                    <span class="playlist-meta">
+                        {{ playlist.createdBy.username }} · 
+                        {{ playlist.playlistTracks | length }}{% if playlist.playlistTracks | length < 2 %} titre{% else %} titres{% endif %}
+                    </span>
+                </span>
+                <span class="playlist-chevron">
+                    {{ ux_icon('material-symbols:chevron-right') }}
+                </span>
+            </a>
+        </li>
     {% else %}
         <li>{% if mine %}Aucune playlist possédée{% else %}Aucune playlist{% endif %}</li>
     {% endfor %}
