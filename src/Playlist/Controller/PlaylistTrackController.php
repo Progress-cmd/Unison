@@ -51,6 +51,34 @@ class PlaylistTrackController extends AbstractController
 
         $this->addFlash('success', 'Titre ajouté à '.$playlist->getName());
 
+        return $this->redirectToRoute('app_library',
+            ['id' => $playlist->getId()]
+        );
+    }
+
+    #[Route('/playlists/{id}/tracks/remove', name: 'app_playlist_remove_track', methods: ['POST'])]
+    public function delete(Request $request, EntityManagerInterface $em, PlaylistTrackRepository $playlistTrackRepository, Playlist $playlist): Response
+    {
+        if (!$this->isCsrfTokenValid('playlist_remove_track', $request->request->getString('_csrf_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $track = $request->request->getInt('track');
+        
+        $playlistTrack = $playlistTrackRepository->findOneBy(['track' => $track, 'playlist' => $playlist]);
+
+        if (null === $playlistTrack) {
+            $this->addFlash('warning', 'Ce titre n\'est plus dans la playlist');
+            return $this->redirectToRoute('app_playlist_show',
+                ['id' => $playlist->getId()]
+            );
+        }
+
+        $em->remove($playlistTrack);
+        $em->flush();
+
+        $this->addFlash('success', 'Titre retiré de '.$playlist->getName());
+
         return $this->redirectToRoute('app_playlist_show',
             ['id' => $playlist->getId()]
         );

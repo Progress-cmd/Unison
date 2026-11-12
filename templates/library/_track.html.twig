@@ -31,7 +31,7 @@
     </div>
 
     <span class="track-duration">{{ track.duration|duration }}</span>
-    {% if hideAdd is not defined %}
+    {% if inPlaylist is not defined %}
         <button
             type="button"
             class="icon-btn"
@@ -41,5 +41,11 @@
         >
             {{ ux_icon('material-symbols:playlist-add') }}
         </button>
+    {% else %}
+        <form method="post" action="{{ path('app_playlist_remove_track', {id: playlist.id}) }}">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('playlist_remove_track') }}">
+            <input type="hidden" name="track" value="{{ track.id }}">
+            <button class="icon-btn" aria-label="Retirer de la playlist " type="submit">{{ ux_icon('material-symbols:playlist-remove') }}</button>
+        </form>
     {% endif %}
 </li>

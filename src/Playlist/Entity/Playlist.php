@@ -33,7 +33,7 @@ class Playlist
      * @var Collection<int, PlaylistTrack>
      */
     #[ORM\OneToMany(targetEntity: PlaylistTrack::class, mappedBy: 'playlist')]
-    #[ORM\OrderBy(['position' => 'ASC'])]
+    #[ORM\OrderBy(['position' => 'DESC'])]
     private Collection $playlistTracks;
 
     public function __construct(User $createdBy)
