@@ -83,4 +83,51 @@ class PlaylistTrackController extends AbstractController
             ['id' => $playlist->getId()]
         );
     }
+
+    #[Route('/playlists/{id}/tracks/move', name: 'app_playlist_move_track', methods: ['POST'])]
+    public function move(Request $request, EntityManagerInterface $em, PlaylistTrackRepository $playlistTrackRepository, Playlist $playlist): Response
+    {
+        if (!$this->isCsrfTokenValid('playlist_move_track', $request->request->getString('_csrf_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $direction = $request->request->getString('direction');
+
+        if (!in_array($direction, ['up', 'down'], true)) {
+            return $this->redirectToRoute('app_playlist_show',
+                ['id' => $playlist->getId()]
+            );
+        }
+
+        $trackId = $request->request->getInt('track');
+        $playlistTrack = $playlistTrackRepository->findOneBy(['track' => $trackId, 'playlist' => $playlist]);
+
+        if (null === $playlistTrack) {
+            $this->addFlash('warning', 'Ce titre n\'est plus dans la playlist');
+            return $this->redirectToRoute('app_playlist_show',
+                ['id' => $playlist->getId()]
+            );
+        }
+
+        $index = $playlist->getPlaylistTracks()->indexOf($playlistTrack);
+        $neighbor = $playlist->getPlaylistTracks()->get($direction === 'up' ? $index - 1 : $index + 1);
+
+        if (null === $neighbor) {
+            return $this->redirectToRoute('app_playlist_show',
+                ['id' => $playlist->getId()]
+            );
+        }
+
+        $position = $playlistTrack->getPosition();
+        $playlistTrack->setPosition($neighbor->getPosition());
+        $neighbor->setPosition($position);
+
+        $playlist->setUpdatedAt(new \DateTimeImmutable());
+
+        $em->flush();
+
+        return $this->redirectToRoute('app_playlist_show',
+            ['id' => $playlist->getId()]
+        );
+    }
 }

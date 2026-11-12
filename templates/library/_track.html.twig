@@ -8,6 +8,7 @@
     data-artists="{{ artists }}"
     data-cover="{{ track.cover }}"
     data-waveform="{{ track.waveform }}"
+    {% if inPlaylist is defined %}style="view-transition-name: track-{{ track.id }}"{% endif %}
 >
     <button
         type="button"
@@ -50,5 +51,7 @@
             <input type="hidden" name="track" value="{{ track.id }}">
             <button class="icon-btn" aria-label="Retirer de la playlist" type="submit">{{ ux_icon('material-symbols:playlist-remove') }}</button>
         </form>
+
+        {% include "playlist/_track_actions.html.twig" %}
     {% endif %}
 </li>

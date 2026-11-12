@@ -115,3 +115,24 @@ h1:has(+ .playlist-summary) {
 .back-link:hover {
     color: var(--color-text);
 }
+
+/* --- Reordering: rows slide to their new place --- */
+
+/* Turbo runs a view transition on the playlist page (see the view-transition
+   meta). Each row has its own view-transition-name, so the browser moves it
+   from its old position to the new one. The rest of the page stays still
+   instead of cross-fading. */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+    display: none;
+}
+
+::view-transition-group(*) {
+    animation-duration: 0.3s;
+    animation-timing-function: ease;
+}

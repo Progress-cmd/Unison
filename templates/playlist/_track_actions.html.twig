@@ -1,0 +1,16 @@
+<form action="{{ path('app_playlist_move_track', {id: playlist.id}) }}" method="post">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('playlist_move_track') }}">
+    <input type="hidden" name="track" value="{{ track.id }}">
+    <button
+        type="submit"
+        name="direction"
+        value="up"
+        {% if isFirst %}disabled{% endif %}
+    >{{ ux_icon('material-symbols:keyboard-arrow-up') }}</button>
+    <button
+        type="submit"
+        name="direction"
+        value="down"
+        {% if isLast %}disabled{% endif %}
+    >{{ ux_icon('material-symbols:keyboard-arrow-down') }}</button>
+</form>
