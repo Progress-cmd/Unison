@@ -21,7 +21,7 @@ class Playlist
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $createdBy = null;
+    private User $createdBy;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -61,16 +61,9 @@ class Playlist
         return $this;
     }
 
-    public function getCreatedBy(): ?User
+    public function getCreatedBy(): User
     {
         return $this->createdBy;
-    }
-
-    public function setCreatedBy(?User $createdBy): static
-    {
-        $this->createdBy = $createdBy;
-
-        return $this;
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable
@@ -118,5 +111,16 @@ class Playlist
         }
 
         return $this;
+    }
+
+    public function getDuration(): int
+    {
+        $duration = 0;
+
+        foreach ($this->playlistTracks as $playlistTrack) {
+            $duration += $playlistTrack->getTrack()->getDuration();
+        }
+
+        return $duration;
     }
 }

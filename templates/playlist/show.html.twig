@@ -3,7 +3,19 @@
 {% block title %}Unison - Playlist{% endblock %}
 
 {% block body %}
+
+{% set totalSeconds = playlist.duration %}
+
+{% set hours = totalSeconds // 3600 %}
+{% set minutes = (totalSeconds % 3600) // 60 %}
+
 <h1>{{ playlist.name }}</h1>
+<div class="playlist-summary">
+    Par {{ playlist.createdBy.username }} · 
+    {% if playlist.playlistTracks|length == 0 %}Aucun titre {% elseif playlist.playlistTracks|length == 1 %}1 titre{% else %}{{ playlist.playlistTracks|length }} titres{% endif %} · 
+    {% if hours > 0 %}{{ hours }} h {% endif %}{{ minutes }} min · 
+    modifiée le {{ playlist.updatedAt|date('d/m') }}
+</div>
 {% include 'library/_tabs.html.twig' with {active: 'playlists'} %}
 <ul 
     class="track-list"
@@ -11,7 +23,7 @@
     data-action="player:change@window->track-list#highlight"
 >
     {% for playlistTrack in playlist.playlistTracks %}
-        {% include 'library/_track.html.twig' with {index: loop.index0, track: playlistTrack.track, inPlaylist: true} %}
+        {% include 'library/_track.html.twig' with {index: loop.index0, track: playlistTrack.track, inPlaylist: true, user: playlistTrack.addedBy.username} %}
     {% else %}
         <li>Aucun morceau pour l'instant.</li>
     {% endfor %}

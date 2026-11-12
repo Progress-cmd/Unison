@@ -28,7 +28,8 @@
 }
 
 .track-title,
-.track-artists {
+.track-artists,
+.track-user {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -38,6 +39,20 @@
 .track-duration {
     font-size: 14px;
     color: var(--color-text-muted);
+}
+
+/* Who added the track to a playlist: smaller and lighter than the artists. */
+.track-user {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    opacity: 0.8;
+}
+
+/* The "remove" form sits in the row like any other button. */
+.track form {
+    display: flex;
+    flex: none;
+    margin: 0;
 }
 
 .track-duration {

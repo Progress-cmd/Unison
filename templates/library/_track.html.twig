@@ -28,6 +28,9 @@
     <div class="track-info">
         <span class="track-title">{{ track.title }}</span>
         <span class="track-artists">{{ artists }}</span>
+        {% if user is defined %}
+            <span class="track-user">{{ user }}</span>
+        {% endif %}
     </div>
 
     <span class="track-duration">{{ track.duration|duration }}</span>
@@ -45,7 +48,7 @@
         <form method="post" action="{{ path('app_playlist_remove_track', {id: playlist.id}) }}">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token('playlist_remove_track') }}">
             <input type="hidden" name="track" value="{{ track.id }}">
-            <button class="icon-btn" aria-label="Retirer de la playlist " type="submit">{{ ux_icon('material-symbols:playlist-remove') }}</button>
+            <button class="icon-btn" aria-label="Retirer de la playlist" type="submit">{{ ux_icon('material-symbols:playlist-remove') }}</button>
         </form>
     {% endif %}
 </li>

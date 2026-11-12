@@ -71,3 +71,16 @@
     flex: none;
     color: var(--color-text-muted);
 }
+
+/* --- Playlist page header --- */
+
+/* Brings the summary closer to the title it describes. */
+h1:has(+ .playlist-summary) {
+    margin-bottom: 6px;
+}
+
+.playlist-summary {
+    margin: 0 0 20px;
+    font-size: 14px;
+    color: var(--color-text-muted);
+}
