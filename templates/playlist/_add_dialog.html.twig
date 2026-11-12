@@ -1,0 +1,20 @@
+<dialog data-add-to-playlist-target="dialog">
+    <h2>Ajouter à une playlist</h2>
+    <ul>
+        {% for playlist in playlists %}
+            <li>
+                <form method="post" action="{{ path('app_playlist_add_track', {id: playlist.id}) }}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('playlist_add_track') }}">
+                    <input type="hidden" name="track" data-add-to-playlist-target="trackInput">
+                    <button type="submit">{{ playlist.name }}</button>
+                </form>
+            </li>
+        {% else %}
+            <li>Aucune playlist</li>
+            <li><a href="{{ path('app_playlists') }}">Créer une playlist</a></li>
+        {% endfor %}
+    </ul>
+    <form method="dialog">
+        <button type="submit">Fermer</button>
+    </form>
+</dialog>

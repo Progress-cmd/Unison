@@ -31,4 +31,15 @@
     </div>
 
     <span class="track-duration">{{ track.duration|duration }}</span>
+    {% if hideAdd is not defined %}
+        <button
+            type="button"
+            class="icon-btn"
+            aria-label="Ajouter à une playlist"
+            data-action="add-to-playlist#open"
+            data-add-to-playlist-track-id-param="{{ track.id }}"
+        >
+            {{ ux_icon('material-symbols:playlist-add') }}
+        </button>
+    {% endif %}
 </li>
