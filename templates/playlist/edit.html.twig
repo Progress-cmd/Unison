@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - Playlist{% endblock %}
+
+{% block body %}
+<h1>Modifier {{ playlist.name }}</h1>
+{% include 'library/_tabs.html.twig' with {active: 'playlists'} %}
+{{ form_start(form, {attr: {class: 'form playlist-create'}}) }}
+    {{ form_row(form.name) }}
+    <button type="submit" class="btn">Modifier</button>
+{{ form_end(form) }}
+<a class="back-link" href="{{ path('app_playlist_show', {'id': playlist.id}) }}">
+    {{ ux_icon('material-symbols:arrow-back') }}
+    Retour
+</a>
+{% endblock %}

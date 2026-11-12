@@ -15,6 +15,42 @@
     background: var(--color-accent-hover);
 }
 
+/* Variants of .btn, to put on the same element: class="btn btn-secondary".
+   Must stay after .btn. They also work on links. */
+.btn-secondary,
+.btn-danger {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.btn-secondary svg,
+.btn-danger svg {
+    width: 18px;
+    height: 18px;
+}
+
+.btn-secondary {
+    color: var(--color-text);
+}
+
+.btn-secondary:hover {
+    background: var(--color-accent-soft);
+}
+
+.btn-danger {
+    color: var(--color-error);
+}
+
+.btn-danger:hover {
+    background: var(--color-error-bg);
+}
+
 .icon-btn {
     display: flex;
     padding: 0;

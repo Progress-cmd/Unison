@@ -4,6 +4,12 @@
     padding: 0;
 }
 
+/* "No track yet" message, which is a plain <li> in the same list. */
+.track-list > li:not(.track) {
+    padding: 12px 8px;
+    color: var(--color-text-muted);
+}
+
 .track {
     display: flex;
     align-items: center;

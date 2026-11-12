@@ -84,3 +84,34 @@ h1:has(+ .playlist-summary) {
     font-size: 14px;
     color: var(--color-text-muted);
 }
+
+/* Edit / delete, only shown to the owner. */
+.playlist-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.playlist-actions form {
+    margin: 0;
+}
+
+/* Quiet link under a form, e.g. "Retour". */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-text-muted);
+    text-decoration: none;
+}
+
+.back-link svg {
+    width: 18px;
+    height: 18px;
+}
+
+.back-link:hover {
+    color: var(--color-text);
+}

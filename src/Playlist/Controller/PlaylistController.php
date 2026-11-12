@@ -48,4 +48,54 @@ final class PlaylistController extends AbstractController
             'playlist' => $playlist
         ]);
     }
+
+    #[Route('/playlists/{id}/edit', name: 'app_playlist_edit', requirements: ['id' => '[0-9]+'])]
+    public function edit(Request $request, EntityManagerInterface $em, #[CurrentUser] User $user, Playlist $playlist): Response
+    {
+        $owner = $playlist->getCreatedBy();
+
+        if ($owner !== $user) {
+            throw $this->createAccessDeniedException('Accès interdit');
+        }
+
+        $form = $this->createForm(PlaylistType::class, $playlist);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $playlist->setUpdatedAt(new \DateTimeImmutable);
+
+            $em->flush();
+
+            $this->addFlash('success', 'Playlist '.$playlist->getName().' modifiée');
+
+            return $this->redirectToRoute('app_playlist_show', ['id' => $playlist->getId()]);
+        }
+
+        return $this->render('playlist/edit.html.twig', [
+            'form' => $form,
+            'playlist' => $playlist,
+        ]);
+    }
+
+    #[Route('/playlists/{id}/delete', name: 'app_playlist_delete', requirements: ['id' => '[0-9]+'], methods: ['POST'])]
+    public function delete(Request $request, EntityManagerInterface $em, Playlist $playlist, #[CurrentUser] User $user): Response
+    {
+        if (!$this->isCsrfTokenValid('playlist_delete', $request->request->getString('_csrf_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $owner = $playlist->getCreatedBy();
+
+        if ($owner !== $user) {
+            throw $this->createAccessDeniedException('Accès interdit');
+        }
+
+        $em->remove($playlist);
+        $em->flush();
+
+        $this->addFlash('success', 'Playlist supprimée');
+    
+        return $this->redirectToRoute('app_playlists');
+    }
 }
