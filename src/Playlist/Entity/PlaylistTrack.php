@@ -34,9 +34,10 @@ class PlaylistTrack
     #[ORM\Column]
     private ?\DateTimeImmutable $addedAt = null;
 
-    public function __construct()
+    public function __construct(User $addedBy)
     {
         $this->addedAt = new \DateTimeImmutable();
+        $this->addedBy = $addedBy;
     }
 
     public function getId(): ?int
@@ -83,13 +84,6 @@ class PlaylistTrack
     public function getAddedBy(): ?User
     {
         return $this->addedBy;
-    }
-
-    public function setAddedBy(?User $addedBy): static
-    {
-        $this->addedBy = $addedBy;
-
-        return $this;
     }
 
     public function getAddedAt(): ?\DateTimeImmutable
