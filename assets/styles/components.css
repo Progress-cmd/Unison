@@ -93,6 +93,99 @@
     color: white;
 }
 
+/* --- Dialog --- */
+
+/* Native <dialog>, opened with showModal(): centred box over a dimmed page. */
+dialog {
+    width: min(420px, calc(100vw - 32px));
+    max-height: 80dvh;
+    padding: 24px;
+    overflow-y: auto;
+    background: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgb(0 0 0 / 25%);
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease,
+        overlay 0.2s allow-discrete,
+        display 0.2s allow-discrete;
+}
+
+dialog[open] {
+    opacity: 1;
+    transform: none;
+}
+
+dialog::backdrop {
+    background: rgb(0 0 0 / 0%);
+    transition:
+        background-color 0.2s ease,
+        overlay 0.2s allow-discrete,
+        display 0.2s allow-discrete;
+}
+
+dialog[open]::backdrop {
+    background: rgb(0 0 0 / 50%);
+}
+
+/* Entry animation: where the dialog starts from when it opens. */
+@starting-style {
+    dialog[open] {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+
+    dialog[open]::backdrop {
+        background: rgb(0 0 0 / 0%);
+    }
+}
+
+dialog h2 {
+    margin: 0 0 16px;
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 500;
+}
+
+/* The page behind a modal must not scroll. */
+body:has(dialog[open]) {
+    overflow: hidden;
+}
+
+/* The "Fermer" form: one quiet button, bottom right. */
+dialog form[method="dialog"] {
+    display: flex;
+    justify-content: flex-end;
+}
+
+dialog form[method="dialog"] button {
+    padding: 8px 14px;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+dialog form[method="dialog"] button:hover {
+    background: var(--color-accent-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    dialog,
+    dialog::backdrop,
+    dialog form[method="dialog"] button {
+        transition: none;
+    }
+}
+
 /* --- Forms --- */
 
 .form {

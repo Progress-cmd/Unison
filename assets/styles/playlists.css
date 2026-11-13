@@ -136,3 +136,51 @@ h1:has(+ .playlist-summary) {
     animation-duration: 0.3s;
     animation-timing-function: ease;
 }
+
+/* --- "Add to a playlist" dialog --- */
+
+dialog ul {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 50dvh;
+    margin: 0 0 16px;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+}
+
+dialog li form {
+    margin: 0;
+}
+
+/* One playlist per line, the whole line is the button. */
+dialog li form button {
+    width: 100%;
+    padding: 10px 12px;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+dialog li form button:hover,
+dialog li form button:focus-visible {
+    background: var(--color-accent-soft);
+}
+
+/* "No playlist yet" and the link to create one. */
+dialog li:not(:has(form)) {
+    padding: 10px 12px;
+    color: var(--color-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    dialog li form button {
+        transition: none;
+    }
+}
