@@ -108,6 +108,20 @@
     transform: translateY(2px);
 }
 
+/* Favorite heart: the only row button that carries aria-pressed.
+   Filled and in the accent colour when the track is a favorite. */
+.track form button[aria-pressed="true"] {
+    color: var(--color-accent);
+}
+
+.track form button[aria-pressed="true"]:hover {
+    color: var(--color-accent-hover);
+}
+
+.track form button[aria-pressed]:hover svg {
+    transform: scale(1.15);
+}
+
 @media (prefers-reduced-motion: reduce) {
     .track form button,
     .track form button svg {

@@ -8,6 +8,8 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=DM+Sans:wght@400;500&display=swap">
         {% block stylesheets %}{% endblock %}
 
+        {# After a form redirects to the page it came from, keep the scroll position. #}
+        <meta name="turbo-refresh-scroll" content="preserve">
         {% block meta %}{% endblock %}
         
         {% block javascripts %}

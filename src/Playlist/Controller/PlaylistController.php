@@ -3,6 +3,7 @@
 namespace App\Playlist\Controller;
 
 use App\Account\Entity\User;
+use App\Library\Repository\FavoriteTrackRepository;
 use App\Playlist\Entity\Playlist;
 use App\Playlist\Form\PlaylistType;
 use App\Playlist\Repository\PlaylistRepository;
@@ -42,10 +43,11 @@ final class PlaylistController extends AbstractController
     }
 
     #[Route('/playlists/{id}', name: 'app_playlist_show', requirements: ['id' => '[0-9]+'])]
-    public function show(Playlist $playlist): Response
+    public function show(Playlist $playlist, FavoriteTrackRepository $favoriteTrackRepository, #[CurrentUser] User $user): Response
     {
         return $this->render('playlist/show.html.twig', [
-            'playlist' => $playlist
+            'playlist' => $playlist,
+            'favoriteIds' => $favoriteTrackRepository->findTrackIds($user),
         ]);
     }
 

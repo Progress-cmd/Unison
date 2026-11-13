@@ -17,15 +17,15 @@ class FavoriteTrackRepository extends ServiceEntityRepository
         parent::__construct($registry, FavoriteTrack::class);
     }
 
-   public function findAllFavorite(User $user, int $page = 1): array
+   public function findTrackIds(User $user): array
    {
        return $this->createQueryBuilder('f')
+           ->select('IDENTITY(f.track)')
            ->andWhere('f.user = :user')
            ->setParameter('user', $user)
            ->orderBy('f.addedAt', 'DESC')
-           ->setMaxResults(50 * $page)
            ->getQuery()
-           ->getResult()
+           ->getSingleColumnResult()
        ;
    }
 }
