@@ -20,6 +20,9 @@ class Track
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $originalTitle = null;
+
     #[ORM\Column]
     private ?int $duration = null;
 
@@ -85,6 +88,18 @@ class Track
     public function setTitle(string $title): static
     {
         $this->title = $title;
+
+        return $this;
+    }
+
+    public function getOriginalTitle(): ?string
+    {
+        return $this->originalTitle;
+    }
+
+    public function setOriginalTitle(?string $originalTitle): static
+    {
+        $this->originalTitle = $originalTitle;
 
         return $this;
     }
