@@ -1,0 +1,171 @@
+/* --- Greeting --- */
+
+.home-greeting {
+    margin: 0;
+    font-size: clamp(32px, 7vw, 48px);
+    line-height: 1.1;
+}
+
+.home-greeting em {
+    color: var(--color-accent);
+}
+
+.home-subtitle {
+    margin: 8px 0 32px;
+    color: var(--color-text-muted);
+}
+
+/* --- Layout --- */
+
+/* Phone and medium screens: one column, the discoveries first.
+   Large screen (see below): main column + a side column for playlists and favorites. */
+.home-columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px 40px;
+    align-items: start;
+}
+
+.home-section {
+    margin-bottom: 32px;
+}
+
+/* Title on the left, "Voir tout" on the right. */
+.home-section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.home-section-header h2,
+.home-section > h2 {
+    margin: 0;
+}
+
+.home-section > h2 {
+    margin-bottom: 12px;
+}
+
+.home-section-header a {
+    flex: none;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.home-section-header a:hover {
+    text-decoration: underline;
+}
+
+/* --- Rows that scroll sideways on a phone --- */
+
+/* "À découvrir": two rows of cards scrolling to the right on a phone,
+   a plain grid on a larger screen. */
+.discover-grid {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(2, auto);
+    grid-auto-columns: minmax(220px, 78%);
+    gap: 8px;
+    margin: 0;
+    padding: 0 0 8px;
+    overflow-x: auto;
+    list-style: none;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+}
+
+.discover-grid > li {
+    min-width: 0;
+    scroll-snap-align: start;
+}
+
+/* "Albums récents": one row of covers scrolling to the right on a phone. */
+.home .album-grid {
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    grid-auto-columns: 140px;
+    padding-bottom: 8px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+}
+
+.home .album-grid > li {
+    scroll-snap-align: start;
+}
+
+/* --- Track card ("À découvrir") --- */
+
+.track-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 8px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.track-card:hover {
+    background: var(--color-accent-soft);
+}
+
+.track-card:active {
+    transform: scale(0.98);
+}
+
+.track-card:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+/* --- Side column --- */
+
+/* Favorites in a narrow column: the duration is the first thing to go. */
+.home-side .track-duration {
+    display: none;
+}
+
+/* --- Responsive --- */
+
+@media (min-width: 1024px) {
+    .discover-grid {
+        grid-auto-flow: row;
+        grid-template-rows: none;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        padding-bottom: 0;
+        overflow: visible;
+    }
+
+    .home .album-grid {
+        grid-auto-flow: row;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        grid-auto-columns: auto;
+        padding-bottom: 0;
+        overflow: visible;
+    }
+}
+
+@media (min-width: 1280px) {
+    .home-columns {
+        grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .track-card {
+        transition: none;
+    }
+
+    .track-card:active {
+        transform: none;
+    }
+}

@@ -16,4 +16,5 @@ import './styles/library.css';
 import './styles/playlists.css';
 import './styles/albums.css';
 import './styles/artists.css';
+import './styles/home.css';
 import './styles/imports.css';
