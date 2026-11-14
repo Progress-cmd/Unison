@@ -12,6 +12,7 @@ export default class extends Controller
     play(event)
     {
         const tracks = this.trackTargets.map(row => ({
+            id: Number(row.dataset.id),
             url: row.dataset.url,
             title: row.dataset.title,
             artists: row.dataset.artists,

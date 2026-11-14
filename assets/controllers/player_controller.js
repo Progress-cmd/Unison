@@ -20,6 +20,8 @@ export default class extends Controller
         'upcomingRow',
     ];
 
+    static values = { saveUrl: String, saveToken: String };
+
     queue = [];
     index = 0;
     repeat = 'off';
@@ -316,5 +318,28 @@ export default class extends Controller
         cancelAnimationFrame(this.frame);
 
         Array.from(this.barsTarget.children).forEach(bar => { bar.style.height = bar.dataset.height; });
+    }
+
+    saveState()
+    {
+        if (!this.queue.length) {
+            return;
+        }
+
+        const state = {
+            queue: this.queue.map(track => track.id),
+            sourceQueue: this.sourceQueue.map(track => track.id),
+            currentIndex: this.index,
+            position: Math.floor(this.audioTarget.currentTime),
+            shuffle: this.shuffle,
+            repeatMode: this.repeat,
+            _token: this.saveTokenValue,
+        };
+
+        fetch(this.saveUrlValue, {
+            method: 'POST',
+            body: JSON.stringify(state),
+            keepalive: true,
+        });
     }
 }

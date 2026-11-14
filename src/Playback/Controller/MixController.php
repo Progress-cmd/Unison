@@ -23,6 +23,7 @@ final class MixController extends AbstractController
     private function toQueueItem(Track $track): array
     {
         return [
+            'id' => $track->getId(),
             'url' => $this->generateUrl('app_track_stream', ['id' => $track->getId()]),
             'title' => $track->getTitle(),
             'artists' => implode(', ', array_map(fn($a) => $a->getName(), $track->getArtists()->toArray())),
