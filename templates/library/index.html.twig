@@ -3,20 +3,7 @@
 {% block title %}Unison - Bibliothèque{% endblock %}
 
 {% block body %}
-<div data-controller="add-to-playlist">
-    <h1>Bibliothèque</h1>
-    {% include 'library/_tabs.html.twig' with {active: 'tracks'} %}
-    <ul 
-        class="track-list"
-        data-controller="track-list"
-        data-action="player:change@window->track-list#highlight"
-    >
-        {% for track in tracks %}
-            {% include 'library/_track.html.twig' with {index: loop.index0} %}
-        {% else %}
-            <li>Aucun morceau pour l'instant.</li>
-        {% endfor %}
-    </ul>
-    {% include 'playlist/_add_dialog.html.twig' %}
-</div>
+<h1>Bibliothèque</h1>
+{% include 'library/_tabs.html.twig' with {active: 'tracks'} %}
+{% include 'library/_track_list.html.twig' %}
 {% endblock %}

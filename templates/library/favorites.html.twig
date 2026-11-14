@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - Favoris{% endblock %}
+
+{% block body %}
+<h1>Favoris</h1>
+{% include 'library/_tabs.html.twig' with {active: 'favorites'} %}
+{% include 'library/_track_list.html.twig' %}
+{% endblock %}

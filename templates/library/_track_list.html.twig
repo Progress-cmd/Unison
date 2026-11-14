@@ -1,0 +1,14 @@
+<div data-controller="add-to-playlist">
+    <ul 
+        class="track-list"
+        data-controller="track-list"
+        data-action="player:change@window->track-list#highlight"
+    >
+        {% for track in tracks %}
+            {% include 'library/_track.html.twig' with {index: loop.index0} %}
+        {% else %}
+            <li>Aucun morceau pour l'instant.</li>
+        {% endfor %}
+    </ul>
+    {% include 'playlist/_add_dialog.html.twig' %}
+</div>
