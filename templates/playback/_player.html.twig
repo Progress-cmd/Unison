@@ -9,6 +9,8 @@
         click@window->player#wakeSound
     "
     data-turbo-permanent
+    data-player-save-url-value="{{ path('app_playback_state_save') }}"
+    data-player-save-token-value="{{ csrf_token('playback_state') }}"
 >
     <button
         type="button"
