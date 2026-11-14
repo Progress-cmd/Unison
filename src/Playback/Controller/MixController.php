@@ -14,10 +14,25 @@ final class MixController extends AbstractController
     #[Route('/tracks/{id}/mix', name: 'app_track_mix', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function index(Track $track, TrackRepository $trackRepository, QueueItems $queueItems): Response
     {
+        return $this->json($this->queueFrom($track, $trackRepository, $queueItems));
+    }
+
+    #[Route('/tracks/random/mix', name: 'app_random_mix', methods: ['GET'])]
+    public function random(TrackRepository $trackRepository, QueueItems $queueItems): Response
+    {
+        $tracks = $trackRepository->findRandom(1);
+
+        if (!$tracks) {
+            return new Response(null, 204);
+        }
+
+        return $this->json($this->queueFrom($tracks[0], $trackRepository, $queueItems));
+    }
+
+    private function queueFrom(Track $track, TrackRepository $trackRepository, QueueItems $queueItems): array
+    {
         $tracks = array_merge([$track], $trackRepository->findRandom(49, $track));
 
-        $tracks = $queueItems->fromTracks($tracks);
-
-        return $this->json($tracks);
+        return $queueItems->fromTracks($tracks);
     }
 }

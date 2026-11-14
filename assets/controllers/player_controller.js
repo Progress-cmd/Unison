@@ -20,7 +20,7 @@ export default class extends Controller
         'upcomingRow',
     ];
 
-    static values = { saveUrl: String, saveToken: String, loadUrl: String };
+    static values = { saveUrl: String, saveToken: String, loadUrl: String, randomUrl: String };
 
     queue = [];
     lastSave = 0;
@@ -176,7 +176,7 @@ export default class extends Controller
 
         bars.forEach((bar, index) => bar.classList.toggle('is-played', index < played));
 
-        if (Date.now() - this.lastSave > 15000) {
+        if (!this.audioTarget.paused && Date.now() - this.lastSave > 15000) {
             this.saveState();
         }
     }
@@ -365,7 +365,12 @@ export default class extends Controller
     {
         const response = await fetch(this.loadUrlValue);
 
-        if (response.status !== 200) {
+        if (response.status === 204) {
+            this.loadRandom();
+            return;
+        }
+
+        if (!response.ok) {
             return;
         }
 
@@ -382,6 +387,23 @@ export default class extends Controller
         this.audioTarget.addEventListener('loadedmetadata', () => {
             this.audioTarget.currentTime = state.position;
         }, { once: true });
+
+        this.loadCurrent(false);
+    }
+
+    async loadRandom()
+    {
+        const response = await fetch(this.randomUrlValue);
+
+        if (response.status !== 200) {
+            return;
+        }
+
+        const tracks = await response.json();
+
+        this.queue = tracks;
+        this.sourceQueue = tracks;
+        this.index = 0;
 
         this.loadCurrent(false);
     }
