@@ -33,6 +33,21 @@
                     {% endfor %}
                 </ul>
             </section>
+            <section class="home-section">
+                <div class="home-section-header">
+                    <h2>Artistes</h2>
+                    <a href="{{ path('app_artists') }}">Voir tout</a>
+                </div>
+                <ul class="artist-grid">
+                    {% for artist in topArtists %}
+                        <li>
+                            {% include "library/_artist_card.html.twig" %}
+                        </li>
+                    {% else %}
+                        <li>Aucun artiste pour l'instant</li>
+                    {% endfor %}
+                </ul>
+            </section>
         </div>
         <aside class="home-side">
             <section class="home-section">

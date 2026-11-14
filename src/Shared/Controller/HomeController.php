@@ -5,6 +5,7 @@ namespace App\Shared\Controller;
 use App\Account\Entity\User;
 use App\Library\Repository\FavoriteTrackRepository;
 use App\Library\Repository\AlbumRepository;
+use App\Library\Repository\ArtistRepository;
 use App\Library\Repository\TrackRepository;
 use App\Playlist\Repository\PlaylistRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,7 +16,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 final class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function index(PlaylistRepository $playlistRepository, #[CurrentUser] User $user, FavoriteTrackRepository $favoriteTrackRepository, TrackRepository $trackRepository, AlbumRepository $albumRepository): Response
+    public function index(PlaylistRepository $playlistRepository, #[CurrentUser] User $user, FavoriteTrackRepository $favoriteTrackRepository, TrackRepository $trackRepository, AlbumRepository $albumRepository, ArtistRepository $artistRepository): Response
     {
         return $this->render('shared/home.html.twig', [
             'recentPlaylists' => $playlistRepository->findBy(['createdBy' => $user], ['updatedAt' => 'DESC'], 4),
@@ -24,6 +25,7 @@ final class HomeController extends AbstractController
             'tracks' => $trackRepository->findFavorites($user, 5),
             'recentAlbums' => $albumRepository->findAllAlbum(6),
             'discoverTracks' => $trackRepository->findRandom(8),
+            'topArtists' => $artistRepository->findTop(6),
         ]);
     }
 }
