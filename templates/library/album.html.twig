@@ -3,6 +3,7 @@
 {% block title %}Unison - Album{% endblock %}
 
 {% block body %}
+<h1>Bibliothèque</h1>
 {% include 'library/_tabs.html.twig' with {active: 'albums'} %}
 <a class="back-link" href="{{ path('app_albums') }}">
     {{ ux_icon('material-symbols:arrow-back') }}
@@ -15,7 +16,7 @@
         <div class="album-cover"></div>
     {% endif %}
     <div class="detail-info">
-        <h1>{{ album.title }}</h1>
+        <h2>{{ album.title }}</h2>
         <span class="album-artists">{{ album.artists|map(artist => artist.name)|join(', ') }}</span>
         {% if album.year %}
             <span class="album-year">{{ album.year }}</span>

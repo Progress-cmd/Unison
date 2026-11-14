@@ -28,6 +28,11 @@
     font-weight: 500;
 }
 
+/* A section title right under the tabs needs no extra space above it. */
+.library-tabs + h2 {
+    margin-top: 0;
+}
+
 /* --- Detail page header (an album, an artist, a playlist) --- */
 
 /* "← Albums" link between the tabs and the header. */
@@ -83,8 +88,10 @@
     min-width: 0;
 }
 
-.detail-info h1 {
+/* The album, artist or playlist name: an h2, but as large as a page title. */
+.detail-info h2 {
     margin: 0 0 4px;
+    font-size: 36px;
     overflow-wrap: anywhere;
 }
 

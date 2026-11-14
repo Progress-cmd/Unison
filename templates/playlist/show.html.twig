@@ -11,6 +11,7 @@
 {% set hours = totalSeconds // 3600 %}
 {% set minutes = (totalSeconds % 3600) // 60 %}
 
+<h1>Bibliothèque</h1>
 {% include 'library/_tabs.html.twig' with {active: 'playlists'} %}
 <a class="back-link" href="{{ path('app_playlists') }}">
     {{ ux_icon('material-symbols:arrow-back') }}
@@ -21,7 +22,7 @@
         {{ ux_icon('material-symbols:queue-music') }}
     </div>
     <div class="detail-info">
-        <h1>{{ playlist.name }}</h1>
+        <h2>{{ playlist.name }}</h2>
         <div class="playlist-summary">
             Par {{ playlist.createdBy.username }} · 
             {% if playlist.playlistTracks|length == 0 %}Aucun titre {% elseif playlist.playlistTracks|length == 1 %}1 titre{% else %}{{ playlist.playlistTracks|length }} titres{% endif %} · 

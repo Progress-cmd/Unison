@@ -3,6 +3,7 @@
 {% block title %}Unison - Artiste{% endblock %}
 
 {% block body %}
+<h1>Bibliothèque</h1>
 {% include 'library/_tabs.html.twig' with {active: 'artists'} %}
 <a class="back-link" href="{{ path('app_artists') }}">
     {{ ux_icon('material-symbols:arrow-back') }}
@@ -15,7 +16,7 @@
         <div class="artist-image">{{ artist.name|first|upper }}</div>
     {% endif %}
     <div class="detail-info">
-        <h1>{{ artist.name }}</h1>
+        <h2>{{ artist.name }}</h2>
         <span class="artist-tracks">{% if artist.tracks|length == 0 %}Aucun titre{% elseif artist.tracks|length == 1%}1 titre{% else %}{{ artist.tracks|length }} titres{% endif %}</span>
     </div>
 </div>
