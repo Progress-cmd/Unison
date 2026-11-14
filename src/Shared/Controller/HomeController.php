@@ -23,6 +23,7 @@ final class HomeController extends AbstractController
             'favoriteIds' => $favoriteTrackRepository->findTrackIds($user),
             'tracks' => $trackRepository->findFavorites($user, 5),
             'recentAlbums' => $albumRepository->findAllAlbum(6),
+            'discoverTracks' => $trackRepository->findRandom(8),
         ]);
     }
 }

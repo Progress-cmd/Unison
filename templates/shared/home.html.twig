@@ -9,6 +9,16 @@
     <div class="home-columns">
         <div class="home-main">
             <section class="home-section">
+                <h2>À découvrir</h2>
+                <ul class="discover-grid" data-controller="discover">
+                    {% for track in discoverTracks %}
+                        <li>
+                            {% include "library/_track_card.html.twig" %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+            <section class="home-section">
                 <div class="home-section-header">
                     <h2>Albums récents</h2>
                     <a href="{{ path('app_albums') }}">Voir tout</a>

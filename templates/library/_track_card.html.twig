@@ -1,0 +1,14 @@
+{% set artists = track.artists|map(artist => artist.name)|join(', ') %}
+
+<button type="button" class="track-card" aria-label="Lire {{ track.title }}" data-discover-url-param="{{ path('app_track_mix', {id: track.id}) }}" data-action="discover#play">
+    {% if track.cover %}
+        <img class="track-cover" src="{{ track.cover }}" alt="" loading="lazy">
+    {% else %}
+        <span class="track-cover"></span>
+    {% endif %}
+
+    <span class="track-info">
+        <span class="track-title">{{ track.title }}</span>
+        <span class="track-artists">{{ artists }}</span>
+    </span>
+</button>
