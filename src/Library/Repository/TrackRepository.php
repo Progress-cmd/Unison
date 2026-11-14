@@ -59,4 +59,35 @@ class TrackRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    public function findRandom(int $count, ?Track $exclude = null): array
+    {
+        $qb = $this->createQueryBuilder('t')->select('t.id');
+
+        if (null !== $exclude) {
+            $qb->andWhere('t.id != :exclude')->setParameter('exclude', $exclude->getId());
+        }
+
+        $trackIds = $qb->getQuery()->getSingleColumnResult();
+
+        if (!$trackIds) {
+            return [];
+        }
+
+        shuffle($trackIds);
+        $trackIds = array_slice($trackIds, 0, $count);
+
+        $tracks = $this->createQueryBuilder('t')
+            ->leftJoin('t.artists', 'a')
+            ->addSelect('a')
+            ->andWhere('t.id IN (:ids)')
+            ->setParameter('ids', $trackIds)
+            ->getQuery()
+            ->getResult()
+        ;
+
+        shuffle($tracks);
+
+        return $tracks;
+    }
 }
