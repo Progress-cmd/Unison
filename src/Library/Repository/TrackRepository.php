@@ -3,6 +3,7 @@
 namespace App\Library\Repository;
 
 use App\Account\Entity\User;
+use App\Library\Entity\Artist;
 use App\Library\Entity\Track;
 use App\Library\Entity\FavoriteTrack;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -39,6 +40,20 @@ class TrackRepository extends ServiceEntityRepository
             ->andWhere('f.user = :user')
             ->setParameter('user', $user)
             ->orderBy('f.addedAt', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function findByArtist(Artist $artist): array
+    {
+        return $this->createQueryBuilder('t')
+            ->innerJoin('t.artists', 'filter')
+            ->andWhere('filter = :artist')
+            ->setParameter('artist', $artist)
+            ->leftJoin('t.artists', 'a')
+            ->addSelect('a')
+            ->orderBy('t.title', 'ASC')
             ->getQuery()
             ->getResult()
         ;

@@ -15,4 +15,5 @@ import './styles/tracks.css';
 import './styles/library.css';
 import './styles/playlists.css';
 import './styles/albums.css';
+import './styles/artists.css';
 import './styles/imports.css';

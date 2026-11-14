@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - Artistes{% endblock %}
+
+{% block body %}
+<h1>Artistes</h1>
+{% include 'library/_tabs.html.twig' with {active: 'artists'} %}
+<ul class="artist-grid">
+    {% for artist in artists %}
+        <li>
+            {% include 'library/_artist_card.html.twig' %}
+        </li>
+    {% else %}
+        <li>Aucun artiste pour l'instant.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

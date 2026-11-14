@@ -1,0 +1,156 @@
+/* --- Section titles inside a page ("Albums", "Titres"…) --- */
+
+/* Scoped to <main> so the player and dialogs keep their own titles. */
+main h2 {
+    margin: 32px 0 16px;
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 500;
+}
+
+/* --- Artist grid --- */
+
+/* Same principle as the album grid: as many columns as fit, no media query. */
+.artist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 24px 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* "Aucun artiste pour l'instant." spans the whole row. */
+.artist-grid > li:not(:has(.artist-card)) {
+    grid-column: 1 / -1;
+    padding: 12px 0;
+    color: var(--color-text-muted);
+}
+
+/* --- Artist card --- */
+
+.artist-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    color: inherit;
+    text-align: center;
+    text-decoration: none;
+}
+
+/* Round avatar: the picture, or the initial on a tinted disc. */
+.artist-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+    font-family: var(--serif);
+    font-weight: 500;
+    line-height: 1;
+}
+
+.artist-card .artist-image {
+    width: 100%;
+    font-size: 48px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.artist-card:hover .artist-image,
+.artist-card:focus-visible .artist-image {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgb(0 0 0 / 18%);
+}
+
+.artist-card:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+    border-radius: 8px;
+}
+
+.artist-card .artist-info {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+}
+
+.artist-card .artist-name {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.artist-card .artist-count {
+    font-size: 14px;
+    color: var(--color-text-muted);
+}
+
+/* --- Artist page header --- */
+
+/* Phone: avatar on top, name centred below. */
+.artist-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.artist-header .artist-image {
+    flex: none;
+    width: min(180px, 50vw);
+    font-size: 72px;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 15%);
+}
+
+.artist-header .artist-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.artist-header h1 {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.artist-header .artist-tracks {
+    font-size: 14px;
+    color: var(--color-text-muted);
+}
+
+/* --- Responsive --- */
+
+/* Large screen: avatar on the left, name on the right. */
+@media (min-width: 1024px) {
+    .artist-header {
+        flex-direction: row;
+        gap: 24px;
+        text-align: left;
+    }
+
+    .artist-header .artist-image {
+        width: 160px;
+        font-size: 64px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .artist-card .artist-image {
+        transition: none;
+    }
+
+    .artist-card:hover .artist-image,
+    .artist-card:focus-visible .artist-image {
+        transform: none;
+    }
+}

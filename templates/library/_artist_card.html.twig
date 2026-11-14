@@ -1,0 +1,12 @@
+<a class="artist-card" href="{{ path('app_artists_show', {'id': artist.id}) }}">
+    {% if artist.image %}
+        <img class="artist-image" src="{{ artist.image }}" alt="" loading="lazy">
+    {% else %}
+        <div class="artist-image">{{ artist.name|first|upper }}</div>
+    {% endif %}
+
+    <div class="artist-info">
+        <span class="artist-name">{{ artist.name }}</span>
+        <span class="artist-count">{% if artist.tracks|length == 0 %}Aucun titre{% elseif artist.tracks|length == 1%}1 titre{% else %}{{ artist.tracks|length }} titres{% endif %}</span>
+    </div>
+</a>
