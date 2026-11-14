@@ -1,4 +1,9 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+{% set hour = 'now'|date('G') %}
+<div class="home">
+    <h1 class="home-greeting">{{ hour < 18 ? 'Bonjour' : 'Bonsoir'}}, <em>{{ app.user.username }}</em></h1>
+    <p class="home-subtitle">Que voulez-vous écouter aujourd'hui ?</p>
+</div>
 {% endblock %}
