@@ -23,6 +23,7 @@ class TrackImporter
         #[Autowire('%env(resolve:MUSIC_DIR)%')]
         private readonly string $musicDir,
         private readonly CoverDownloader $coverDownloader,
+        private readonly TitleCleaner $titleCleaner,
     ) {}
 
     public function import(string $url, User $user, ?Album $album = null, ?int $trackNumber = null): Track
@@ -35,11 +36,13 @@ class TrackImporter
         $metadata = $this->ytDlpClient->fetchMetadata($url);
         $title = $metadata['track'] ?? $metadata['title'];
 
+        $cleaned = $this->titleCleaner->clean($title);
+
         $existing = $this->trackRepository->findOneBy(['sourceUrl' => $metadata['webpage_url']]);
 
         if (null !== $existing) {
             if (null === $album) {
-                throw new TrackAlreadyImportedException($title);
+                throw new TrackAlreadyImportedException($cleaned->title);
             }
 
             $existing->setAlbum($album);
@@ -61,7 +64,8 @@ class TrackImporter
         }
 
         $track = new Track();
-        $track->setTitle(mb_substr($title, 0, 255));
+        $track->setTitle(mb_substr($cleaned->title, 0, 255));
+        $track->setOriginalTitle(mb_substr($title, 0, 255));
         $track->setDuration((int) $metadata['duration']);
         $track->setWaveform($waveform);
         $track->setFileName($fileName);
@@ -72,7 +76,7 @@ class TrackImporter
         $track->setSourceAlbum($album);
         $track->setTrackNumber($trackNumber);
 
-        foreach ($this->artistNames($metadata) as $name) {
+        foreach ($this->artistNames($metadata, $cleaned->featuring) as $name) {
             $artist = $this->artistRepository->findOneBy(['name' => $name]);
 
             if (null === $artist) {
@@ -95,7 +99,7 @@ class TrackImporter
         return $track;
     }
 
-    private function artistNames(array $metadata): array
+    private function artistNames(array $metadata, array $featuring): array
     {
         if (isset($metadata['artists'])) {
             $names = $metadata['artists'];
@@ -105,6 +109,7 @@ class TrackImporter
             $names = [preg_replace('/\s*-\s*Topic$/i', '', $metadata['channel'] ?? '')];
         }
 
+        $names = array_merge($names, $featuring);
         $names = array_map('trim', $names);
         $names = array_filter($names);
         $names = array_map(fn ($name) => mb_substr($name, 0, 100), $names);
