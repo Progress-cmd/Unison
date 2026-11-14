@@ -4,6 +4,10 @@
 
 {% block body %}
 {% include 'library/_tabs.html.twig' with {active: 'artists'} %}
+<a class="back-link" href="{{ path('app_artists') }}">
+    {{ ux_icon('material-symbols:arrow-back') }}
+    Artistes
+</a>
 <div class="detail-header">
     {% if artist.image %}
         <img class="artist-image" src="{{ artist.image }}" alt="">

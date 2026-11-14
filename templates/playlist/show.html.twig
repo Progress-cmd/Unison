@@ -12,6 +12,10 @@
 {% set minutes = (totalSeconds % 3600) // 60 %}
 
 {% include 'library/_tabs.html.twig' with {active: 'playlists'} %}
+<a class="back-link" href="{{ path('app_playlists') }}">
+    {{ ux_icon('material-symbols:arrow-back') }}
+    Playlists
+</a>
 <div class="detail-header">
     <div class="playlist-cover">
         {{ ux_icon('material-symbols:queue-music') }}

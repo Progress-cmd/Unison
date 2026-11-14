@@ -4,6 +4,10 @@
 
 {% block body %}
 {% include 'library/_tabs.html.twig' with {active: 'albums'} %}
+<a class="back-link" href="{{ path('app_albums') }}">
+    {{ ux_icon('material-symbols:arrow-back') }}
+    Albums
+</a>
 <div class="detail-header">
     {% if album.cover %}
         <img class="album-cover" src="{{ album.cover }}" alt="">

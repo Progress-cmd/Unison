@@ -30,6 +30,11 @@
 
 /* --- Detail page header (an album, an artist, a playlist) --- */
 
+/* "← Albums" link between the tabs and the header. */
+.library-tabs + .back-link {
+    margin-bottom: 16px;
+}
+
 /* Phone: picture on top, text centred below.
    Large screen: picture on the left, text on the right, aligned at the bottom. */
 .detail-header {
