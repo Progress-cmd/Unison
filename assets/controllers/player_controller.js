@@ -20,7 +20,7 @@ export default class extends Controller
         'upcomingRow',
     ];
 
-    static values = { saveUrl: String, saveToken: String };
+    static values = { saveUrl: String, saveToken: String, loadUrl: String };
 
     queue = [];
     lastSave = 0;
@@ -32,6 +32,7 @@ export default class extends Controller
     initialize()
     {
         this.sound = new SoundAnalyser(this.audioTarget, 120);
+        this.restoreState();
     }
 
     // --- Actions, called from the HTML ---
@@ -195,7 +196,7 @@ export default class extends Controller
 
     // --- Internal helpers ---
 
-    loadCurrent()
+    loadCurrent(autoplay = true)
     {
         const track = this.queue[this.index];
 
@@ -211,9 +212,11 @@ export default class extends Controller
 
         this.dispatch('change', { detail: { url: track.url } });
 
-        this.audioTarget.play();
+        if (autoplay) {
+            this.audioTarget.play();
 
-        this.saveState();
+            this.saveState();
+        }
     }
 
     renderWaveform(waveform)
@@ -356,5 +359,30 @@ export default class extends Controller
             body: JSON.stringify(state),
             keepalive: true,
         });
+    }
+
+    async restoreState()
+    {
+        const response = await fetch(this.loadUrlValue);
+
+        if (response.status !== 200) {
+            return;
+        }
+
+        const state = await response.json();
+
+        this.queue = state.queue;
+        this.sourceQueue = state.sourceQueue.map(item => this.queue.find(track => track.id === item.id) ?? item);
+        this.index = state.currentIndex;
+
+        this.shuffle = state.shuffle;
+        this.shuffleTarget.setAttribute('aria-pressed', this.shuffle);
+        this.setRepeat(state.repeatMode);
+
+        this.audioTarget.addEventListener('loadedmetadata', () => {
+            this.audioTarget.currentTime = state.position;
+        }, { once: true });
+
+        this.loadCurrent(false);
     }
 }
