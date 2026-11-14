@@ -74,65 +74,7 @@
     color: var(--color-text-muted);
 }
 
-/* --- Album page header --- */
-
-/* Phone: cover on top, text centred below. */
-.album-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 24px;
-    text-align: center;
-}
-
-.album-header .album-cover {
-    display: block;
-    flex: none;
-    width: min(220px, 60vw);
-    aspect-ratio: 1;
-    object-fit: cover;
-    border-radius: 12px;
-    background: var(--color-border);
-    box-shadow: 0 10px 30px rgb(0 0 0 / 15%);
-}
-
-.album-header .album-info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 0;
-}
-
-.album-header h1 {
-    margin: 0 0 4px;
-    overflow-wrap: anywhere;
-}
-
-.album-header .album-artists {
-    font-weight: 500;
-}
-
-.album-header .album-info span:not(.album-artists) {
-    font-size: 14px;
-    color: var(--color-text-muted);
-}
-
 /* --- Responsive --- */
-
-/* Large screen: cover on the left, text on the right, aligned at the bottom. */
-@media (min-width: 1024px) {
-    .album-header {
-        flex-direction: row;
-        align-items: flex-end;
-        gap: 24px;
-        text-align: left;
-    }
-
-    .album-header .album-cover {
-        width: 200px;
-    }
-}
 
 @media (prefers-reduced-motion: reduce) {
     .album-card .album-cover {

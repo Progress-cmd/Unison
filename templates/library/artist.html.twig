@@ -4,13 +4,13 @@
 
 {% block body %}
 {% include 'library/_tabs.html.twig' with {active: 'artists'} %}
-<div class="artist-header">
+<div class="detail-header">
     {% if artist.image %}
         <img class="artist-image" src="{{ artist.image }}" alt="">
     {% else %}
         <div class="artist-image">{{ artist.name|first|upper }}</div>
     {% endif %}
-    <div class="artist-info">
+    <div class="detail-info">
         <h1>{{ artist.name }}</h1>
         <span class="artist-tracks">{% if artist.tracks|length == 0 %}Aucun titre{% elseif artist.tracks|length == 1%}1 titre{% else %}{{ artist.tracks|length }} titres{% endif %}</span>
     </div>

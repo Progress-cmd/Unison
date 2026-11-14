@@ -4,13 +4,13 @@
 
 {% block body %}
 {% include 'library/_tabs.html.twig' with {active: 'albums'} %}
-<div class="album-header">
+<div class="detail-header">
     {% if album.cover %}
         <img class="album-cover" src="{{ album.cover }}" alt="">
     {% else %}
         <div class="album-cover"></div>
     {% endif %}
-    <div class="album-info">
+    <div class="detail-info">
         <h1>{{ album.title }}</h1>
         <span class="album-artists">{{ album.artists|map(artist => artist.name)|join(', ') }}</span>
         {% if album.year %}

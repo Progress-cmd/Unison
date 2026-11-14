@@ -27,3 +27,102 @@
     color: var(--color-text);
     font-weight: 500;
 }
+
+/* --- Detail page header (an album, an artist, a playlist) --- */
+
+/* Phone: picture on top, text centred below.
+   Large screen: picture on the left, text on the right, aligned at the bottom. */
+.detail-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+/* The picture: album cover, playlist icon or round artist avatar. */
+.detail-header .album-cover,
+.detail-header .playlist-cover {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: min(220px, 60vw);
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 12px;
+    background: var(--color-border);
+    color: var(--color-text-muted);
+    box-shadow: 0 10px 30px rgb(0 0 0 / 15%);
+}
+
+.detail-header .playlist-cover svg {
+    width: 40%;
+    height: 40%;
+}
+
+.detail-header .artist-image {
+    flex: none;
+    width: min(180px, 50vw);
+    font-size: 72px;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 15%);
+}
+
+.detail-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+}
+
+.detail-info h1 {
+    margin: 0 0 4px;
+    overflow-wrap: anywhere;
+}
+
+/* Details under the title: year, number of tracks… */
+.detail-info > span {
+    font-size: 14px;
+    color: var(--color-text-muted);
+}
+
+.detail-info > .album-artists {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.detail-info .playlist-actions {
+    justify-content: center;
+    margin-top: 12px;
+}
+
+@media (min-width: 1024px) {
+    .detail-header {
+        flex-direction: row;
+        align-items: flex-end;
+        gap: 24px;
+        text-align: left;
+    }
+
+    .detail-info {
+        align-items: flex-start;
+    }
+
+    .detail-header .album-cover,
+    .detail-header .playlist-cover {
+        width: 200px;
+    }
+
+    .detail-header .artist-image {
+        width: 160px;
+        font-size: 64px;
+    }
+
+    .detail-info .playlist-actions {
+        justify-content: flex-start;
+    }
+}

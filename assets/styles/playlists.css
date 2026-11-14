@@ -74,13 +74,7 @@
 
 /* --- Playlist page header --- */
 
-/* Brings the summary closer to the title it describes. */
-h1:has(+ .playlist-summary) {
-    margin-bottom: 6px;
-}
-
 .playlist-summary {
-    margin: 0 0 20px;
     font-size: 14px;
     color: var(--color-text-muted);
 }
@@ -91,7 +85,6 @@ h1:has(+ .playlist-summary) {
     flex-wrap: wrap;
     align-items: center;
     gap: 8px;
-    margin-bottom: 24px;
 }
 
 .playlist-actions form {

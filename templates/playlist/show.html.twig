@@ -11,31 +11,38 @@
 {% set hours = totalSeconds // 3600 %}
 {% set minutes = (totalSeconds % 3600) // 60 %}
 
-<h1>{{ playlist.name }}</h1>
-<div class="playlist-summary">
-    Par {{ playlist.createdBy.username }} · 
-    {% if playlist.playlistTracks|length == 0 %}Aucun titre {% elseif playlist.playlistTracks|length == 1 %}1 titre{% else %}{{ playlist.playlistTracks|length }} titres{% endif %} · 
-    {% if hours > 0 %}{{ hours }} h {% endif %}{{ minutes }} min · 
-    modifiée le {{ playlist.updatedAt|date('d/m') }}
+{% include 'library/_tabs.html.twig' with {active: 'playlists'} %}
+<div class="detail-header">
+    <div class="playlist-cover">
+        {{ ux_icon('material-symbols:queue-music') }}
+    </div>
+    <div class="detail-info">
+        <h1>{{ playlist.name }}</h1>
+        <div class="playlist-summary">
+            Par {{ playlist.createdBy.username }} · 
+            {% if playlist.playlistTracks|length == 0 %}Aucun titre {% elseif playlist.playlistTracks|length == 1 %}1 titre{% else %}{{ playlist.playlistTracks|length }} titres{% endif %} · 
+            {% if hours > 0 %}{{ hours }} h {% endif %}{{ minutes }} min · 
+            modifiée le {{ playlist.updatedAt|date('d/m') }}
+        </div>
+
+        {% if playlist.createdBy == app.user %}
+            <div class="playlist-actions">
+                <a class="btn btn-secondary" href="{{ path('app_playlist_edit', {'id': playlist.id}) }}">
+                    {{ ux_icon('material-symbols:edit') }}
+                    Modifier
+                </a>
+                <form method="post" action="{{ path('app_playlist_delete', {id: playlist.id}) }}" data-turbo-confirm="Supprimer cette playlist ?">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('playlist_delete') }}">
+                    <button class="btn btn-danger" type="submit">
+                        {{ ux_icon('material-symbols:delete') }}
+                        Supprimer
+                    </button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
 </div>
 
-{% if playlist.createdBy == app.user %}
-    <div class="playlist-actions">
-        <a class="btn btn-secondary" href="{{ path('app_playlist_edit', {'id': playlist.id}) }}">
-            {{ ux_icon('material-symbols:edit') }}
-            Modifier
-        </a>
-        <form method="post" action="{{ path('app_playlist_delete', {id: playlist.id}) }}" data-turbo-confirm="Supprimer cette playlist ?">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token('playlist_delete') }}">
-            <button class="btn btn-danger" type="submit">
-                {{ ux_icon('material-symbols:delete') }}
-                Supprimer
-            </button>
-        </form>
-    </div>
-{% endif %}
-
-{% include 'library/_tabs.html.twig' with {active: 'playlists'} %}
 <ul 
     class="track-list"
     data-controller="track-list"

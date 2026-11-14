@@ -3,8 +3,8 @@
 {% block title %}Unison - Albums{% endblock %}
 
 {% block body %}
-<h1>Albums</h1>
 {% include 'library/_tabs.html.twig' with {active: 'albums'} %}
+<h1>Albums</h1>
 <ul class="album-grid">
     {% for album in albums %}
         <li>
