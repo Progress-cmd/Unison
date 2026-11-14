@@ -11,7 +11,7 @@
 {% set hours = totalSeconds // 3600 %}
 {% set minutes = (totalSeconds % 3600) // 60 %}
 
-<h1>Bibliothèque</h1>
+{% include 'library/_heading.html.twig' %}
 {% include 'library/_tabs.html.twig' with {active: 'playlists'} %}
 <a class="back-link" href="{{ path('app_playlists') }}">
     {{ ux_icon('material-symbols:arrow-back') }}

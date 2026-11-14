@@ -3,7 +3,7 @@
 {% block title %}Unison - Album{% endblock %}
 
 {% block body %}
-<h1>Bibliothèque</h1>
+{% include 'library/_heading.html.twig' %}
 {% include 'library/_tabs.html.twig' with {active: 'albums'} %}
 <a class="back-link" href="{{ path('app_albums') }}">
     {{ ux_icon('material-symbols:arrow-back') }}

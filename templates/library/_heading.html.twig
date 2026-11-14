@@ -1,0 +1,9 @@
+{% set stats = library_stats() %}
+<div class="library-heading">
+    <h1>Bibliothèque</h1>
+    <p class="library-stats">
+        {{ stats.tracks < 2 ? stats.tracks ~ ' titre' : stats.tracks ~ ' titres'}} · 
+        {{ stats.albums < 2 ? stats.albums ~ ' album' : stats.albums ~ ' albums'}} · 
+        {{ stats.artists < 2 ? stats.artists ~ ' artiste' : stats.artists ~ ' artistes'}}
+    </p>
+</div>

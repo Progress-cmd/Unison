@@ -3,7 +3,7 @@
 {% block title %}Unison - Artistes{% endblock %}
 
 {% block body %}
-<h1>Bibliothèque</h1>
+{% include 'library/_heading.html.twig' %}
 {% include 'library/_tabs.html.twig' with {active: 'artists'} %}
 <ul class="artist-grid">
     {% for artist in artists %}

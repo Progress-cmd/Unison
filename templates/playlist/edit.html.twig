@@ -3,7 +3,7 @@
 {% block title %}Unison - Playlist{% endblock %}
 
 {% block body %}
-<h1>Bibliothèque</h1>
+{% include 'library/_heading.html.twig' %}
 {% include 'library/_tabs.html.twig' with {active: 'playlists'} %}
 <h2>Modifier {{ playlist.name }}</h2>
 {{ form_start(form, {attr: {class: 'form playlist-create'}}) }}
