@@ -4,6 +4,27 @@
 {% set hour = 'now'|date('G') %}
 <div class="home">
     <h1 class="home-greeting">{{ hour < 18 ? 'Bonjour' : 'Bonsoir'}}, <em>{{ app.user.username }}</em></h1>
-    <p class="home-subtitle">Que voulez-vous écouter aujourd'hui ?</p>
+    <p class="home-subtitle">Que veux-tu écouter aujourd'hui ?</p>
+
+    <div class="home-columns">
+        <div class="home-main"></div>
+        <aside class="home-side">
+            <section class="home-section">
+                <div class="home-section-header">
+                    <h2>Tes playlists</h2>
+                    <a href="{{ path('app_playlists') }}">Voir tout</a>
+                </div>
+                <ul class="playlist-list">
+                    {% for playlist in playlists %}
+                        <li>
+                            {% include "playlist/_playlist_row.html.twig" %}
+                        </li>
+                    {% else %}
+                        <li>Aucune playlist pour l'instant</li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </aside>
+    </div>
 </div>
 {% endblock %}

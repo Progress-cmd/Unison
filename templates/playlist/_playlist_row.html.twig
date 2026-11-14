@@ -1,0 +1,17 @@
+<a href="{{ path('app_playlist_show', {'id': playlist.id}) }}" class="playlist-row">
+    <span class="playlist-cover">
+        {{ ux_icon('material-symbols:queue-music') }}
+    </span>
+    <span class="playlist-info">
+        <span class="playlist-name">
+            {{ playlist.name }}
+        </span>
+        <span class="playlist-meta">
+            {{ playlist.createdBy.username }} · 
+            {{ playlist.playlistTracks | length }}{% if playlist.playlistTracks | length < 2 %} titre{% else %} titres{% endif %}
+        </span>
+    </span>
+    <span class="playlist-chevron">
+        {{ ux_icon('material-symbols:chevron-right') }}
+    </span>
+</a>
