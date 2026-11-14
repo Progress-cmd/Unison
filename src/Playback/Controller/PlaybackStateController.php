@@ -3,8 +3,10 @@
 namespace App\Playback\Controller;
 
 use App\Account\Entity\User;
+use App\Library\Repository\TrackRepository;
 use App\Playback\Entity\PlaybackState;
 use App\Playback\Repository\PlaybackStateRepository;
+use App\Playback\Service\QueueItems;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,6 +16,36 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 final class PlaybackStateController extends AbstractController
 {
+    #[Route('/playback/state', name: 'app_playback_state_load', methods: ['GET'])]
+    public function load(#[CurrentUser] User $user, PlaybackStateRepository $playbackStateRepository, TrackRepository $trackRepository, QueueItems $queueItems): Response
+    {
+        $state = $playbackStateRepository->findOneBy(['user' => $user]);
+
+        if (null === $state) {
+            return new Response(null, 204);
+        }
+
+        $queue = $trackRepository->findByIdsInOrder($state->getQueue());
+
+        if (!$queue) {
+            return new Response(null, 204);
+        }
+
+        $currentIndex = $state->getCurrentIndex();
+        if ($currentIndex >= count($queue)) {
+            $currentIndex = 0;
+        }
+
+        return $this->json([
+            'queue' => $queueItems->fromTracks($queue),
+            'sourceQueue' => $queueItems->fromTracks($trackRepository->findByIdsInOrder($state->getSourceQueue())),
+            'currentIndex' => $currentIndex,
+            'position' => $state->getPosition(),
+            'shuffle' => $state->isShuffle(),
+            'repeatMode' => $state->getRepeatMode(),
+        ]);
+    }
+
     #[Route('/playback/state', name: 'app_playback_state_save', methods: ['POST'])]
     public function save(Request $request, #[CurrentUser] User $user, PlaybackStateRepository $playbackStateRepository, EntityManagerInterface $em): Response
     {
