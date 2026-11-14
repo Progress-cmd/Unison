@@ -7,7 +7,23 @@
     <p class="home-subtitle">Que veux-tu écouter aujourd'hui ?</p>
 
     <div class="home-columns">
-        <div class="home-main"></div>
+        <div class="home-main">
+            <section class="home-section">
+                <div class="home-section-header">
+                    <h2>Albums récents</h2>
+                    <a href="{{ path('app_albums') }}">Voir tout</a>
+                </div>
+                <ul class="album-grid">
+                    {% for album in recentAlbums %}
+                        <li>
+                            {% include "library/_album_card.html.twig" %}
+                        </li>
+                    {% else %}
+                        <li>Aucun album pour l'instant</li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
         <aside class="home-side">
             <section class="home-section">
                 <div class="home-section-header">
