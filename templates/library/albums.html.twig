@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - Albums{% endblock %}
+
+{% block body %}
+<h1>Albums</h1>
+{% include 'library/_tabs.html.twig' with {active: 'albums'} %}
+<ul class="album-grid">
+    {% for album in albums %}
+        <li>
+            {% include 'library/_album_card.html.twig' %}
+        </li>
+    {% else %}
+        <li>Aucun album pour l'instant.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

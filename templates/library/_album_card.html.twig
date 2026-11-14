@@ -1,0 +1,15 @@
+<a class="album-card" href="{{ path('app_albums_show', {'id': album.id}) }}">
+    {% if album.cover %}
+        <img class="album-cover" src="{{ album.cover }}" alt="" loading="lazy">
+    {% else %}
+        <div class="album-cover"></div>
+    {% endif %}
+
+    <div class="album-info">
+        <span class="album-title">{{ album.title }}</span>
+        <span class="album-artists">{{ album.artists|map(artist => artist.name)|join(', ') }}</span>
+        {% if album.year %}
+            <span class="album-year">{{ album.year }}</span>
+        {% endif %}
+    </div>
+</a>

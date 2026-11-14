@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - Album{% endblock %}
+
+{% block body %}
+{% include 'library/_tabs.html.twig' with {active: 'albums'} %}
+<div class="album-header">
+    {% if album.cover %}
+        <img class="album-cover" src="{{ album.cover }}" alt="">
+    {% else %}
+        <div class="album-cover"></div>
+    {% endif %}
+    <div class="album-info">
+        <h1>{{ album.title }}</h1>
+        <span class="album-artists">{{ album.artists|map(artist => artist.name)|join(', ') }}</span>
+        {% if album.year %}
+            <span class="album-year">{{ album.year }}</span>
+        {% endif %}
+        <span>{% if album.tracks|length == 0 %}Aucun titre{% elseif album.tracks|length == 1 %}1 titre{% else %}{{ album.tracks|length }} titres{% endif %}
+        </span>
+    </div>
+</div>
+
+{% include 'library/_track_list.html.twig' %}
+{% endblock %}

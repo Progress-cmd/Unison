@@ -1,0 +1,146 @@
+/* --- Album grid --- */
+
+/* As many 150px+ columns as fit: 2 on a phone, 6 or more on a large screen,
+   without any media query. */
+.album-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 24px 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* "Aucun album pour l'instant." spans the whole row. */
+.album-grid > li:not(:has(.album-card)) {
+    grid-column: 1 / -1;
+    padding: 12px 0;
+    color: var(--color-text-muted);
+}
+
+/* --- Album card --- */
+
+.album-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+}
+
+.album-card .album-cover {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 8px;
+    background: var(--color-border);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.album-card:hover .album-cover,
+.album-card:focus-visible .album-cover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgb(0 0 0 / 18%);
+}
+
+.album-card:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+    border-radius: 8px;
+}
+
+.album-card .album-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.album-card .album-title,
+.album-card .album-artists {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.album-card .album-title {
+    font-weight: 500;
+}
+
+.album-card .album-artists,
+.album-card .album-year {
+    font-size: 14px;
+    color: var(--color-text-muted);
+}
+
+/* --- Album page header --- */
+
+/* Phone: cover on top, text centred below. */
+.album-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.album-header .album-cover {
+    display: block;
+    flex: none;
+    width: min(220px, 60vw);
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 12px;
+    background: var(--color-border);
+    box-shadow: 0 10px 30px rgb(0 0 0 / 15%);
+}
+
+.album-header .album-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.album-header h1 {
+    margin: 0 0 4px;
+    overflow-wrap: anywhere;
+}
+
+.album-header .album-artists {
+    font-weight: 500;
+}
+
+.album-header .album-info span:not(.album-artists) {
+    font-size: 14px;
+    color: var(--color-text-muted);
+}
+
+/* --- Responsive --- */
+
+/* Large screen: cover on the left, text on the right, aligned at the bottom. */
+@media (min-width: 1024px) {
+    .album-header {
+        flex-direction: row;
+        align-items: flex-end;
+        gap: 24px;
+        text-align: left;
+    }
+
+    .album-header .album-cover {
+        width: 200px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .album-card .album-cover {
+        transition: none;
+    }
+
+    .album-card:hover .album-cover,
+    .album-card:focus-visible .album-cover {
+        transform: none;
+    }
+}
