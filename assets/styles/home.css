@@ -98,24 +98,44 @@
 
 /* --- Track card ("À découvrir") --- */
 
+/* A flat tile: the cover fills the left edge, title and artists beside it. */
 .track-card {
     display: flex;
     align-items: center;
     gap: 12px;
     width: 100%;
-    padding: 8px;
+    padding: 0 12px 0 0;
+    overflow: hidden;
     background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 10px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
     color: inherit;
     font: inherit;
     text-align: left;
     cursor: pointer;
-    transition: background-color 0.15s ease, transform 0.15s ease;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.track-card .track-cover {
+    width: 60px;
+    height: 60px;
+    border-radius: 0;
+    transition: filter 0.15s ease;
+}
+
+.track-card .track-title {
+    font-weight: 500;
 }
 
 .track-card:hover {
     background: var(--color-accent-soft);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 12%);
+}
+
+/* The cover dims slightly under the pointer, as a hint that it plays. */
+.track-card:hover .track-cover {
+    filter: brightness(0.85);
 }
 
 .track-card:active {
@@ -140,7 +160,8 @@
     .discover-grid {
         grid-auto-flow: row;
         grid-template-rows: none;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        /* Always 4 columns: the 8 tiles make two full rows, no gap at the end. */
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         padding-bottom: 0;
         overflow: visible;
     }
@@ -161,7 +182,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .track-card {
+    .track-card,
+    .track-card .track-cover {
         transition: none;
     }
 
