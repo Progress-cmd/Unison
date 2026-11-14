@@ -31,14 +31,9 @@ final class PlaylistController extends AbstractController
             return $this->redirectToRoute('app_playlists');
         }
 
-        $mine = 'mine' === $request->getSession()->get('scope', 'all');
-
-        $criteria = $mine ? ['createdBy' => $user] : [];
-
         return $this->render('playlist/index.html.twig', [
             'form' => $form,
-            'playlists' => $playlistRepository->findBy($criteria, ['updatedAt' => 'DESC']),
-            'mine' => $mine,
+            'playlists' => $playlistRepository->findBy([], ['updatedAt' => 'DESC']),
         ]);
     }
 

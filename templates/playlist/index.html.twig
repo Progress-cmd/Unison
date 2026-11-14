@@ -9,7 +9,7 @@
     {{ form_row(form.name) }}
     <button type="submit" class="btn">Créer</button>
 {{ form_end(form) }}
-<h2>{% if mine %}Mes playlists{% else %}Nos playlists{% endif %}</h2>
+<h2>Nos playlists</h2>
 <ul class="playlist-list">
     {% for playlist in playlists %}
         <li>
@@ -32,7 +32,7 @@
             </a>
         </li>
     {% else %}
-        <li>{% if mine %}Aucune playlist possédée{% else %}Aucune playlist{% endif %}</li>
+        <li>Aucune playlist</li>
     {% endfor %}
 </ul>
 {% endblock %}

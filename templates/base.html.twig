@@ -32,11 +32,6 @@
         {% endif %}
 
         <main>
-            {% if app.user %}
-                <header class="topbar">
-                    {% include "shared/_scope_switch.html.twig" %}
-                </header>
-            {% endif %}
             <div class="notif">
                 {% for type, messages in app.flashes %}
                     {% for message in messages %}
