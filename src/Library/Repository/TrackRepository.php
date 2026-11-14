@@ -90,4 +90,34 @@ class TrackRepository extends ServiceEntityRepository
 
         return $tracks;
     }
+
+    public function findByIdsInOrder(array $ids): array
+    {
+        if (!$ids) {
+            return [];
+        }
+
+        $tracks = $this->createQueryBuilder('t')
+            ->leftJoin('t.artists', 'a')
+            ->addSelect('a')
+            ->andWhere('t.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult()
+        ;
+
+        $byId = [];
+        foreach ($tracks as $track) {
+            $byId[$track->getId()] = $track;
+        }
+
+        $ordered = [];
+        foreach ($ids as $id) {
+            if (isset($byId[$id])) {
+                $ordered[] = $byId[$id];
+            }
+        }
+
+        return $ordered;
+    }
 }
