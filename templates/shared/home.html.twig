@@ -15,7 +15,7 @@
                     <a href="{{ path('app_playlists') }}">Voir tout</a>
                 </div>
                 <ul class="playlist-list">
-                    {% for playlist in playlists %}
+                    {% for playlist in recentPlaylists %}
                         <li>
                             {% include "playlist/_playlist_row.html.twig" %}
                         </li>
@@ -23,6 +23,13 @@
                         <li>Aucune playlist pour l'instant</li>
                     {% endfor %}
                 </ul>
+            </section>
+            <section class="home-section">
+                <div class="home-section-header">
+                    <h2>Tes favoris</h2>
+                    <a href="{{ path('app_favorites') }}">Voir tout</a>
+                </div>
+                {% include "library/_track_list.html.twig" %}
             </section>
         </aside>
     </div>

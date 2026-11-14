@@ -7,6 +7,7 @@ use App\Library\Entity\Artist;
 use App\Library\Entity\Track;
 use App\Library\Entity\FavoriteTrack;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -31,18 +32,18 @@ class TrackRepository extends ServiceEntityRepository
         ;
     }
 
-    public function findFavorites(User $user): array
+    public function findFavorites(User $user, ?int $limit = null): array
     {
-        return $this->createQueryBuilder('t')
+        return iterator_to_array(new Paginator($this->createQueryBuilder('t')
             ->innerJoin(FavoriteTrack::class, 'f', 'WITH', 'f.track = t')
             ->leftJoin('t.artists', 'a')
             ->addSelect('a')
             ->andWhere('f.user = :user')
             ->setParameter('user', $user)
+            ->setMaxResults($limit)
             ->orderBy('f.addedAt', 'DESC')
             ->getQuery()
-            ->getResult()
-        ;
+        ));
     }
 
     public function findByArtist(Artist $artist): array
