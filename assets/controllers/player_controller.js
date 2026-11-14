@@ -23,6 +23,7 @@ export default class extends Controller
     static values = { saveUrl: String, saveToken: String };
 
     queue = [];
+    lastSave = 0;
     index = 0;
     repeat = 'off';
     shuffle = false;
@@ -109,6 +110,8 @@ export default class extends Controller
         const nextMode = { off: 'all', all: 'one', one: 'off' };
 
         this.setRepeat(nextMode[this.repeat]);
+
+        this.saveState();
     }
 
     toggleShuffle()
@@ -120,6 +123,8 @@ export default class extends Controller
         this.arrangeQueue();
 
         this.renderUpcoming();
+
+        this.saveState();
     }
 
     jumpTo(event)
@@ -150,6 +155,8 @@ export default class extends Controller
         this.toggleTarget.setAttribute('aria-label', 'Lecture');
 
         this.stopAnimation();
+
+        this.saveState();
     }
 
     updateDuration()
@@ -167,6 +174,10 @@ export default class extends Controller
         const played = bars.length * this.audioTarget.currentTime / this.audioTarget.duration;
 
         bars.forEach((bar, index) => bar.classList.toggle('is-played', index < played));
+
+        if (Date.now() - this.lastSave > 15000) {
+            this.saveState();
+        }
     }
 
     trackEnded()
@@ -201,6 +212,8 @@ export default class extends Controller
         this.dispatch('change', { detail: { url: track.url } });
 
         this.audioTarget.play();
+
+        this.saveState();
     }
 
     renderWaveform(waveform)
@@ -325,6 +338,8 @@ export default class extends Controller
         if (!this.queue.length) {
             return;
         }
+
+        this.lastSave = Date.now();
 
         const state = {
             queue: this.queue.map(track => track.id),

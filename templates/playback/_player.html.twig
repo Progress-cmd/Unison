@@ -7,6 +7,7 @@
         discover:play@window->player#play
         keydown.esc@window->player#collapse
         click@window->player#wakeSound
+        pagehide@window->player#saveState
     "
     data-turbo-permanent
     data-player-save-url-value="{{ path('app_playback_state_save') }}"
