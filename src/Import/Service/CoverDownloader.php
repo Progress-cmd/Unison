@@ -27,7 +27,7 @@ class CoverDownloader
             '-q:v', '4',
             $this->coversDir . '/' . $videoId . '.jpg'
         ]);
-        
+
         $process->setTimeout(30);
 
         $process->run();

@@ -128,7 +128,7 @@ export default class extends Controller
         this.shuffle = !this.shuffle;
 
         this.shuffleTarget.setAttribute('aria-pressed', this.shuffle);
-        
+
         this.arrangeQueue();
 
         this.renderUpcoming();
@@ -295,13 +295,13 @@ export default class extends Controller
     arrangeQueue()
     {
         if (!this.queue.length) {
-            return; 
+            return;
         }
         const current = this.queue[this.index];
 
         if (this.shuffle) {
             const others = this.sourceQueue.filter(track => track !== current);
-            
+
             this.queue = [current, ...this.shuffled(others)];
             this.index = 0;
         } else {
@@ -313,14 +313,14 @@ export default class extends Controller
     shuffled(tracks)
     {
         const result = [...tracks];
-        
+
         for (let i = result.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [result[i], result[j]] = [result[j], result[i]];
         }
         return result;
     }
-    
+
     renderUpcoming()
     {
         const first = this.index + 1;

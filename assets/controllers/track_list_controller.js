@@ -8,7 +8,7 @@ export default class extends Controller
     {
         this.markCurrent(document.documentElement.dataset.currentUrl);
     }
-    
+
     play(event)
     {
         const tracks = this.trackTargets.map(row => ({

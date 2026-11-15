@@ -7,7 +7,7 @@ use Symfony\Component\Process\Process;
 class WaveformGenerator
 {
     private const POINTS = 120;
-    
+
     public function generate(string $filePath): ?string
     {
         $process = new Process([
@@ -20,7 +20,7 @@ class WaveformGenerator
             '-c:a', 'pcm_s16le', '-f', 'data',
             '-'
         ]);
-        
+
         $process->setTimeout(120);
 
         $process->run();

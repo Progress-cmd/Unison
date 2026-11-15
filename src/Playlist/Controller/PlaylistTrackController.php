@@ -32,7 +32,7 @@ class PlaylistTrackController extends AbstractController
 
         $alreadyIn = $playlistTrackRepository->findOneBy(['track' => $track, 'playlist' => $playlist]);
 
-        if (!is_null($alreadyIn)) {            
+        if (!is_null($alreadyIn)) {
             $this->addFlash('warning', 'Titre déjà dans '.$playlist->getName());
             return $this->redirectToRoute('app_playlist_show',
                 ['id' => $playlist->getId()]
@@ -40,7 +40,7 @@ class PlaylistTrackController extends AbstractController
         }
 
         $playlistTrack = new PlaylistTrack($user);
-        
+
         $playlistTrack->setPlaylist($playlist);
         $playlistTrack->setTrack($track);
         $playlistTrack->setPosition($playlistTrackRepository->findPositionMax($playlist) + 1);
@@ -64,7 +64,7 @@ class PlaylistTrackController extends AbstractController
         }
 
         $track = $request->request->getInt('track');
-        
+
         $playlistTrack = $playlistTrackRepository->findOneBy(['track' => $track, 'playlist' => $playlist]);
 
         if (null === $playlistTrack) {

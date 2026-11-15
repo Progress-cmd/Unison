@@ -46,7 +46,7 @@ class ImportTrackHandler
 
         try {
             $track = $this->trackImporter->import($message->url, $user, $album, $message->trackNumber);
-            
+
             $job?->setStatus(ImportStatus::Done);
             $job?->setTitle($track->getTitle());
         } catch (TrackAlreadyImportedException $e) {
