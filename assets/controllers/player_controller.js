@@ -20,6 +20,7 @@ export default class extends Controller
         'upcomingRow',
         'favorite',
         'favoriteTrack',
+        'add',
     ];
 
     static values = {
@@ -444,6 +445,7 @@ export default class extends Controller
         const track = this.queue[this.index];
 
         this.favoriteTrackTarget.value = track.id;
+        this.addTarget.dataset.playlistPickerUrlParam = track.playlistsUrl;
 
         const response = await fetch(`${this.favoriteUrlValue}?track=${track.id}`);
 

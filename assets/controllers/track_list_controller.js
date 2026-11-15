@@ -18,6 +18,7 @@ export default class extends Controller
             artists: row.dataset.artists,
             cover: row.dataset.cover,
             waveform: row.dataset.waveform,
+            playlistsUrl: row.dataset.playlistsUrl,
         }));
 
         this.dispatch('play', { detail: { tracks: tracks, index: event.params.index } });
