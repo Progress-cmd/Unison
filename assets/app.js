@@ -18,3 +18,4 @@ import './styles/albums.css';
 import './styles/artists.css';
 import './styles/home.css';
 import './styles/imports.css';
+import './styles/account.css';

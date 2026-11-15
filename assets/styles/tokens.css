@@ -36,3 +36,13 @@
     /* --- Player --- */
     --player-height: 72px;
 }
+
+/* Theme chosen on the account page: forcing color-scheme switches every light-dark() above.
+   With "system" (or logged out), the device setting applies. */
+:root[data-theme="light"] {
+    color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+}

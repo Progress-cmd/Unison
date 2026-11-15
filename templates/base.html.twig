@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr"{% if app.user %} data-theme="{{ app.user.theme.value }}"{% endif %}>
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}Unison{% endblock %}</title>
