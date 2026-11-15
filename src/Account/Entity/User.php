@@ -2,8 +2,10 @@
 
 namespace App\Account\Entity;
 
+use App\Account\Enum\Theme;
 use App\Account\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -11,6 +13,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Table(name: 'users')]
 #[ORM\UniqueConstraint(name: 'UNIQ_USERS_EMAIL', fields: ['email'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_USERS_USERNAME', fields: ['username'])]
+#[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé.')]
+#[UniqueEntity(fields: ['username'], message: 'Ce nom d\'utilisateur est déjà utilisé.')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -38,6 +42,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\Column(enumType: Theme::class, options: ['default' => 'system'])]
+    private Theme $theme = Theme::System;
 
     public function __construct()
     {
@@ -140,5 +147,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials(): void
     {
         // @deprecated, to be removed when upgrading to Symfony 8
+    }
+
+    public function getTheme(): Theme
+    {
+        return $this->theme;
+    }
+
+    public function setTheme(Theme $theme): static
+    {
+        $this->theme = $theme;
+
+        return $this;
     }
 }

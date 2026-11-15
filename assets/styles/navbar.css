@@ -12,10 +12,8 @@
     border-top: 1px solid var(--color-border);
 }
 
-/* The four entries share the width equally. The logout button sits in a form,
-   so the form is the one that takes its share. */
-.navbar > .nav-item,
-.navbar > form {
+/* The entries share the width equally. */
+.navbar > .nav-item {
     flex: 1;
     min-width: 0;
     display: flex;
@@ -85,8 +83,7 @@
     }
 
     /* In a column, the entries keep their own height. */
-    .navbar > .nav-item,
-    .navbar > form {
+    .navbar > .nav-item {
         flex: none;
     }
 
@@ -94,11 +91,6 @@
         font-family: var(--serif);
         font-size: 30px;
         margin-bottom: 30px;
-        padding: 0 12px;
-    }
-
-    .username {
-        margin-top: auto;
         padding: 0 12px;
     }
 

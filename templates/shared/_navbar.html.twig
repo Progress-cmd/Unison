@@ -12,12 +12,8 @@
         {{ ux_icon('material-symbols:download') }}
         <span class="nav-label">Importer</span>
     </a>
-    <div class="username desktop-only">{{ app.user.username }}</div>
-    <form action="{{ path('app_logout') }}" method="post">
-        <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
-        <button class="nav-item" type="submit">
-            {{ ux_icon('material-symbols:logout') }}
-            <span class="nav-label">Déconnexion</span>
-        </button>
-    </form>
+    <a class="nav-item" aria-current="{{ section == 'account' ? 'page' : 'false' }}" href="{{ path('app_account') }}">
+        {{ ux_icon('material-symbols:person' ~ (section == 'account' ? '' : '-outline' )) }}
+        <span class="nav-label">Compte</span>
+    </a>
 </nav>

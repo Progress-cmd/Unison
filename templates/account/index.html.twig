@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - Compte{% endblock %}
+
+{% block section %}account{% endblock %}
+
+{% block body %}
+<h1>Compte</h1>
+<div class="account-header">
+    <p class="account-name">{{ app.user.username }}</p>
+    <p class="account-email">{{ app.user.email }}</p>
+</div>
+
+<section class="account-section">
+    <h2>Mes informations</h2>
+    {{ form_start(accountForm, {attr: {class: 'form'}}) }}
+        {{ form_row(accountForm.username) }}
+        {{ form_row(accountForm.email) }}
+        <button class="btn" type="submit">Enregistrer</button>
+    {{ form_end(accountForm) }}
+</section>
+
+<section class="account-section">
+    <h2>Mot de passe</h2>
+    {{ form_start(passwordForm, {attr: {class: 'form'}}) }}
+        {{ form_row(passwordForm.currentPassword) }}
+        {{ form_row(passwordForm.newPassword) }}
+        <button class="btn" type="submit">Enregistrer</button>
+    {{ form_end(passwordForm) }}
+</section>
+
+<section class="account-section">
+    <h2>Thème</h2>
+    {{ form_start(themeForm, {attr: {class: 'form', 'data-controller': 'theme', 'data-action': 'change->theme#apply'}}) }}
+        {{ form_row(themeForm.theme, {attr: {class: 'theme-choice'}}) }}
+    {{ form_end(themeForm) }}
+</section>
+
+<section class="account-section">
+    <form action="{{ path('app_logout') }}" method="post">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+        <button class="btn btn-danger" type="submit">Déconnexion</button>
+    </form>
+</section>
+{% endblock %}
