@@ -1,0 +1,14 @@
+<turbo-frame id="playlist-picker">
+    <ul>
+        {% for playlist in playlists %}
+            <li>
+                {{ playlist.name }}
+                {% set count = playlist.playlistTracks|length %}
+                {{ count ~ (count < 2 ? ' titre' : ' titres') }}
+                <input type="checkbox" {% if playlist.id in checkedIds %}checked{% endif %}>
+            </li>
+        {% else %}
+            <li>Aucune playlist</li>
+        {% endfor %}
+    </ul>
+</turbo-frame>
