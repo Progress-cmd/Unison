@@ -2,7 +2,7 @@
     <ul>
         {% for playlist in playlists %}
             {% set checked = playlist.id in checkedIds %}
-            <li>
+            <li data-name="{{ playlist.name|lower }}">
                 <form method="post" action="{{ checked ? path('app_playlist_remove_track', {id: playlist.id}) : path('app_playlist_add_track', {id: playlist.id}) }}">
                     <input type="hidden" name="_csrf_token" value="{{ checked ? csrf_token('playlist_remove_track') : csrf_token('playlist_add_track') }}">
                     <input type="hidden" name="track" value="{{ track.id }}">

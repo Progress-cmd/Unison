@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller
 {
-    static targets = ['dialog', 'frame'];
+    static targets = ['dialog', 'frame', 'search'];
 
     open(event)
     {
@@ -15,10 +15,20 @@ export default class extends Controller
     {
         this.frameTarget.removeAttribute('src');
         this.frameTarget.innerHTML = '';
+        this.searchTarget.value = '';
     }
 
     submit(event)
     {
         event.target.form.requestSubmit();
+    }
+
+    filter()
+    {
+        const query = this.searchTarget.value.toLowerCase().trim();
+
+        this.frameTarget.querySelectorAll('li[data-name]').forEach(item => {
+            item.hidden = !item.dataset.name.includes(query);
+        });
     }
 }
