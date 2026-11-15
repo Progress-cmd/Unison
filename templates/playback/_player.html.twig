@@ -9,6 +9,7 @@
         click@window->player#wakeSound
         pagehide@window->player#saveState
         turbo:load@document->player#refreshFavorite
+        keydown@window->player#shortcut
     "
     data-turbo-permanent
     data-player-save-url-value="{{ path('app_playback_state_save') }}"
