@@ -458,6 +458,71 @@ export default class extends Controller
 
 
         this.favoriteTarget.setAttribute('aria-pressed', favorite);
-        this.favoriteTarget.setAttribute('aria-label', favorite ? 'Retirer des favoris' : 'Ajouter aux favoris ')
+        this.favoriteTarget.setAttribute('aria-label', favorite ? 'Retirer des favoris' : 'Ajouter aux favoris');
+    }
+
+    shortcut(event)
+    {
+        if (event.ctrlKey || event.metaKey || event.altKey) {
+            return;
+        }
+
+        if (event.target.closest('input, textarea, select')) {
+            return;
+        }
+
+        if (this.queue.length === 0) {
+            return;
+        }
+
+        if (document.querySelector('dialog[open]')) {
+            return;
+        }
+
+        switch (event.key) {
+            case ' ':
+                this.toggle();
+                break;
+
+            case 'ArrowLeft':
+                if (event.shiftKey) {
+                    this.previous();
+                } else {
+                    this.seekBy(-10);
+                }
+                break;
+
+            case 'ArrowRight':
+                if (event.shiftKey) {
+                    this.next();
+                } else {
+                    this.seekBy(10);
+                }
+                break;
+
+            case 'f':
+            case 'F':
+                this.favoriteTarget.click();
+                break;
+
+            case 'e':
+            case 'E':
+                this.toggleExpanded();
+                break;
+
+            default:
+                return;
+        }
+
+        event.preventDefault();
+    }
+
+    seekBy(seconds)
+    {
+        if (!this.audioTarget.duration) {
+            return;
+        }
+        
+        this.audioTarget.currentTime = Math.min(Math.max(this.audioTarget.currentTime + seconds, 0), this.audioTarget.duration);
     }
 }
