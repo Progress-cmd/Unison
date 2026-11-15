@@ -20,7 +20,6 @@ final class HomeController extends AbstractController
     {
         return $this->render('shared/home.html.twig', [
             'recentPlaylists' => $playlistRepository->findBy(['createdBy' => $user], ['updatedAt' => 'DESC'], 4),
-            'playlists' => $playlistRepository->findBy([], ['updatedAt' => 'DESC']),
             'favoriteIds' => $favoriteTrackRepository->findTrackIds($user),
             'tracks' => $trackRepository->findFavorites($user, 5),
             'recentAlbums' => $albumRepository->findAllAlbum(6),
