@@ -8,12 +8,14 @@
         keydown.esc@window->player#collapse
         click@window->player#wakeSound
         pagehide@window->player#saveState
+        turbo:load@document->player#refreshFavorite
     "
     data-turbo-permanent
     data-player-save-url-value="{{ path('app_playback_state_save') }}"
     data-player-save-token-value="{{ csrf_token('playback_state') }}"
     data-player-load-url-value="{{ path('app_playback_state_load') }}"
     data-player-random-url-value="{{ path('app_random_mix') }}"
+    data-player-favorite-url-value="{{ path('app_favorite_state') }}"
 >
     <button
         type="button"
@@ -24,6 +26,7 @@
         {{ ux_icon('material-symbols:keyboard-arrow-down') }}
     </button>
 
+    <img class="track-cover desktop-only" data-player-target="cover" alt="" data-action="click->player#toggleExpanded">
     <button
         type="button"
         class="player-track"
@@ -32,27 +35,41 @@
         data-player-target="expand"
         data-action="player#toggleExpanded"
     >
-        <img class="track-cover desktop-only" data-player-target="cover" alt="">
         <span class="track-info">
             <span class="track-title" data-player-target="title"></span>
             <span class="track-artists" data-player-target="artists"></span>
         </span>
     </button>
 
+    <button class="icon-btn player-add" type="button" aria-label="Ajouter à une playlist">
+        {{ ux_icon('material-symbols:playlist-add') }}
+    </button>
+
+    <form class="player-favorite" action="{{ path('app_favorite_toggle') }}" method="post">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('favorite_toggle') }}">
+        <input type="hidden" name="track" data-player-target="favoriteTrack">
+        <button class="icon-btn" aria-label="Ajouter aux favoris" type="submit" aria-pressed="false" data-player-target="favorite">
+            {{ ux_icon('material-symbols:favorite', {class: 'icon-favorite-on'}) }}
+            {{ ux_icon('material-symbols:favorite-outline', {class: 'icon-favorite-off'}) }}
+        </button>
+    </form>
+
     <div class="player-controls">
         <button
             type="button"
             class="icon-btn player-option"
-            aria-label="Lecture aléatoire"
+            aria-label="Répéter"
             aria-pressed="false"
-            data-player-target="shuffle"
-            data-action="player#toggleShuffle"
+            data-player-target="repeat"
+            data-action="player#toggleRepeat"
         >
-            {{ ux_icon('material-symbols:shuffle') }}
+            {{ ux_icon('material-symbols:repeat', {class: 'icon-repeat'}) }}
+            {{ ux_icon('material-symbols:repeat-one', {class: 'icon-repeat-one'}) }}
         </button>
+
         <button
             type="button"
-            class="icon-btn"
+            class="icon-btn player-previous"
             aria-label="Morceau précédent"
             data-action="player#previous"
         >
@@ -72,7 +89,7 @@
 
         <button
             type="button"
-            class="icon-btn"
+            class="icon-btn player-next"
             aria-label="Morceau suivant"
             data-action="player#next"
         >
@@ -82,13 +99,12 @@
         <button
             type="button"
             class="icon-btn player-option"
-            aria-label="Répéter"
+            aria-label="Lecture aléatoire"
             aria-pressed="false"
-            data-player-target="repeat"
-            data-action="player#toggleRepeat"
+            data-player-target="shuffle"
+            data-action="player#toggleShuffle"
         >
-            {{ ux_icon('material-symbols:repeat', {class: 'icon-repeat'}) }}
-            {{ ux_icon('material-symbols:repeat-one', {class: 'icon-repeat-one'}) }}
+            {{ ux_icon('material-symbols:shuffle') }}
         </button>
     </div>
 

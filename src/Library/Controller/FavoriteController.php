@@ -56,4 +56,14 @@ final class FavoriteController extends AbstractController
 
         return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_home'));
     }
+
+    #[Route('/favorites/state', name: 'app_favorite_state', methods: ['GET'])]
+    public function state(#[CurrentUser] User $user, Request $request, FavoriteTrackRepository $favoriteTrackRepository): Response
+    {
+        $trackId = $request->query->getInt('track');
+
+        $isFavorite = null !== $favoriteTrackRepository->findOneBy(['track' => $trackId, 'user' => $user]);
+
+        return $this->json(['favorite' => $isFavorite]);
+    }
 }

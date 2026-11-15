@@ -15,7 +15,8 @@ main {
 @media (min-width: 1024px) {
     .navbar ~ main {
         margin-left: var(--sidebar-width);
-        padding-bottom: calc(var(--player-height) + 20px);
+        /* Room for the floating player and the gap under it. */
+        padding-bottom: calc(var(--player-height) + 16px + 20px);
     }
 
     .desktop-only {

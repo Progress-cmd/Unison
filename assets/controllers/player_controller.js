@@ -18,9 +18,17 @@ export default class extends Controller
         'shuffle',
         'upcoming',
         'upcomingRow',
+        'favorite',
+        'favoriteTrack',
     ];
 
-    static values = { saveUrl: String, saveToken: String, loadUrl: String, randomUrl: String };
+    static values = {
+        saveUrl: String,
+        saveToken: String,
+        loadUrl: String,
+        randomUrl: String,
+        favoriteUrl: String
+    };
 
     queue = [];
     lastSave = 0;
@@ -217,6 +225,8 @@ export default class extends Controller
 
             this.saveState();
         }
+
+        this.refreshFavorite();
     }
 
     renderWaveform(waveform)
@@ -250,8 +260,25 @@ export default class extends Controller
 
     setExpanded(expanded)
     {
-        this.element.classList.toggle('is-expanded', expanded);
-        this.expandTarget.setAttribute('aria-expanded', expanded);
+        // Escape calls collapse() even when the player is already small: nothing to animate.
+        if (expanded === this.element.classList.contains('is-expanded')) {
+            return;
+        }
+
+        const apply = () => {
+            this.element.classList.toggle('is-expanded', expanded);
+            this.expandTarget.setAttribute('aria-expanded', expanded);
+        };
+
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // The browser pictures the player before and after apply(), then animates
+        // between the two (see "view-transition-name: player" in player.css).
+        if (document.startViewTransition && !reduceMotion) {
+            document.startViewTransition(apply);
+        } else {
+            apply();
+        }
     }
 
     setRepeat(mode)
@@ -406,5 +433,28 @@ export default class extends Controller
         this.index = 0;
 
         this.loadCurrent(false);
+    }
+
+    async refreshFavorite()
+    {
+        if (this.queue.length === 0) {
+            return;
+        }
+
+        const track = this.queue[this.index];
+
+        this.favoriteTrackTarget.value = track.id;
+
+        const response = await fetch(`${this.favoriteUrlValue}?track=${track.id}`);
+
+        if (!response.ok) {
+            return;
+        }
+
+        const { favorite } = await response.json();
+
+
+        this.favoriteTarget.setAttribute('aria-pressed', favorite);
+        this.favoriteTarget.setAttribute('aria-label', favorite ? 'Retirer des favoris' : 'Ajouter aux favoris ')
     }
 }
