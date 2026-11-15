@@ -250,8 +250,25 @@ export default class extends Controller
 
     setExpanded(expanded)
     {
-        this.element.classList.toggle('is-expanded', expanded);
-        this.expandTarget.setAttribute('aria-expanded', expanded);
+        // Escape calls collapse() even when the player is already small: nothing to animate.
+        if (expanded === this.element.classList.contains('is-expanded')) {
+            return;
+        }
+
+        const apply = () => {
+            this.element.classList.toggle('is-expanded', expanded);
+            this.expandTarget.setAttribute('aria-expanded', expanded);
+        };
+
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // The browser pictures the player before and after apply(), then animates
+        // between the two (see "view-transition-name: player" in player.css).
+        if (document.startViewTransition && !reduceMotion) {
+            document.startViewTransition(apply);
+        } else {
+            apply();
+        }
     }
 
     setRepeat(mode)

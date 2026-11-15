@@ -10,8 +10,17 @@
     align-items: center;
     gap: 12px;
     padding: 0 16px;
-    background: var(--color-surface);
-    border-top: 1px solid var(--color-border);
+    background: #121212;
+    color: white;
+    /* The browser animates this element on its own when the player opens or
+       closes (see setExpanded() in player_controller.js). */
+    view-transition-name: player;
+}
+
+/* Black in every state: secondary text in light grey. */
+.player .track-artists,
+.player .player-time {
+    color: rgb(255 255 255 / 65%);
 }
 
 .player-track {
@@ -39,19 +48,26 @@
 }
 
 /* Must stay after components.css: it overrides .icon-btn on the same button. */
+/* White circle, black icon: stands out on the black player without shouting. */
 .player-play {
     width: 44px;
     height: 44px;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: var(--color-accent);
-    color: white;
+    background: white;
+    color: black;
+    transition: transform 0.15s ease;
 }
 
 .player-play:hover {
-    background: var(--color-accent-hover);
-    color: white;
+    color: black;
+    transform: scale(1.06);
+}
+
+.player-play svg {
+    width: 26px;
+    height: 26px;
 }
 
 /* Only shown in the detailed card. Must also stay after components.css. */
@@ -121,7 +137,7 @@
 
 .player-bars span {
     flex: 1;
-    background: color-mix(in srgb, var(--color-text-muted) 40%, transparent);
+    background: rgb(255 255 255 / 35%);
     border-radius: 99px;
     transform: scaleX(0.65);
     transition: background-color 0.2s;
@@ -171,8 +187,6 @@
     gap: 16px;
     padding: 24px;
     background: black;
-    color: white;
-    border-top: none;
     max-height: 100dvh;
     overflow-y: auto;
 }
@@ -209,11 +223,6 @@
     width: 100%;
 }
 
-.player.is-expanded .track-artists,
-.player.is-expanded .player-time {
-    color: rgb(255 255 255 / 70%);
-}
-
 .player.is-expanded .player-time {
     display: block;
 }
@@ -233,14 +242,6 @@
     height: 64px;
 }
 
-.player.is-expanded .player-bars span {
-    background: rgb(255 255 255 / 35%);
-}
-
-.player.is-expanded .player-bars span.is-played {
-    background: var(--color-accent);
-}
-
 .player.is-expanded .player-bars span:not(:nth-child(3n)) {
     display: block;
 }
@@ -249,6 +250,17 @@
     grid-area: controls;
     justify-content: center;
     gap: 24px;
+}
+
+/* Full screen: the main button is bigger. */
+.player.is-expanded .player-play {
+    width: 64px;
+    height: 64px;
+}
+
+.player.is-expanded .player-play svg {
+    width: 34px;
+    height: 34px;
 }
 
 .player.is-expanded .player-volume {
@@ -296,19 +308,110 @@
     background: rgb(255 255 255 / 10%);
 }
 
+/* --- Phone: floating mini-player --- */
+
+/* A black rounded pill above the navigation bar: play, title and artists, next.
+   The detailed card (.is-expanded) is not affected. */
+@media (max-width: 1023px) {
+    .player:not(.is-expanded) {
+        left: 8px;
+        right: 8px;
+        bottom: calc(var(--nav-height) + 8px);
+        z-index: 5;
+        height: 60px;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        grid-template-areas: "play track next";
+        align-items: center;
+        gap: 12px;
+        padding: 0 8px;
+        border: 1px solid rgb(255 255 255 / 8%);
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgb(0 0 0 / 25%);
+    }
+
+    /* The buttons of .player-controls are placed directly in the pill's grid. */
+    .player:not(.is-expanded) .player-controls {
+        display: contents;
+    }
+
+    /* In the pill, a smaller circle so it doesn't dominate the title. */
+    .player:not(.is-expanded) .player-play {
+        grid-area: play;
+        width: 38px;
+        height: 38px;
+    }
+
+    .player:not(.is-expanded) .player-play svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    .player:not(.is-expanded) .player-next {
+        grid-area: next;
+        padding: 8px;
+    }
+
+    .player:not(.is-expanded) .player-next svg {
+        width: 26px;
+        height: 26px;
+    }
+
+    .player:not(.is-expanded) .player-next:hover {
+        color: white;
+        opacity: 0.8;
+    }
+
+    .player:not(.is-expanded) .player-track {
+        grid-area: track;
+    }
+
+    .player:not(.is-expanded) .track-title {
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .player:not(.is-expanded) .track-artists {
+        font-size: 12px;
+    }
+
+    .player:not(.is-expanded) .player-previous,
+    .player:not(.is-expanded) .player-wave {
+        display: none;
+    }
+}
+
+/* --- Opening and closing animation --- */
+
+/* The browser takes a picture of the player before and after the change,
+   then moves and resizes it from one to the other, above the rest of the page. */
+::view-transition-group(player) {
+    z-index: 20;
+    animation-duration: 0.35s;
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
 /* --- Responsive --- */
 
 @media (min-width: 1024px) {
+    /* A floating rounded bar, detached from the sidebar and the window edges,
+       like the pill on a phone. */
     .player {
-        bottom: 0;
-        left: var(--sidebar-width);
+        bottom: 16px;
+        left: calc(var(--sidebar-width) + 16px);
+        right: 16px;
+        z-index: 5;
+        border: 1px solid rgb(255 255 255 / 8%);
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgb(0 0 0 / 25%);
     }
 
     .player.is-expanded {
-        inset: auto 20px 20px auto;
+        /* Same right and bottom gap as the floating bar: the card grows from its corner. */
+        inset: auto 16px 16px auto;
         width: 340px;
         border-radius: 20px;
-        max-height: calc(100dvh - 40px);
+        max-height: calc(100dvh - 32px);
     }
 
     .player-track {
@@ -331,5 +434,15 @@
     .player-volume input {
         width: 90px;
         accent-color: var(--color-accent);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .player-play {
+        transition: none;
+    }
+
+    .player-play:hover {
+        transform: none;
     }
 }
