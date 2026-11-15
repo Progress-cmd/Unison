@@ -107,6 +107,40 @@
     display: block;
 }
 
+/* --- Favorite (heart) --- */
+
+.player-favorite {
+    flex: none;
+    display: flex;
+    margin: 0;
+}
+
+.player-favorite .icon-btn {
+    padding: 8px;
+}
+
+.player-favorite svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* One icon at a time: outline when off, filled and in the accent colour when on. */
+.icon-favorite-on {
+    display: none;
+}
+
+.player-favorite [aria-pressed="true"] {
+    color: var(--color-accent);
+}
+
+.player-favorite [aria-pressed="true"] .icon-favorite-on {
+    display: block;
+}
+
+.player-favorite [aria-pressed="true"] .icon-favorite-off {
+    display: none;
+}
+
 /* --- Progress --- */
 
 .player-time {
@@ -179,6 +213,7 @@
     grid-template-areas:
         "close close close"
         "track track track"
+        "favorite favorite favorite"
         "wave wave wave"
         "elapsed . duration"
         "controls controls controls"
@@ -216,6 +251,13 @@
     width: 220px;
     height: 220px;
     border-radius: 12px;
+}
+
+/* Temporary place under the title: the full-screen rework (step 3)
+   puts it in a row with the "+" button. */
+.player.is-expanded .player-favorite {
+    grid-area: favorite;
+    justify-self: center;
 }
 
 .player.is-expanded .track-info {
@@ -320,8 +362,8 @@
         z-index: 5;
         height: 60px;
         display: grid;
-        grid-template-columns: auto minmax(0, 1fr) auto;
-        grid-template-areas: "play track next";
+        grid-template-columns: auto minmax(0, 1fr) auto auto;
+        grid-template-areas: "play track favorite next";
         align-items: center;
         gap: 12px;
         padding: 0 8px;
@@ -364,6 +406,10 @@
 
     .player:not(.is-expanded) .player-track {
         grid-area: track;
+    }
+
+    .player:not(.is-expanded) .player-favorite {
+        grid-area: favorite;
     }
 
     .player:not(.is-expanded) .track-title {

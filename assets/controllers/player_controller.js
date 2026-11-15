@@ -18,9 +18,17 @@ export default class extends Controller
         'shuffle',
         'upcoming',
         'upcomingRow',
+        'favorite',
+        'favoriteTrack',
     ];
 
-    static values = { saveUrl: String, saveToken: String, loadUrl: String, randomUrl: String };
+    static values = {
+        saveUrl: String,
+        saveToken: String,
+        loadUrl: String,
+        randomUrl: String,
+        favoriteUrl: String
+    };
 
     queue = [];
     lastSave = 0;
@@ -217,6 +225,8 @@ export default class extends Controller
 
             this.saveState();
         }
+
+        this.refreshFavorite();
     }
 
     renderWaveform(waveform)
@@ -423,5 +433,28 @@ export default class extends Controller
         this.index = 0;
 
         this.loadCurrent(false);
+    }
+
+    async refreshFavorite()
+    {
+        if (this.queue.length === 0) {
+            return;
+        }
+
+        const track = this.queue[this.index];
+
+        this.favoriteTrackTarget.value = track.id;
+
+        const response = await fetch(`${this.favoriteUrlValue}?track=${track.id}`);
+
+        if (!response.ok) {
+            return;
+        }
+
+        const { favorite } = await response.json();
+
+
+        this.favoriteTarget.setAttribute('aria-pressed', favorite);
+        this.favoriteTarget.setAttribute('aria-label', favorite ? 'Retirer des favoris' : 'Ajouter aux favoris ')
     }
 }

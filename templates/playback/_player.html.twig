@@ -8,12 +8,14 @@
         keydown.esc@window->player#collapse
         click@window->player#wakeSound
         pagehide@window->player#saveState
+        turbo:load@document->player#refreshFavorite
     "
     data-turbo-permanent
     data-player-save-url-value="{{ path('app_playback_state_save') }}"
     data-player-save-token-value="{{ csrf_token('playback_state') }}"
     data-player-load-url-value="{{ path('app_playback_state_load') }}"
     data-player-random-url-value="{{ path('app_random_mix') }}"
+    data-player-favorite-url-value="{{ path('app_favorite_state') }}"
 >
     <button
         type="button"
@@ -38,6 +40,15 @@
             <span class="track-artists" data-player-target="artists"></span>
         </span>
     </button>
+
+    <form class="player-favorite" action="{{ path('app_favorite_toggle') }}" method="post">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('favorite_toggle') }}">
+        <input type="hidden" name="track" data-player-target="favoriteTrack">
+        <button class="icon-btn" aria-label="Ajouter aux favoris" type="submit" aria-pressed="false" data-player-target="favorite">
+            {{ ux_icon('material-symbols:favorite', {class: 'icon-favorite-on'}) }}
+            {{ ux_icon('material-symbols:favorite-outline', {class: 'icon-favorite-off'}) }}
+        </button>
+    </form>
 
     <div class="player-controls">
         <button
