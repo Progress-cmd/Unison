@@ -16,4 +16,9 @@ export default class extends Controller
         this.frameTarget.removeAttribute('src');
         this.frameTarget.innerHTML = '';
     }
+
+    submit(event)
+    {
+        event.target.form.requestSubmit();
+    }
 }

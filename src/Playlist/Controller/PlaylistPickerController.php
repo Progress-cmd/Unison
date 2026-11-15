@@ -16,7 +16,7 @@ final class PlaylistPickerController extends AbstractController
     {
         return $this->render('playlist/_picker.html.twig', [
             'track' => $track,
-            'playlists' => $playlistRepository->findBy([], ['updatedAt' => 'DESC']),
+            'playlists' => $playlistRepository->findBy([], ['name' => 'ASC']),
             'checkedIds' => $playlistTrackRepository->findPlaylistIds($track)
         ]);
     }
