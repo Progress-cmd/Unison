@@ -2,11 +2,13 @@ import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller
 {
-    static targets = ['dialog', 'frame', 'search'];
+    static targets = ['dialog', 'frame', 'search', 'subtitle'];
 
     open(event)
     {
         this.frameTarget.src = event.params.url;
+
+        this.subtitleTarget.textContent = event.params.title;
 
         this.dialogTarget.showModal();
     }

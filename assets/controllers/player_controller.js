@@ -446,6 +446,7 @@ export default class extends Controller
 
         this.favoriteTrackTarget.value = track.id;
         this.addTarget.dataset.playlistPickerUrlParam = track.playlistsUrl;
+        this.addTarget.dataset.playlistPickerTitleParam = track.title;
 
         const response = await fetch(`${this.favoriteUrlValue}?track=${track.id}`);
 

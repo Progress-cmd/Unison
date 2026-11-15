@@ -59,6 +59,7 @@
             aria-label="Ajouter à une playlist"
             data-action="playlist-picker#open"
             data-playlist-picker-url-param="{{ path('app_track_playlists', {id: track.id}) }}"
+            data-playlist-picker-title-param="{{ track.title }}"
         >
             {{ ux_icon('material-symbols:playlist-add') }}
         </button>

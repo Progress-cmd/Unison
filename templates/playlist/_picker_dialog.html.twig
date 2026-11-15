@@ -1,5 +1,6 @@
 <dialog class="playlist-picker" data-playlist-picker-target="dialog" data-action="close->playlist-picker#reset">
     <h2>Ajouter à une playlist</h2>
+    <p class="picker-track" data-playlist-picker-target="subtitle"></p>
     <input type="search" placeholder="Rechercher une playlist" aria-label="Rechercher une playlist" data-playlist-picker-target="search" data-action="input->playlist-picker#filter">
     <turbo-frame id="playlist-picker" data-playlist-picker-target="frame" data-action="turbo:frame-load->playlist-picker#filter">
     </turbo-frame>
