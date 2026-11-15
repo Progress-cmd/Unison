@@ -42,6 +42,17 @@ export default class extends Controller
     {
         this.sound = new SoundAnalyser(this.audioTarget, 120);
         this.restoreState();
+
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.setActionHandler('play', () => this.audioTarget.play());
+            navigator.mediaSession.setActionHandler('pause', () => this.audioTarget.pause());
+            navigator.mediaSession.setActionHandler('previoustrack', () => this.previous());
+            navigator.mediaSession.setActionHandler('nexttrack', () => this.next());
+
+            navigator.mediaSession.setActionHandler('seekto', (details) => {
+                this.audioTarget.currentTime = details.seekTime;
+            });
+        }
     }
 
     // --- Actions, called from the HTML ---
@@ -157,6 +168,8 @@ export default class extends Controller
         this.toggleTarget.setAttribute('aria-label', 'Pause');
 
         this.startAnimation();
+
+        this.updatePositionState();
     }
 
     showPaused()
@@ -167,12 +180,16 @@ export default class extends Controller
         this.stopAnimation();
 
         this.saveState();
+
+        this.updatePositionState();
     }
 
     updateDuration()
     {
         this.progressTarget.max = this.audioTarget.duration;
         this.durationTarget.textContent = this.formatTime(this.audioTarget.duration);
+
+        this.updatePositionState();
     }
 
     updateProgress()
@@ -205,9 +222,19 @@ export default class extends Controller
 
     // --- Internal helpers ---
 
-    loadCurrent(autoplay = true)
+    async loadCurrent(autoplay = true)
     {
         const track = this.queue[this.index];
+
+        if (!this.audioTarget.paused) {
+            this.audioTarget.pause();
+
+            await new Promise(resolve => setTimeout(resolve, 250));
+
+            if (track !== this.queue[this.index]) {
+                return;
+            }
+        }
 
         document.documentElement.dataset.currentUrl = track.url;
         this.audioTarget.src = track.url;
@@ -228,6 +255,8 @@ export default class extends Controller
         }
 
         this.refreshFavorite();
+
+        this.updateMediaSession(track);
     }
 
     renderWaveform(waveform)
@@ -522,7 +551,65 @@ export default class extends Controller
         if (!this.audioTarget.duration) {
             return;
         }
-        
+
         this.audioTarget.currentTime = Math.min(Math.max(this.audioTarget.currentTime + seconds, 0), this.audioTarget.duration);
+    }
+
+    async updateMediaSession(track)
+    {
+        if (!('mediaSession' in navigator)) {
+            return;
+        }
+
+        const artwork = track.cover ? [{ src: await this.squareCover(track.cover) }] : [];
+
+        if (track !== this.queue[this.index]) {
+            return;
+        }
+
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: track.title,
+            artist: track.artists,
+            artwork: artwork,
+        });
+    }
+
+    async squareCover(url)
+    {
+        const image = new Image();
+        image.crossOrigin = 'anonymous';
+        image.src = url;
+
+        try {
+            await image.decode();
+
+            const size = Math.min(image.naturalWidth, image.naturalHeight);
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+
+            canvas.getContext('2d').drawImage(
+                image,
+                (image.naturalWidth - size) / 2, (image.naturalHeight - size) / 2, size, size,
+                0, 0, size, size,
+            );
+
+            return canvas.toDataURL('image/jpeg', 0.9);
+        } catch {
+            return url;
+        }
+    }
+
+    updatePositionState()
+    {
+        if (!('mediaSession' in navigator) || !Number.isFinite(this.audioTarget.duration)) {
+            return;
+        }
+
+        navigator.mediaSession.setPositionState({
+            duration: this.audioTarget.duration,
+            position: this.audioTarget.currentTime,
+            playbackRate: this.audioTarget.playbackRate,
+        });
     }
 }
