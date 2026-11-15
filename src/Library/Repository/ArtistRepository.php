@@ -16,16 +16,30 @@ class ArtistRepository extends ServiceEntityRepository
         parent::__construct($registry, Artist::class);
     }
 
-   public function findTop(int $limit): array
-   {
-       return $this->createQueryBuilder('a')
-           ->leftJoin('a.tracks', 't')
-           ->addSelect('COUNT(t.id) AS HIDDEN trackCount')
-           ->groupBy('a.id')
-           ->orderBy('trackCount', 'DESC')
-           ->setMaxResults($limit)
-           ->getQuery()
-           ->getResult()
-       ;
-   }
+    public function findTop(int $limit): array
+    {
+        return $this->createQueryBuilder('a')
+            ->leftJoin('a.tracks', 't')
+            ->addSelect('COUNT(t.id) AS HIDDEN trackCount')
+            ->groupBy('a.id')
+            ->orderBy('trackCount', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function findOrCreate(string $name): Artist
+    {
+        $artist = $this->findOneBy(['name' => $name]);
+
+        if (null === $artist) {
+            $artist = new Artist();
+
+            $artist->setName($name);
+            $this->getEntityManager()->persist($artist);
+        }
+
+        return $artist;
+    }
 }

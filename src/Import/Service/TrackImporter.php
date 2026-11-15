@@ -5,7 +5,6 @@ namespace App\Import\Service;
 use App\Account\Entity\User;
 use App\Import\Exception\TrackAlreadyImportedException;
 use App\Library\Entity\Album;
-use App\Library\Entity\Artist;
 use App\Library\Entity\Track;
 use App\Library\Repository\TrackRepository;
 use App\Library\Repository\ArtistRepository;
@@ -77,16 +76,7 @@ class TrackImporter
         $track->setTrackNumber($trackNumber);
 
         foreach ($this->artistNames($metadata, $cleaned->featuring) as $name) {
-            $artist = $this->artistRepository->findOneBy(['name' => $name]);
-
-            if (null === $artist) {
-                $artist = new Artist();
-
-                $artist->setName($name);
-                $this->em->persist($artist);
-            }
-
-            $track->addArtist($artist);
+            $track->addArtist($this->artistRepository->findOrCreate($name));
         }
 
         if (null !== $album) {
