@@ -18,17 +18,8 @@
     </head>
     <body>
         {% if app.user %}
-            <nav class="navbar">
-                <div class="nav-brand desktop-only">Unison</div>
-                <a class="nav-item" href="{{ path('app_home') }}">Accueil</a>
-                <a class="nav-item" href="{{ path('app_library') }}">Bibliothèque</a>
-                <a class="nav-item" href="{{ path('app_import') }}">Importer</a>
-                <div class="username desktop-only">{{ app.user.username }}</div>
-                <form action="{{ path('app_logout') }}" method="post">
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
-                    <button class="nav-item" type="submit">Déconnexion</button>
-                </form>
-            </nav>
+            {% set section = block('section') is defined ? block('section') : '' %}
+            {% include 'shared/_navbar.html.twig' %}
         {% endif %}
 
         <main>

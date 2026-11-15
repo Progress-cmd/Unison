@@ -1,3 +1,5 @@
+/* Phone: a bar fixed at the bottom, one column per entry (icon above a small label).
+   Large screen (see below): a sidebar on the left, icon beside the label. */
 .navbar {
     position: fixed;
     bottom: 0;
@@ -5,25 +7,68 @@
     right: 0;
     height: var(--nav-height);
     display: flex;
-    justify-content: space-around;
-    align-items: center;
+    align-items: stretch;
     background: var(--color-surface);
     border-top: 1px solid var(--color-border);
 }
 
+/* The four entries share the width equally. The logout button sits in a form,
+   so the form is the one that takes its share. */
+.navbar > .nav-item,
+.navbar > form {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+}
+
 .nav-item {
-    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    padding: 6px 2px;
     background: none;
     border: none;
-    color: var(--color-text);
+    color: var(--color-text-muted);
     font: inherit;
-    text-align: left;
+    font-size: 11px;
+    line-height: 1.2;
+    text-align: center;
     text-decoration: none;
     cursor: pointer;
+    transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.nav-item svg {
+    flex: none;
+    width: 24px;
+    height: 24px;
+}
+
+/* A long label ends with "…" instead of pushing its neighbours. */
+.nav-label {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .nav-item:hover {
-    color: var(--color-link);
+    color: var(--color-text);
+}
+
+/* The section of the current page. */
+.nav-item[aria-current="page"] {
+    color: var(--color-accent);
+    font-weight: 500;
+}
+
+.nav-item:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+    border-radius: 10px;
 }
 
 @media (min-width: 1024px) {
@@ -33,12 +78,16 @@
         width: var(--sidebar-width);
         height: auto;
         flex-direction: column;
-        justify-content: flex-start;
-        align-items: stretch;
         gap: 6px;
         padding: 30px 15px;
         border-top: none;
         border-right: 1px solid var(--color-border);
+    }
+
+    /* In a column, the entries keep their own height. */
+    .navbar > .nav-item,
+    .navbar > form {
+        flex: none;
     }
 
     .nav-brand {
@@ -54,12 +103,33 @@
     }
 
     .nav-item {
-        width: 100%;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 12px;
         padding: 12px;
         border-radius: 10px;
+        color: var(--color-text);
+        font-size: 16px;
+        text-align: left;
+    }
+
+    .nav-item svg {
+        width: 22px;
+        height: 22px;
     }
 
     .nav-item:hover {
         background: var(--color-accent-soft);
+    }
+
+    .nav-item[aria-current="page"] {
+        background: var(--color-accent-soft);
+        color: var(--color-accent);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nav-item {
+        transition: none;
     }
 }
