@@ -202,8 +202,16 @@
     display: none;
 }
 
+/* --- "+" (add to a playlist): only in the detailed card --- */
+
+.player-add {
+    display: none;
+}
+
 /* --- Detailed card --- */
 
+/* From top to bottom: close, cover, "+" and heart, times, waveform,
+   title, controls, then the upcoming tracks. */
 .player.is-expanded {
     inset: 0;
     z-index: 10;
@@ -211,15 +219,16 @@
     display: grid;
     grid-template-columns: auto 1fr auto;
     grid-template-areas:
-        "close close close"
-        "track track track"
-        "favorite favorite favorite"
-        "wave wave wave"
+        "close . ."
+        "cover cover cover"
+        "add . favorite"
         "elapsed . duration"
+        "wave wave wave"
+        "track track track"
         "controls controls controls"
         "upcoming upcoming upcoming";
     align-content: safe center;
-    gap: 16px;
+    gap: 12px 16px;
     padding: 24px;
     background: black;
     max-height: 100dvh;
@@ -229,44 +238,51 @@
 .player.is-expanded .player-close {
     display: flex;
     grid-area: close;
-    justify-self: end;
+    justify-self: start;
 }
 
-.player.is-expanded .player-option {
-    display: flex;
-}
-
-.player.is-expanded .player-option[aria-pressed="true"] {
-    color: var(--color-accent);
-}
-
-.player.is-expanded .player-track {
-    grid-area: track;
-    flex-direction: column;
-    text-align: center;
+.player.is-expanded .player-close svg {
+    width: 28px;
+    height: 28px;
 }
 
 .player.is-expanded .track-cover {
     display: block;
-    width: 220px;
-    height: 220px;
+    grid-area: cover;
+    justify-self: center;
+    width: min(260px, 100%);
+    height: auto;
+    aspect-ratio: 1;
+    margin-bottom: 4px;
     border-radius: 12px;
+    box-shadow: 0 16px 40px rgb(0 0 0 / 50%);
 }
 
-/* Temporary place under the title: the full-screen rework (step 3)
-   puts it in a row with the "+" button. */
+.player.is-expanded .player-add {
+    display: flex;
+    grid-area: add;
+    justify-self: start;
+    padding: 8px;
+}
+
+.player.is-expanded .player-add svg {
+    width: 22px;
+    height: 22px;
+}
+
 .player.is-expanded .player-favorite {
     grid-area: favorite;
-    justify-self: center;
+    justify-self: end;
 }
 
-.player.is-expanded .track-info {
-    flex: none;
-    width: 100%;
+.player.is-expanded .player-favorite svg {
+    width: 22px;
+    height: 22px;
 }
 
 .player.is-expanded .player-time {
     display: block;
+    font-size: 13px;
 }
 
 .player.is-expanded .player-elapsed {
@@ -281,28 +297,73 @@
 
 .player.is-expanded .player-wave {
     grid-area: wave;
-    height: 64px;
+    height: 44px;
 }
 
-.player.is-expanded .player-bars span:not(:nth-child(3n)) {
+/* One bar out of two: in a narrow card, the 120 bars would be hair-thin.
+   This keeps about the same bar width as in the desktop bar. */
+.player.is-expanded .player-bars span {
     display: block;
+}
+
+.player.is-expanded .player-bars span:nth-child(2n) {
+    display: none;
+}
+
+/* The title button now only holds the title and the artists. */
+.player.is-expanded .player-track {
+    grid-area: track;
+    justify-content: center;
+    margin-top: 4px;
+    text-align: center;
+}
+
+.player.is-expanded .track-info {
+    flex: none;
+    width: 100%;
+    gap: 2px;
+}
+
+/* Only the current track's title: the rows of "À suivre" keep their own size. */
+.player.is-expanded .player-track .track-title {
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.player.is-expanded .player-track .track-artists {
+    font-size: 14px;
+}
+
+.player.is-expanded .player-option {
+    display: flex;
+}
+
+.player.is-expanded .player-option[aria-pressed="true"] {
+    color: var(--color-accent);
 }
 
 .player.is-expanded .player-controls {
     grid-area: controls;
-    justify-content: center;
-    gap: 24px;
+    justify-content: space-between;
+    width: min(300px, 100%);
+    justify-self: center;
+    margin-top: 4px;
+}
+
+.player.is-expanded .player-controls svg {
+    width: 24px;
+    height: 24px;
 }
 
 /* Full screen: the main button is bigger. */
 .player.is-expanded .player-play {
-    width: 64px;
-    height: 64px;
+    width: 52px;
+    height: 52px;
 }
 
 .player.is-expanded .player-play svg {
-    width: 34px;
-    height: 34px;
+    width: 28px;
+    height: 28px;
 }
 
 .player.is-expanded .player-volume {
@@ -313,6 +374,7 @@
     display: block;
     grid-area: upcoming;
     max-height: 180px;
+    margin-top: 8px;
     overflow-y: auto;
 }
 
@@ -348,6 +410,15 @@
 
 .player-queue-row:hover {
     background: rgb(255 255 255 / 10%);
+}
+
+/* "À suivre" stays discreet: smaller than the current track. */
+.player-queue-row .track-title {
+    font-size: 14px;
+}
+
+.player-queue-row .track-artists {
+    font-size: 12px;
 }
 
 /* --- Phone: floating mini-player --- */

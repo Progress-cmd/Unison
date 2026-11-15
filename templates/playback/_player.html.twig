@@ -26,6 +26,7 @@
         {{ ux_icon('material-symbols:keyboard-arrow-down') }}
     </button>
 
+    <img class="track-cover desktop-only" data-player-target="cover" alt="" data-action="click->player#toggleExpanded">
     <button
         type="button"
         class="player-track"
@@ -34,11 +35,14 @@
         data-player-target="expand"
         data-action="player#toggleExpanded"
     >
-        <img class="track-cover desktop-only" data-player-target="cover" alt="">
         <span class="track-info">
             <span class="track-title" data-player-target="title"></span>
             <span class="track-artists" data-player-target="artists"></span>
         </span>
+    </button>
+
+    <button class="icon-btn player-add" type="button" aria-label="Ajouter à une playlist">
+        {{ ux_icon('material-symbols:playlist-add') }}
     </button>
 
     <form class="player-favorite" action="{{ path('app_favorite_toggle') }}" method="post">
@@ -54,13 +58,15 @@
         <button
             type="button"
             class="icon-btn player-option"
-            aria-label="Lecture aléatoire"
+            aria-label="Répéter"
             aria-pressed="false"
-            data-player-target="shuffle"
-            data-action="player#toggleShuffle"
+            data-player-target="repeat"
+            data-action="player#toggleRepeat"
         >
-            {{ ux_icon('material-symbols:shuffle') }}
+            {{ ux_icon('material-symbols:repeat', {class: 'icon-repeat'}) }}
+            {{ ux_icon('material-symbols:repeat-one', {class: 'icon-repeat-one'}) }}
         </button>
+
         <button
             type="button"
             class="icon-btn player-previous"
@@ -93,13 +99,12 @@
         <button
             type="button"
             class="icon-btn player-option"
-            aria-label="Répéter"
+            aria-label="Lecture aléatoire"
             aria-pressed="false"
-            data-player-target="repeat"
-            data-action="player#toggleRepeat"
+            data-player-target="shuffle"
+            data-action="player#toggleShuffle"
         >
-            {{ ux_icon('material-symbols:repeat', {class: 'icon-repeat'}) }}
-            {{ ux_icon('material-symbols:repeat-one', {class: 'icon-repeat-one'}) }}
+            {{ ux_icon('material-symbols:shuffle') }}
         </button>
     </div>
 
