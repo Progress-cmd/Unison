@@ -9,6 +9,7 @@
     data-artists="{{ artists }}"
     data-cover="{{ track.cover }}"
     data-waveform="{{ track.waveform }}"
+    data-playlists-url="{{ path('app_track_playlists', {id: track.id}) }}"
     {% if inPlaylist is defined %}style="view-transition-name: track-{{ track.id }}"{% endif %}
 >
     <button
@@ -56,8 +57,9 @@
             type="button"
             class="icon-btn"
             aria-label="Ajouter à une playlist"
-            data-action="add-to-playlist#open"
-            data-add-to-playlist-track-id-param="{{ track.id }}"
+            data-action="playlist-picker#open"
+            data-playlist-picker-url-param="{{ path('app_track_playlists', {id: track.id}) }}"
+            data-playlist-picker-title-param="{{ track.title }}"
         >
             {{ ux_icon('material-symbols:playlist-add') }}
         </button>

@@ -1,0 +1,28 @@
+<turbo-frame id="playlist-picker">
+    <ul>
+        {% for playlist in playlists %}
+            {% set checked = playlist.id in checkedIds %}
+            <li data-name="{{ playlist.name|lower }}">
+                <form method="post" action="{{ checked ? path('app_playlist_remove_track', {id: playlist.id}) : path('app_playlist_add_track', {id: playlist.id}) }}">
+                    <input type="hidden" name="_csrf_token" value="{{ checked ? csrf_token('playlist_remove_track') : csrf_token('playlist_add_track') }}">
+                    <input type="hidden" name="track" value="{{ track.id }}">
+                    <label>
+                        <span class="picker-name">{{ playlist.name }}</span>
+                        {% set count = playlist.playlistTracks|length %}
+                        <span class="picker-count">{{ count ~ (count < 2 ? ' titre' : ' titres') }}</span>
+                        <input type="checkbox" {% if checked %}checked{% endif %} data-action="change->playlist-picker#submit">
+                    </label>
+                </form>
+            </li>
+        {% else %}
+            <li>Aucune playlist</li>
+        {% endfor %}
+    </ul>
+    <details {% if not form.vars.valid %}open{% endif %}>
+        <summary>+ Nouvelle playlist</summary>
+        {{ form_start(form) }}
+            {{ form_row(form.name, {label: false, attr: {placeholder: 'Nom de la playlist', 'aria-label': 'Nom de la playlist'}}) }}
+            <button type="submit" class="btn">Créer</button>
+        {{ form_end(form) }}
+    </details>
+</turbo-frame>

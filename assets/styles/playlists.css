@@ -130,50 +130,219 @@
     animation-timing-function: ease;
 }
 
-/* --- "Add to a playlist" dialog --- */
+/* --- "Add to a playlist" dialog (templates/playlist/_picker*.html.twig) --- */
 
-dialog ul {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    max-height: 50dvh;
+/* Phone: a sheet that rises from the bottom of the screen, full width.
+   Large screen (see below): the usual centred dialog. */
+.playlist-picker {
+    margin: auto 0 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 90dvh;
+    padding: 24px 24px calc(20px + env(safe-area-inset-bottom));
+    border-width: 1px 0 0;
+    border-radius: 16px 16px 0 0;
+    transform: translateY(100%);
+}
+
+.playlist-picker[open] {
+    transform: none;
+}
+
+@starting-style {
+    .playlist-picker[open] {
+        transform: translateY(100%);
+    }
+}
+
+.playlist-picker h2 {
+    margin-bottom: 4px;
+}
+
+/* The track being added, under the title. */
+.picker-track {
     margin: 0 0 16px;
+    font-size: 14px;
+    color: var(--color-text-muted);
+}
+
+/* Shared look of the two text fields: search and new playlist name. */
+.playlist-picker input[type="search"],
+.playlist-picker input[type="text"] {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--color-bg);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font: inherit;
+    font-size: 16px;
+}
+
+.playlist-picker input[type="search"]:focus-visible,
+.playlist-picker input[type="text"]:focus-visible {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.playlist-picker input[type="search"] {
+    margin-bottom: 8px;
+}
+
+/* The list scrolls on its own; search and "Fermer" stay in view. */
+.playlist-picker ul {
+    max-height: 50dvh;
+    margin: 0;
     padding: 0;
     overflow-y: auto;
     list-style: none;
 }
 
-dialog li form {
+.playlist-picker li form {
     margin: 0;
 }
 
-/* One playlist per line, the whole line is the button. */
-dialog li form button {
-    width: 100%;
-    padding: 10px 12px;
-    background: none;
-    border: none;
-    border-radius: 8px;
-    color: inherit;
-    font: inherit;
-    text-align: left;
+/* One playlist per line: checkbox, name, then the track count on the right.
+   The whole line is the label, so a tap anywhere ticks the box. */
+.playlist-picker label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 4px;
     cursor: pointer;
-    transition: background-color 0.15s ease;
 }
 
-dialog li form button:hover,
-dialog li form button:focus-visible {
-    background: var(--color-accent-soft);
+.playlist-picker input[type="checkbox"] {
+    flex: none;
+    order: -1;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--color-accent);
+    cursor: pointer;
 }
 
-/* "No playlist yet" and the link to create one. */
-dialog li:not(:has(form)) {
-    padding: 10px 12px;
+.picker-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.playlist-picker label:hover .picker-name {
+    color: var(--color-link);
+}
+
+.picker-count {
+    flex: none;
+    font-size: 12px;
     color: var(--color-text-muted);
 }
 
+/* "No playlist yet". */
+.playlist-picker li:not([data-name]) {
+    padding: 12px 4px;
+    color: var(--color-text-muted);
+}
+
+/* --- "+ Nouvelle playlist": a dashed button that turns into a field --- */
+
+.playlist-picker details {
+    margin: 12px 0 16px;
+}
+
+.playlist-picker summary {
+    padding: 10px;
+    border: 1px dashed var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    text-align: center;
+    list-style: none;
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.playlist-picker summary::-webkit-details-marker {
+    display: none;
+}
+
+.playlist-picker summary:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+/* Once opened, the dashed button gives its place to the field. */
+.playlist-picker details[open] summary {
+    display: none;
+}
+
+/* Field and "Créer" on one line. */
+.playlist-picker details form {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.playlist-picker details form > div {
+    flex: 1;
+    min-width: 0;
+}
+
+.playlist-picker details .btn {
+    flex: none;
+    padding: 10px 16px;
+}
+
+/* Validation message from PlaylistType ("Ajoute au moins un nom."). */
+.playlist-picker details ul {
+    max-height: none;
+    margin: 0 0 6px;
+    color: var(--color-error);
+    font-size: 14px;
+}
+
+/* "Fermer": a full-width button at the bottom. */
+.playlist-picker form[method="dialog"] {
+    display: block;
+}
+
+.playlist-picker form[method="dialog"] button {
+    width: 100%;
+    padding: 12px;
+    background: var(--color-accent);
+    border: none;
+    color: white;
+    font-weight: 500;
+}
+
+.playlist-picker form[method="dialog"] button:hover {
+    background: var(--color-accent-hover);
+}
+
+@media (min-width: 640px) {
+    .playlist-picker {
+        margin: auto;
+        width: min(420px, calc(100vw - 32px));
+        max-height: 85dvh;
+        padding: 24px;
+        border-width: 1px;
+        border-radius: 16px;
+        transform: translateY(8px) scale(0.98);
+    }
+
+    @starting-style {
+        .playlist-picker[open] {
+            transform: translateY(8px) scale(0.98);
+        }
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
-    dialog li form button {
+    .playlist-picker summary {
         transition: none;
     }
 }

@@ -64,9 +64,9 @@ class YtDlpClient
     public function fetchMetadata(string $url): array
     {
         $output = $this->run([
-            '--dump-json', 
-            '--skip-download', 
-            '--no-playlist', 
+            '--dump-json',
+            '--skip-download',
+            '--no-playlist',
             $url
         ]);
 
@@ -76,24 +76,24 @@ class YtDlpClient
     public function fetchPlaylist(string $url): array
     {
         $output = $this->run([
-            '--flat-playlist', 
-            '--dump-single-json', 
-            '--yes-playlist', 
+            '--flat-playlist',
+            '--dump-single-json',
+            '--yes-playlist',
             $url
         ]);
 
-        return json_decode($output, true, 512, JSON_THROW_ON_ERROR);  
+        return json_decode($output, true, 512, JSON_THROW_ON_ERROR);
     }
 
     public function downloadAudio(string $url): string
     {
         $fileName = $this->run([
-            '-f', 'ba[ext=m4a][audio_channels<=2]/ba[ext=m4a]/ba/b', 
-            '-x', '--audio-format', 'm4a', 
-            '--no-playlist', '--no-overwrites', 
-            '-P', $this->musicDir, 
-            '-o', '%(id)s.%(ext)s', 
-            '--print', 'after_move:filepath', 
+            '-f', 'ba[ext=m4a][audio_channels<=2]/ba[ext=m4a]/ba/b',
+            '-x', '--audio-format', 'm4a',
+            '--no-playlist', '--no-overwrites',
+            '-P', $this->musicDir,
+            '-o', '%(id)s.%(ext)s',
+            '--print', 'after_move:filepath',
             $url
         ]);
 

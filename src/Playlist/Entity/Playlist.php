@@ -32,7 +32,7 @@ class Playlist
     /**
      * @var Collection<int, PlaylistTrack>
      */
-    #[ORM\OneToMany(targetEntity: PlaylistTrack::class, mappedBy: 'playlist')]
+    #[ORM\OneToMany(targetEntity: PlaylistTrack::class, mappedBy: 'playlist', fetch: 'EXTRA_LAZY')]
     #[ORM\OrderBy(['position' => 'DESC'])]
     private Collection $playlistTracks;
 

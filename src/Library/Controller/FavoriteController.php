@@ -7,7 +7,6 @@ use App\Library\Entity\Track;
 use App\Library\Repository\TrackRepository;
 use App\Library\Entity\FavoriteTrack;
 use App\Library\Repository\FavoriteTrackRepository;
-use App\Playlist\Repository\PlaylistRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,11 +17,10 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 final class FavoriteController extends AbstractController
 {
     #[Route('/library/favorites', name: 'app_favorites')]
-    public function index(#[CurrentUser] User $user, TrackRepository $trackRepository, FavoriteTrackRepository $favoriteTrackRepository, PlaylistRepository $playlistRepository): Response
+    public function index(#[CurrentUser] User $user, TrackRepository $trackRepository, FavoriteTrackRepository $favoriteTrackRepository): Response
     {
         return $this->render('library/favorites.html.twig', [
             'tracks' => $trackRepository->findFavorites($user),
-            'playlists' => $playlistRepository->findBy([], ['updatedAt' => 'DESC']),
             'favoriteIds' => $favoriteTrackRepository->findTrackIds($user),
         ]);
     }

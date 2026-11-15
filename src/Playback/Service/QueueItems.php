@@ -25,6 +25,7 @@ final class QueueItems
             'artists' => implode(', ', array_map(fn ($artist) => $artist->getName(), $track->getArtists()->toArray())),
             'cover' => $track->getCover(),
             'waveform' => $track->getWaveform(),
+            'playlistsUrl' => $this->urlGenerator->generate('app_track_playlists', ['id' => $track->getId()]),
         ];
     }
 }

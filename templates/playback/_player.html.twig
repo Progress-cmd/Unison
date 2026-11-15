@@ -41,7 +41,13 @@
         </span>
     </button>
 
-    <button class="icon-btn player-add" type="button" aria-label="Ajouter à une playlist">
+    <button
+        class="icon-btn player-add"
+        type="button"
+        aria-label="Ajouter à une playlist"
+        data-player-target="add"
+        data-action="playlist-picker#open"
+    >
         {{ ux_icon('material-symbols:playlist-add') }}
     </button>
 

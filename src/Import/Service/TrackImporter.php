@@ -28,7 +28,7 @@ class TrackImporter
     public function import(string $url, User $user, ?Album $album = null, ?int $trackNumber = null): Track
     {
         $existing = $this->findExisting($url);
-        
+
         if (null !== $existing && (null === $album || $existing->getAlbum() === $album)) {
             throw new TrackAlreadyImportedException($existing->getTitle());
         }

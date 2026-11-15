@@ -7,7 +7,6 @@ use App\Library\Entity\Artist;
 use App\Library\Repository\ArtistRepository;
 use App\Library\Repository\TrackRepository;
 use App\Library\Repository\FavoriteTrackRepository;
-use App\Playlist\Repository\PlaylistRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -24,13 +23,12 @@ final class ArtistController extends AbstractController
     }
 
     #[Route('/artists/{id}', name: 'app_artists_show', requirements: ['id' => '[0-9]+'])]
-    public function show(Artist $artist, #[CurrentUser] User $user,FavoriteTrackRepository $favoriteTrackRepository, PlaylistRepository $playlistRepository, TrackRepository $trackRepository): Response
+    public function show(Artist $artist, #[CurrentUser] User $user, FavoriteTrackRepository $favoriteTrackRepository, TrackRepository $trackRepository): Response
     {
         return $this->render('library/artist.html.twig', [
             'artist' => $artist,
             'tracks' => $trackRepository->findByArtist($artist),
             'favoriteIds' => $favoriteTrackRepository->findTrackIds($user),
-            'playlists' => $playlistRepository->findBy([], ['updatedAt' => 'DESC']),
         ]);
     }
 }

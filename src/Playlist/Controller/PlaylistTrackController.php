@@ -23,6 +23,8 @@ class PlaylistTrackController extends AbstractController
             throw $this->createAccessDeniedException('Jeton CSRF invalide.');
         }
 
+        $fromPicker = 'playlist-picker' === $request->headers->get('Turbo-Frame');
+
         $trackId = $request->request->getInt('track');
         $track = $trackRepository->find($trackId);
 
@@ -32,7 +34,11 @@ class PlaylistTrackController extends AbstractController
 
         $alreadyIn = $playlistTrackRepository->findOneBy(['track' => $track, 'playlist' => $playlist]);
 
-        if (!is_null($alreadyIn)) {            
+        if (!is_null($alreadyIn)) {
+            if ($fromPicker) {
+                return $this->redirectToPicker($track->getId());
+            }
+
             $this->addFlash('warning', 'Titre déjà dans '.$playlist->getName());
             return $this->redirectToRoute('app_playlist_show',
                 ['id' => $playlist->getId()]
@@ -40,7 +46,7 @@ class PlaylistTrackController extends AbstractController
         }
 
         $playlistTrack = new PlaylistTrack($user);
-        
+
         $playlistTrack->setPlaylist($playlist);
         $playlistTrack->setTrack($track);
         $playlistTrack->setPosition($playlistTrackRepository->findPositionMax($playlist) + 1);
@@ -48,6 +54,10 @@ class PlaylistTrackController extends AbstractController
 
         $em->persist($playlistTrack);
         $em->flush();
+
+        if ($fromPicker) {
+            return $this->redirectToPicker($track->getId());
+        }
 
         $this->addFlash('success', 'Titre ajouté à '.$playlist->getName());
 
@@ -63,11 +73,17 @@ class PlaylistTrackController extends AbstractController
             throw $this->createAccessDeniedException('Jeton CSRF invalide.');
         }
 
+        $fromPicker = 'playlist-picker' === $request->headers->get('Turbo-Frame');
+
         $track = $request->request->getInt('track');
-        
+
         $playlistTrack = $playlistTrackRepository->findOneBy(['track' => $track, 'playlist' => $playlist]);
 
         if (null === $playlistTrack) {
+            if ($fromPicker) {
+                return $this->redirectToPicker($track);
+            }
+
             $this->addFlash('warning', 'Ce titre n\'est plus dans la playlist');
             return $this->redirectToRoute('app_playlist_show',
                 ['id' => $playlist->getId()]
@@ -76,6 +92,10 @@ class PlaylistTrackController extends AbstractController
 
         $em->remove($playlistTrack);
         $em->flush();
+
+        if ($fromPicker) {
+            return $this->redirectToPicker($track);
+        }
 
         $this->addFlash('success', 'Titre retiré de '.$playlist->getName());
 
@@ -129,5 +149,10 @@ class PlaylistTrackController extends AbstractController
         return $this->redirectToRoute('app_playlist_show',
             ['id' => $playlist->getId()]
         );
+    }
+
+    private function redirectToPicker(int $trackId): Response
+    {
+        return $this->redirectToRoute('app_track_playlists', ['id' => $trackId]);
     }
 }

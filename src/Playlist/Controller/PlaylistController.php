@@ -92,7 +92,7 @@ final class PlaylistController extends AbstractController
         $em->flush();
 
         $this->addFlash('success', 'Playlist supprimée');
-    
+
         return $this->redirectToRoute('app_playlists');
     }
 }

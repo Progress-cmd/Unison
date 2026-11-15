@@ -11,12 +11,12 @@
         {# After a form redirects to the page it came from, keep the scroll position. #}
         <meta name="turbo-refresh-scroll" content="preserve">
         {% block meta %}{% endblock %}
-        
+
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
-    <body>
+    <body data-controller="playlist-picker">
         {% if app.user %}
             {% set section = block('section') is defined ? block('section') : '' %}
             {% include 'shared/_navbar.html.twig' %}
@@ -35,6 +35,7 @@
         </main>
         {% if app.user %}
             {% include 'playback/_player.html.twig' %}
+            {% include 'playlist/_picker_dialog.html.twig' %}
         {% endif %}
     </body>
 </html>

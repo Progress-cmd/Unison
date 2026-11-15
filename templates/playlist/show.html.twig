@@ -26,9 +26,9 @@
     <div class="detail-info">
         <h2>{{ playlist.name }}</h2>
         <div class="playlist-summary">
-            Par {{ playlist.createdBy.username }} · 
-            {% if playlist.playlistTracks|length == 0 %}Aucun titre {% elseif playlist.playlistTracks|length == 1 %}1 titre{% else %}{{ playlist.playlistTracks|length }} titres{% endif %} · 
-            {% if hours > 0 %}{{ hours }} h {% endif %}{{ minutes }} min · 
+            Par {{ playlist.createdBy.username }} ·
+            {% if playlist.playlistTracks|length == 0 %}Aucun titre {% elseif playlist.playlistTracks|length == 1 %}1 titre{% else %}{{ playlist.playlistTracks|length }} titres{% endif %} ·
+            {% if hours > 0 %}{{ hours }} h {% endif %}{{ minutes }} min ·
             modifiée le {{ playlist.updatedAt|date('d/m') }}
         </div>
 
@@ -50,7 +50,7 @@
     </div>
 </div>
 
-<ul 
+<ul
     class="track-list"
     data-controller="track-list"
     data-action="player:change@window->track-list#highlight"

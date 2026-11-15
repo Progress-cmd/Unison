@@ -6,7 +6,6 @@ use App\Account\Entity\User;
 use App\Library\Entity\Album;
 use App\Library\Repository\AlbumRepository;
 use App\Library\Repository\FavoriteTrackRepository;
-use App\Playlist\Repository\PlaylistRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -23,13 +22,12 @@ final class AlbumController extends AbstractController
     }
 
     #[Route('/albums/{id}', name: 'app_albums_show', requirements: ['id' => '[0-9]+'])]
-    public function show(Album $album, #[CurrentUser] User $user, FavoriteTrackRepository $favoriteTrackRepository, PlaylistRepository $playlistRepository): Response
+    public function show(Album $album, #[CurrentUser] User $user, FavoriteTrackRepository $favoriteTrackRepository): Response
     {
         return $this->render('library/album.html.twig', [
             'album' => $album,
             'tracks' => $album->getTracks(),
             'favoriteIds' => $favoriteTrackRepository->findTrackIds($user),
-            'playlists' => $playlistRepository->findBy([], ['updatedAt' => 'DESC']),
         ]);
     }
 }
