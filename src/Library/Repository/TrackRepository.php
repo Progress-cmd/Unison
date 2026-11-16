@@ -7,7 +7,8 @@ use App\Library\Entity\Artist;
 use App\Library\Entity\Track;
 use App\Library\Entity\FavoriteTrack;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\Tools\Pagination\OffsetPaginator;
+use Doctrine\ORM\Tools\Pagination\Window;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -34,16 +35,22 @@ class TrackRepository extends ServiceEntityRepository
 
     public function findFavorites(User $user, ?int $limit = null): array
     {
-        return iterator_to_array(new Paginator($this->createQueryBuilder('t')
+        $query = $this->createQueryBuilder('t')
             ->innerJoin(FavoriteTrack::class, 'f', 'WITH', 'f.track = t')
             ->leftJoin('t.artists', 'a')
             ->addSelect('a')
             ->andWhere('f.user = :user')
             ->setParameter('user', $user)
-            ->setMaxResults($limit)
             ->orderBy('f.addedAt', 'DESC')
             ->getQuery()
-        ));
+        ;
+
+        // Without a limit, nothing to cut: a plain result is enough.
+        if (null === $limit) {
+            return $query->getResult();
+        }
+
+        return (new OffsetPaginator())->paginate($query, Window::fromPageNumberAndSize(1, $limit))->getItems();
     }
 
     public function findByArtist(Artist $artist): array
