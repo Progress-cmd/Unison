@@ -1,0 +1,19 @@
+{# "Importer" button of a YouTube Music result (a song or an album).
+   Its id is the target the Turbo Stream replaces once the import is queued.
+   Already queued (the page was left and opened again): the pill shows it straight away. #}
+{% if item.url in queuedUrls|default([]) %}
+    <span class="youtube-queued youtube-queued--static" role="status">
+        {{ ux_icon('material-symbols:check-rounded') }}
+        <span class="youtube-action-label">En file d'attente</span>
+    </span>
+{% else %}
+    <form id="youtube-{{ item.id }}" method="post" action="{{ path('app_import_youtube_add') }}">
+        <input type="hidden" name="url" value="{{ item.url }}">
+        <input type="hidden" name="title" value="{{ item.title }}">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('import_youtube') }}">
+        <button type="submit" class="youtube-import" aria-label="Importer {{ item.title }}">
+            {{ ux_icon('material-symbols:download') }}
+            <span class="youtube-action-label">Importer</span>
+        </button>
+    </form>
+{% endif %}
