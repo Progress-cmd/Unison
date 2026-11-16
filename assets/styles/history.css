@@ -1,0 +1,15 @@
+/* --- Day headings ("Aujourd'hui", "Hier", date) between the track rows --- */
+
+/* Same look as the day headings of the import page. The li.history-day selector
+   is needed to win over the "no track yet" rule of .track-list (tracks.css). */
+.track-list > li.history-day {
+    padding: 20px 8px 6px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+}
+
+.track-list > li.history-day:first-child {
+    padding-top: 0;
+}
