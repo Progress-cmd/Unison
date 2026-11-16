@@ -1,0 +1,39 @@
+<turbo-frame id="youtube-results">
+    {% if error is defined %}
+        <p class="youtube-error" role="alert">
+            {{ ux_icon('material-symbols:cloud-off-outline') }}
+            YouTube Music ne répond pas, réessaie dans un moment.
+        </p>
+    {% else %}
+        <ul class="track-list">
+            {% for result in results %}
+                <li class="track youtube-result" style="--i: {{ loop.index0 }}">
+                    {% if result.thumbnail %}
+                        <img class="track-cover" src="{{ result.thumbnail }}" alt="" loading="lazy">
+                    {% else %}
+                        <div class="track-cover"></div>
+                    {% endif %}
+
+                    <div class="track-info">
+                        <span class="track-title">{{ result.title }}</span>
+                        <span class="track-artists">{{ result.artist }}</span>
+                    </div>
+
+                    <span class="track-duration">{{ result.duration|duration }}</span>
+
+                    <form id="youtube-{{ result.id }}" method="post" action="{{ path('app_import_youtube_add') }}">
+                        <input type="hidden" name="url" value="{{ result.url }}">
+                        <input type="hidden" name="title" value="{{ result.title }}">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('import_youtube') }}">
+                        <button type="submit" class="youtube-import" aria-label="Importer {{ result.title }}">
+                            {{ ux_icon('material-symbols:download') }}
+                            <span class="youtube-action-label">Importer</span>
+                        </button>
+                    </form>
+                </li>
+            {% else %}
+                <li>Rien de plus sur YouTube Music.</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</turbo-frame>

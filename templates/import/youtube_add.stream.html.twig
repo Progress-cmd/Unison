@@ -1,0 +1,14 @@
+<turbo-stream action="replace" target="youtube-{{ id }}">
+    <template>
+        <span class="youtube-queued" role="status">
+            {{ ux_icon('material-symbols:check-rounded') }}
+            <span class="youtube-action-label">En file d'attente</span>
+        </span>
+    </template>
+</turbo-stream>
+
+<turbo-stream action="replace" target="import-jobs">
+    <template>
+        <turbo-frame id="import-jobs" src="{{ path('app_import_jobs') }}"></turbo-frame>
+    </template>
+</turbo-stream>

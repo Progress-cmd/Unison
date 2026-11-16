@@ -127,4 +127,34 @@ class TrackRepository extends ServiceEntityRepository
 
         return $ordered;
     }
+
+    public function search(string $search, int $limit = 20): array
+    {
+        $query = $this->createQueryBuilder('t')
+            ->leftJoin('t.artists', 'a')
+            ->addSelect('a')
+            ->leftJoin('t.artists', 'searchArtist')
+            ->andWhere('t.title LIKE :search OR searchArtist.name LIKE :search')
+            ->setParameter('search', '%'.$search.'%')
+            ->orderBy('t.title', 'ASC')
+            ->getQuery()
+        ;
+
+        return (new OffsetPaginator())->paginate($query, Window::fromPageNumberAndSize(1, $limit))->getItems();
+    }
+
+    public function findExistingSourceUrls(array $urls): array
+    {
+        if (!$urls) {
+            return [];
+        }
+
+        return $this->createQueryBuilder('t')
+            ->select('t.sourceUrl')
+            ->andWhere('t.sourceUrl IN (:urls)')
+            ->setParameter('urls', $urls)
+            ->getQuery()
+            ->getSingleColumnResult()
+        ;
+    }
 }

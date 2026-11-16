@@ -1,19 +1,357 @@
 /* --- Page --- */
 
-.import-page {
+.import-header h1 {
+    margin: 0;
+}
+
+.import-subtitle {
+    margin: 4px 0 20px;
+    font-size: 15px;
+    color: var(--color-text-muted);
+}
+
+/* Phone: search, then the links form, then the recent imports.
+   Medium screen: the two cards side by side under the search.
+   Large screen: search on the left, the cards in a side column. */
+.import-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 32px;
     align-items: start;
 }
 
-/* .form is limited to 420px: here it fills its half of the page. */
-.import-page .form {
+.import-main {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+}
+
+.import-side {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+/* .form is limited to 420px: here it fills its column. */
+.import-side .form {
     max-width: none;
 }
 
 .import-submit {
     align-self: flex-end;
+}
+
+/* --- Search bar --- */
+
+/* One rounded field: magnifier, input, round "go" button.
+   The whole bar lights up when the input has focus. */
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 4px 4px 14px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 6%);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.search-bar:focus-within {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent) 18%, transparent);
+}
+
+.search-bar-icon {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    color: var(--color-text-muted);
+}
+
+/* The bar draws the focus ring, the input itself stays bare. */
+.search-bar input {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 0;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--color-text);
+    font: inherit;
+    font-size: 16px; /* below 16px, iOS zooms into the page on focus */
+}
+
+.search-bar input::placeholder {
+    color: var(--color-text-muted);
+}
+
+.search-bar-submit {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: var(--color-accent);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.search-bar-submit svg {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.15s ease;
+}
+
+.search-bar-submit:hover {
+    background: var(--color-accent-hover);
+}
+
+.search-bar-submit:hover svg {
+    transform: translateX(2px);
+}
+
+.search-bar-submit:active {
+    transform: scale(0.94);
+}
+
+.search-bar-submit:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+/* --- Before any search --- */
+
+.search-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 32px 24px;
+    border: 1px dashed var(--color-border);
+    border-radius: 12px;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.search-hint svg {
+    width: 32px;
+    height: 32px;
+    color: var(--color-accent);
+}
+
+.search-hint p {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 18px;
+    line-height: 1.35;
+    text-wrap: balance;
+}
+
+/* --- Results: one card, two groups --- */
+
+.search-results {
+    padding: 8px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+}
+
+/* "Dans ta bibliothèque" / "Sur YouTube": small labels, like the day headings. */
+.search-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 8px 4px;
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
+.search-group svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* The second group is set apart by a thin line. */
+.search-group:not(:first-child) {
+    margin-top: 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+}
+
+.search-count {
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+    font-size: 11px;
+    letter-spacing: 0;
+}
+
+/* --- YouTube rows --- */
+
+/* No play button on these rows: the empty space keeps covers and titles
+   aligned with the library rows above (24px button + 12px gap). */
+.youtube-result,
+.youtube-skeleton .track {
+    padding-left: 44px;
+}
+
+/* The results arrive one after the other. --i is the row index, set in the template. */
+.youtube-result {
+    animation: youtube-in 0.3s ease both;
+    animation-delay: calc(var(--i, 0) * 40ms);
+}
+
+@keyframes youtube-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+}
+
+/* "Importer": a pill that fills with the accent colour under the pointer.
+   ".track" in front so it wins over the quiet ".track form button" of tracks.css. */
+.track .youtube-import,
+.youtube-queued {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px 5px 8px;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.track .youtube-import {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.track .youtube-import svg,
+.youtube-queued svg {
+    width: 16px;
+    height: 16px;
+}
+
+.track .youtube-import:hover {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: white;
+}
+
+.track .youtube-import:hover svg {
+    transform: translateY(1px);
+}
+
+/* While the request runs, Turbo marks the form busy: the arrow keeps dropping. */
+.track form[aria-busy="true"] .youtube-import {
+    opacity: 1;
+    cursor: progress;
+}
+
+.track form[aria-busy="true"] .youtube-import svg {
+    animation: youtube-drop 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes youtube-drop {
+    to {
+        transform: translateY(3px);
+    }
+}
+
+/* Replaces the button once the import is queued (Turbo Stream). */
+.youtube-queued {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+    animation: youtube-pop 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.4);
+}
+
+@keyframes youtube-pop {
+    from {
+        opacity: 0;
+        transform: scale(0.6);
+    }
+}
+
+.youtube-error {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 4px 8px 8px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+    font-size: 14px;
+}
+
+.youtube-error svg {
+    flex: none;
+    width: 20px;
+    height: 20px;
+}
+
+/* --- While YouTube searches --- */
+
+.youtube-loading {
+    margin: 4px 8px 0;
+    font-size: 14px;
+    color: var(--color-text-muted);
+}
+
+.youtube-skeleton .track-info {
+    gap: 8px;
+}
+
+.skeleton-line {
+    display: block;
+    width: 60%;
+    height: 12px;
+    border-radius: 6px;
+}
+
+.skeleton-line--short {
+    width: 35%;
+    height: 10px;
+}
+
+/* A light band slides over the grey shapes. */
+.youtube-skeleton .track-cover,
+.skeleton-line {
+    background: linear-gradient(
+        90deg,
+        var(--color-border) 25%,
+        color-mix(in srgb, var(--color-border) 35%, var(--color-surface)) 50%,
+        var(--color-border) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+    from {
+        background-position: 100% 0;
+    }
+
+    to {
+        background-position: -100% 0;
+    }
 }
 
 /* --- Card --- */
@@ -23,6 +361,11 @@
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: 12px;
+}
+
+/* Inside a white card, the textarea takes the page colour to stand out. */
+.import-card textarea {
+    background: var(--color-bg);
 }
 
 .import-card-header {
@@ -35,7 +378,7 @@
 .import-heading {
     margin: 0;
     font-family: var(--serif);
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 500;
 }
 
@@ -175,15 +518,74 @@
 
 /* --- Responsive --- */
 
-@media (prefers-reduced-motion: reduce) {
-    .import-item--pending .import-icon svg,
-    .import-preview-row[data-state="loading"] .icon-loading {
-        animation: none;
+/* Phone: the "Importer" and "En file d'attente" pills shrink to their icon.
+   The text stays for screen readers. */
+@media (max-width: 639px) {
+    .youtube-action-label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    .track .youtube-import,
+    .youtube-queued {
+        padding: 7px;
+    }
+
+    .search-hint {
+        padding: 24px 20px;
+    }
+
+    .search-hint p {
+        font-size: 17px;
     }
 }
 
 @media (min-width: 1024px) {
-    .import-page {
+    .import-subtitle {
+        margin-bottom: 24px;
+    }
+
+    .import-side {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1280px) {
+    .import-layout {
+        grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
+        gap: 40px;
+    }
+
+    .import-side {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .search-bar,
+    .search-bar-submit,
+    .search-bar-submit svg,
+    .track .youtube-import {
+        transition: none;
+    }
+
+    .search-bar-submit:hover svg,
+    .search-bar-submit:active,
+    .track .youtube-import:hover svg {
+        transform: none;
+    }
+
+    .youtube-result,
+    .youtube-queued,
+    .youtube-skeleton .track-cover,
+    .skeleton-line,
+    .track form[aria-busy="true"] .youtube-import svg,
+    .import-item--pending .import-icon svg,
+    .import-preview-row[data-state="loading"] .icon-loading {
+        animation: none;
     }
 }
