@@ -3,7 +3,6 @@
 namespace App\Library\Controller;
 
 use App\Account\Entity\User;
-use App\Library\Entity\Track;
 use App\Library\Repository\TrackRepository;
 use App\Library\Entity\FavoriteTrack;
 use App\Library\Repository\FavoriteTrackRepository;

@@ -12,6 +12,20 @@
 </div>
 
 <section class="account-section">
+    <div class="account-section-header">
+        <h2>Écoutes récentes</h2>
+        <a href="{{ path('app_history') }}">Voir tout</a>
+    </div>
+    <ul class="track-list" data-controller="track-list" data-action="player:change@window->track-list#highlight">
+        {% for listen in recentListens %}
+            {% include 'library/_track.html.twig' with {track: listen.track, index: loop.index0} %}
+        {% else %}
+            <li>Aucune écoute pour l'instant.</li>
+        {% endfor %}
+    </ul>
+</section>
+
+<section class="account-section">
     <h2>Mes informations</h2>
     {{ form_start(accountForm, {attr: {class: 'form'}}) }}
         {{ form_row(accountForm.username) }}
