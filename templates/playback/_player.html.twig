@@ -14,6 +14,8 @@
     data-turbo-permanent
     data-player-save-url-value="{{ path('app_playback_state_save') }}"
     data-player-save-token-value="{{ csrf_token('playback_state') }}"
+    data-player-listen-url-value="{{ path('app_listen_record') }}"
+    data-player-listen-token-value="{{ csrf_token('listen_record') }}"
     data-player-load-url-value="{{ path('app_playback_state_load') }}"
     data-player-random-url-value="{{ path('app_random_mix') }}"
     data-player-favorite-url-value="{{ path('app_favorite_state') }}"

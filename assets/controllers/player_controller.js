@@ -28,10 +28,15 @@ export default class extends Controller
         saveToken: String,
         loadUrl: String,
         randomUrl: String,
-        favoriteUrl: String
+        favoriteUrl: String,
+        listenUrl: String,
+        listenToken: String,
     };
 
     queue = [];
+    listenedTime = 0;
+    lastTime = 0;
+    listenSent = false;
     lastSave = 0;
     index = 0;
     repeat = 'off';
@@ -192,7 +197,7 @@ export default class extends Controller
         this.updatePositionState();
     }
 
-    updateProgress()
+        updateProgress()
     {
         this.progressTarget.value = this.audioTarget.currentTime;
         this.elapsedTarget.textContent = this.formatTime(this.audioTarget.currentTime);
@@ -205,6 +210,21 @@ export default class extends Controller
         if (!this.audioTarget.paused && Date.now() - this.lastSave > 15000) {
             this.saveState();
         }
+
+        const gap = this.audioTarget.currentTime - this.lastTime;
+
+        if (gap > 0 && gap < 2) {
+            this.listenedTime += gap;
+        }
+
+        this.lastTime = this.audioTarget.currentTime;
+
+        const threshold = this.audioTarget.duration < 30 ? this.audioTarget.duration * 0.8 : 30;
+
+        if (!this.listenSent && this.listenedTime >= threshold) {
+            this.listenSent = true;
+            this.recordListen();
+        }
     }
 
     trackEnded()
@@ -215,8 +235,11 @@ export default class extends Controller
             this.audioTarget.currentTime = 0;
             this.audioTarget.play();
 
+            this.resetListen();
+
             return;
         }
+
         this.next();
     }
 
@@ -257,6 +280,8 @@ export default class extends Controller
         this.refreshFavorite();
 
         this.updateMediaSession(track);
+
+        this.resetListen();
     }
 
     renderWaveform(waveform)
@@ -610,6 +635,22 @@ export default class extends Controller
             duration: this.audioTarget.duration,
             position: this.audioTarget.currentTime,
             playbackRate: this.audioTarget.playbackRate,
+        });
+    }
+
+    resetListen()
+    {
+        this.listenedTime = 0;
+        this.lastTime = 0;
+        this.listenSent = false;
+    }
+
+    recordListen()
+    {
+        fetch(this.listenUrlValue, {
+            method: 'POST',
+            body: JSON.stringify({'track': this.queue[this.index].id, '_token': this.listenTokenValue}),
+            keepalive: true,
         });
     }
 }
