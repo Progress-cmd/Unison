@@ -200,6 +200,16 @@
 
 /* --- YouTube rows --- */
 
+/* "Albums" under the YouTube Music songs: lighter than the group labels, lined up with the covers. */
+.search-subgroup {
+    margin: 12px 8px 2px 44px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
 /* No play button on these rows: the empty space keeps covers and titles
    aligned with the library rows above (24px button + 12px gap). */
 .youtube-result,
@@ -287,6 +297,11 @@
         opacity: 0;
         transform: scale(0.6);
     }
+}
+
+/* Shown on arrival when the import was queued earlier: no bounce. */
+.youtube-queued--static {
+    animation: none;
 }
 
 .youtube-error {

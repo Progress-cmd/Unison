@@ -1,3 +1,6 @@
+{# Albums are optional: the page still works while the controller doesn't send them. #}
+{% set albums = albums|default([]) %}
+
 <turbo-frame id="youtube-results">
     {% if error is defined %}
         <p class="youtube-error" role="alert">
@@ -21,19 +24,36 @@
 
                     <span class="track-duration">{{ result.duration|duration }}</span>
 
-                    <form id="youtube-{{ result.id }}" method="post" action="{{ path('app_import_youtube_add') }}">
-                        <input type="hidden" name="url" value="{{ result.url }}">
-                        <input type="hidden" name="title" value="{{ result.title }}">
-                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('import_youtube') }}">
-                        <button type="submit" class="youtube-import" aria-label="Importer {{ result.title }}">
-                            {{ ux_icon('material-symbols:download') }}
-                            <span class="youtube-action-label">Importer</span>
-                        </button>
-                    </form>
+                    {% include 'import/_youtube_import.html.twig' with {item: result} %}
                 </li>
             {% else %}
-                <li>Rien de plus sur YouTube Music.</li>
+                <li>Aucun titre de plus sur YouTube Music.</li>
             {% endfor %}
         </ul>
+
+        {% if albums %}
+            <h3 class="search-subgroup">Albums</h3>
+            <ul class="track-list">
+                {% for album in albums %}
+                    {# The rows keep arriving one after the other, after the songs. #}
+                    <li class="track youtube-result youtube-album" style="--i: {{ results|length + loop.index0 }}">
+                        {% if album.thumbnail %}
+                            <img class="track-cover" src="{{ album.thumbnail }}" alt="" loading="lazy">
+                        {% else %}
+                            <div class="track-cover"></div>
+                        {% endif %}
+
+                        <div class="track-info">
+                            <span class="track-title">{{ album.title }}</span>
+                            <span class="track-artists">
+                                {{ album.type }} · {{ album.artist }}{% if album.year %} · {{ album.year }}{% endif %}
+                            </span>
+                        </div>
+
+                        {% include 'import/_youtube_import.html.twig' with {item: album} %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
     {% endif %}
 </turbo-frame>

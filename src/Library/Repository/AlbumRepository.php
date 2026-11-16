@@ -35,4 +35,19 @@ class AlbumRepository extends ServiceEntityRepository
 
         return (new OffsetPaginator())->paginate($query, Window::fromPageNumberAndSize(1, $limit))->getItems();
     }
+
+    public function findExistingSourceUrls(array $urls): array
+    {
+        if (!$urls) {
+            return [];
+        }
+
+        return $this->createQueryBuilder('a')
+            ->select('a.sourceUrl')
+            ->andWhere('a.sourceUrl IN (:urls)')
+            ->setParameter('urls', $urls)
+            ->getQuery()
+            ->getSingleColumnResult()
+        ;
+    }
 }
