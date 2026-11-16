@@ -33,7 +33,19 @@ class TrackImporter
             throw new TrackAlreadyImportedException($existing->getTitle());
         }
         $metadata = $this->ytDlpClient->fetchMetadata($url);
+
         $title = $metadata['track'] ?? $metadata['title'];
+        $titleArtist = null;
+
+        // Without music metadata, YouTube titles usually read "Artist - Title".
+        if (!isset($metadata['track'])) {
+            $split = $this->titleCleaner->splitArtist($title);
+
+            if (null !== $split) {
+                $title = $split['title'];
+                $titleArtist = $split['artist'];
+            }
+        }
 
         $cleaned = $this->titleCleaner->clean($title);
 
@@ -75,7 +87,7 @@ class TrackImporter
         $track->setSourceAlbum($album);
         $track->setTrackNumber($trackNumber);
 
-        foreach ($this->artistNames($metadata, $cleaned->featuring) as $name) {
+        foreach ($this->artistNames($metadata, $cleaned->featuring, $titleArtist) as $name) {
             $track->addArtist($this->artistRepository->findOrCreate($name));
         }
 
@@ -89,12 +101,14 @@ class TrackImporter
         return $track;
     }
 
-    private function artistNames(array $metadata, array $featuring): array
+    private function artistNames(array $metadata, array $featuring, ?string $titleArtist): array
     {
         if (isset($metadata['artists'])) {
             $names = $metadata['artists'];
         } elseif (isset($metadata['artist'])) {
             $names = explode(',', $metadata['artist']);
+        } elseif (null !== $titleArtist) {
+            $names = [$titleArtist];
         } else {
             $names = [preg_replace('/\s*-\s*Topic$/i', '', $metadata['channel'] ?? '')];
         }
