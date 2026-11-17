@@ -16,4 +16,10 @@
         {{ ux_icon('material-symbols:person' ~ (section == 'account' ? '' : '-outline' )) }}
         <span class="nav-label">Compte</span>
     </a>
+    {% if is_granted('ROLE_ADMIN') %}
+        <a class="nav-item" aria-current="{{ section == 'admin' ? 'page' : 'false' }}" href="{{ path('app_admin') }}">
+            {{ ux_icon('material-symbols:admin-panel-settings' ~ (section == 'admin' ? '' : '-outline' )) }}
+            <span class="nav-label">Admin</span>
+        </a>
+    {% endif %}
 </nav>

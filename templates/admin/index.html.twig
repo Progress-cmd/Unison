@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - Administration{% endblock %}
+
+{% block section %}admin{% endblock %}
+
+{% block body %}
+<header class="admin-header">
+    <h1>Administration</h1>
+    <p class="admin-subtitle">Ce qu'il y a dans Unison, et comment se passent les imports.</p>
+</header>
+
+<section class="admin-group" aria-labelledby="admin-library">
+    <h2 class="admin-heading" id="admin-library">Bibliothèque</h2>
+    <dl class="stat-grid">
+        <div class="stat">
+            <dt>Titres</dt>
+            <dd>{{ nbTracks|number_format(0, ',', ' ') }}</dd>
+        </div>
+        <div class="stat">
+            <dt>Artistes</dt>
+            <dd>{{ nbArtists|number_format(0, ',', ' ') }}</dd>
+        </div>
+        <div class="stat">
+            <dt>Albums</dt>
+            <dd>{{ nbAlbums|number_format(0, ',', ' ') }}</dd>
+        </div>
+        <div class="stat">
+            <dt>Durée totale</dt>
+            <dd>{{ totalDuration // 3600 }}<small>h</small>{{ '%02d'|format(totalDuration % 3600 // 60) }}</dd>
+        </div>
+    </dl>
+</section>
+
+{# One entry per import status: label, number, and the modifier that gives its colour. #}
+{% set imports = [
+    {label: 'Réussis', count: nbImportDone, status: 'done'},
+    {label: 'Doublons', count: nbImportDuplicate, status: 'duplicate'},
+    {label: 'Échoués', count: nbImportFailed, status: 'failed'},
+    {label: 'En attente', count: nbImportPending, status: 'pending'},
+] %}
+{% set importTotal = nbImportDone + nbImportDuplicate + nbImportFailed + nbImportPending %}
+
+<div class="admin-columns">
+    <section class="admin-group admin-card" aria-labelledby="admin-imports">
+        <h2 class="admin-heading" id="admin-imports">
+            Imports
+            <span class="admin-count">{{ importTotal|number_format(0, ',', ' ') }}</span>
+        </h2>
+
+        {% if importTotal %}
+            {# One block per status, as wide as its share. The legend below gives the numbers. #}
+            <div class="import-bar" role="img" aria-label="{% for item in imports %}{{ item.label }} : {{ item.count }}{{ loop.last ? '' : ', ' }}{% endfor %}">
+                {% for item in imports|filter(item => item.count > 0) %}
+                    <span class="import-bar-part import-bar-part--{{ item.status }}" style="flex-grow: {{ item.count }}" title="{{ item.label }} : {{ item.count }}"></span>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <ul class="import-legend">
+            {% for item in imports %}
+                <li class="import-legend-item import-legend-item--{{ item.status }}">
+                    <span class="import-legend-label">{{ item.label }}</span>
+                    <span class="import-legend-value">{{ item.count|number_format(0, ',', ' ') }}</span>
+                    <span class="import-legend-share">{{ importTotal ? (item.count / importTotal * 100)|round ~ ' %' : '–' }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <dl class="stat-grid stat-grid--side">
+        <div class="stat">
+            <dt>Comptes</dt>
+            <dd>{{ nbComptes|number_format(0, ',', ' ') }}</dd>
+        </div>
+        <div class="stat">
+            <dt>Titres nettoyés</dt>
+            <dd>{{ nbCleaned|number_format(0, ',', ' ') }}</dd>
+            {% if nbTracks %}
+                <p class="stat-note">{{ (nbCleaned / nbTracks * 100)|round }} % de la bibliothèque</p>
+            {% endif %}
+        </div>
+    </dl>
+</div>
+{% endblock %}
