@@ -1,0 +1,197 @@
+/* --- Administration: dashboard --- */
+
+.admin-header h1 {
+    margin: 0;
+}
+
+.admin-subtitle {
+    margin: 4px 0 24px;
+    font-size: 15px;
+    color: var(--color-text-muted);
+}
+
+.admin-group {
+    margin-bottom: 24px;
+}
+
+/* Small uppercase label above each block, like the groups of the import page. */
+.admin-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+}
+
+.admin-count {
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--color-accent-soft);
+    color: var(--color-text);
+    font-size: 11px;
+    letter-spacing: 0;
+}
+
+/* --- Figures: one card per number --- */
+
+/* Phone: two per row. Wider: the four library figures on one row. */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 0;
+}
+
+.stat {
+    padding: 16px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+}
+
+.stat dt {
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.stat dd {
+    margin: 6px 0 0;
+    font-family: var(--serif);
+    font-size: 34px;
+    font-weight: 500;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+/* The "h" of "4h57": smaller, so the hours and minutes read first. */
+.stat dd small {
+    margin: 0 2px;
+    font-size: 0.55em;
+    color: var(--color-text-muted);
+}
+
+.stat-note {
+    margin: 8px 0 0;
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+/* --- Imports: a bar split by status, and its legend --- */
+
+.admin-card {
+    padding: 16px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+}
+
+.import-bar {
+    display: flex;
+    gap: 2px;
+    height: 10px;
+    margin: 4px 0 14px;
+}
+
+/* Each part grows with its number (flex-grow set in the template). min-width keeps a
+   single failed import visible next to a hundred successful ones. */
+.import-bar-part {
+    flex-basis: 0;
+    min-width: 6px;
+    border-radius: 999px;
+    background: var(--part-color);
+}
+
+.import-bar-part--done,
+.import-legend-item--done {
+    --part-color: var(--color-success);
+}
+
+.import-bar-part--duplicate,
+.import-legend-item--duplicate {
+    --part-color: var(--color-text-muted);
+}
+
+.import-bar-part--failed,
+.import-legend-item--failed {
+    --part-color: var(--color-error);
+}
+
+.import-bar-part--pending,
+.import-legend-item--pending {
+    --part-color: var(--color-warning);
+}
+
+.import-legend {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Dot and label on the first line, number and share under them. */
+.import-legend-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    column-gap: 8px;
+    font-size: 13px;
+}
+
+.import-legend-item::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--part-color);
+}
+
+.import-legend-label {
+    color: var(--color-text-muted);
+}
+
+.import-legend-value {
+    grid-column: 2;
+    font-size: 20px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.import-legend-share {
+    grid-column: 2;
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+@media (min-width: 640px) {
+    .stat-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .import-legend {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+/* Large screen: the imports card on the left, the two remaining figures stacked on the right. */
+@media (min-width: 1024px) {
+    .admin-columns {
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+        gap: 12px;
+        align-items: start;
+    }
+
+    .admin-columns .admin-group {
+        margin-bottom: 0;
+    }
+
+    .stat-grid--side {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

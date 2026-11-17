@@ -157,4 +157,30 @@ class TrackRepository extends ServiceEntityRepository
             ->getSingleColumnResult()
         ;
     }
+
+    /**
+     * Total length of the library, in seconds.
+     */
+    public function totalDuration(): int
+    {
+        return (int) $this->createQueryBuilder('t')
+            ->select('SUM(t.duration)')
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
+    }
+
+    /**
+     * Tracks whose title was changed by TitleCleaner.
+     */
+    public function countCleaned(): int
+    {
+        return (int) $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->andWhere('t.originalTitle IS NOT NULL')
+            ->andWhere('t.title <> t.originalTitle')
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
+    }
 }
