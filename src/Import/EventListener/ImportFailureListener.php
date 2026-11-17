@@ -2,6 +2,8 @@
 
 namespace App\Import\EventListener;
 
+use App\Admin\Entity\ErrorReport;
+use App\Admin\Enum\ErrorSource;
 use App\Import\Enum\ImportStatus;
 use App\Import\Message\ImportPlaylist;
 use App\Import\Message\ImportTrack;
@@ -28,15 +30,15 @@ class ImportFailureListener
         if (!$message instanceof ImportTrack && !$message instanceof ImportPlaylist) {
             return;
         }
+        $failure = $event->getThrowable()->getPrevious() ?? $event->getThrowable();
         $job = null !== $message->jobId ? $this->importJobRepository->find($message->jobId) : null;
 
-        if (null === $job) {
-            return;
+        if (null !== $job) {
+            $job->setStatus(ImportStatus::Failed);
+            $job->setError(mb_substr($failure->getMessage(), 0, 255));
         }
-        $failure = $event->getThrowable()->getPrevious() ?? $event->getThrowable();
 
-        $job->setStatus(ImportStatus::Failed);
-        $job->setError(mb_substr($failure->getMessage(), 0, 255));
+        $this->em->persist(new ErrorReport(ErrorSource::Import, $failure->getMessage(), $message->url, $job));
 
         $this->em->flush();
     }

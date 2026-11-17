@@ -3,6 +3,8 @@
 namespace App\Import\Controller;
 
 use App\Account\Entity\User;
+use App\Admin\Entity\ErrorReport;
+use App\Admin\Enum\ErrorSource;
 use App\Import\Entity\ImportJob;
 use App\Import\Form\ImportType;
 use App\Import\Message\ImportPlaylist;
@@ -100,14 +102,19 @@ final class ImportController extends AbstractController
     }
 
     #[Route('/import/youtube', name: 'app_import_youtube')]
-    public function youtube(Request $request, #[CurrentUser] User $user, ImportJobRepository $importJobRepository, TitleCleaner $titleCleaner, YouTubeMusicSearch $youTubeMusicSearch, TrackRepository $trackRepository, AlbumRepository $albumRepository): Response
+    public function youtube(Request $request, EntityManagerInterface $em, #[CurrentUser] User $user, ImportJobRepository $importJobRepository, TitleCleaner $titleCleaner, YouTubeMusicSearch $youTubeMusicSearch, TrackRepository $trackRepository, AlbumRepository $albumRepository): Response
     {
         $query = trim($request->query->getString('q'));
 
         try {
             $results = $youTubeMusicSearch->search($query);
             $albums = $youTubeMusicSearch->searchAlbums($query);
-        } catch (\RuntimeException) {
+        } catch (\RuntimeException $e) {
+            $error = new ErrorReport(ErrorSource::YouTubeMusic, $e->getPrevious()?->getMessage() ?? $e->getMessage(), mb_substr($query, 0, 255), null);
+
+            $em->persist($error);
+            $em->flush();
+
             return $this->render('import/_youtube.html.twig', [
                 'error' => true,
             ]);
