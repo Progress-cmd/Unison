@@ -7,9 +7,8 @@ use App\Admin\Entity\ErrorReport;
 use App\Admin\Enum\ErrorSource;
 use App\Import\Entity\ImportJob;
 use App\Import\Form\ImportType;
-use App\Import\Message\ImportPlaylist;
-use App\Import\Message\ImportTrack;
 use App\Import\Repository\ImportJobRepository;
+use App\Import\Service\ImportLauncher;
 use App\Import\Service\TitleCleaner;
 use App\Import\Service\YouTubeMusicSearch;
 use App\Import\Service\YouTubeOEmbed;
@@ -21,7 +20,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\UX\Turbo\TurboBundle;
@@ -32,7 +30,7 @@ final class ImportController extends AbstractController
     private const PLAYLIST_URL = 'https://www.youtube.com/playlist?list=';
 
     #[Route('/import', name: 'app_import')]
-    public function index(Request $request, MessageBusInterface $messageBus, #[CurrentUser] User $user, EntityManagerInterface $em, YouTubeOEmbed $youTubeOEmbed, TrackRepository $trackRepository, FavoriteTrackRepository $favoriteTrackRepository): Response
+    public function index(Request $request, ImportLauncher $importLauncher, #[CurrentUser] User $user, EntityManagerInterface $em, YouTubeOEmbed $youTubeOEmbed, TrackRepository $trackRepository, FavoriteTrackRepository $favoriteTrackRepository): Response
     {
         $form = $this->createForm(ImportType::class);
 
@@ -56,11 +54,7 @@ final class ImportController extends AbstractController
             $em->flush();
 
             foreach ($jobs as $job) {
-                if ($this->isPlaylist($job->getUrl())) {
-                    $messageBus->dispatch(new ImportPlaylist($job->getUrl(), $user->getId(), $job->getId()));
-                } else {
-                    $messageBus->dispatch(new ImportTrack($job->getUrl(), $user->getId(), jobId: $job->getId()));
-                }
+                $importLauncher->launch($job);
             }
 
             $this->addFlash('success', 'Imports ajoutés à la file d\'attente.');
@@ -140,7 +134,7 @@ final class ImportController extends AbstractController
     }
 
     #[Route('/import/youtube/add', name: 'app_import_youtube_add', methods: ['POST'])]
-    public function add(Request $request, MessageBusInterface $messageBus, #[CurrentUser] User $user, EntityManagerInterface $em): Response
+    public function add(Request $request, ImportLauncher $importLauncher, #[CurrentUser] User $user, EntityManagerInterface $em): Response
     {
         if (!$this->isCsrfTokenValid('import_youtube', $request->request->getString('_csrf_token'))) {
             throw $this->createAccessDeniedException('Jeton CSRF invalide.');
@@ -164,19 +158,12 @@ final class ImportController extends AbstractController
         $em->persist($job);
         $em->flush();
 
-        $messageBus->dispatch(self::WATCH_URL === $prefix
-            ? new ImportTrack($job->getUrl(), $user->getId(), jobId: $job->getId())
-            : new ImportPlaylist($job->getUrl(), $user->getId(), $job->getId()));
+        $importLauncher->launch($job);
 
         $request->setRequestFormat(TurboBundle::STREAM_FORMAT);
 
         return $this->render('import/youtube_add.stream.html.twig', [
             'id' => substr($url, strlen($prefix)),
         ]);
-    }
-
-    private function isPlaylist(string $url): bool
-    {
-        return str_contains($url, '/playlist') || (str_contains($url, 'list=') && !str_contains($url, 'v='));
     }
 }

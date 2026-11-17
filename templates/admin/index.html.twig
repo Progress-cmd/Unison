@@ -9,6 +9,22 @@
     <h1>Administration</h1>
     <p class="admin-subtitle">Ce qu'il y a dans Unison, et comment se passent les imports.</p>
 </header>
+{% include 'admin/_tabs.html.twig' with {active: 'dashboard'} %}
+
+{# Errors first: the one thing on this page that may need doing something. #}
+<a class="admin-alert{{ nbUnresolvedErrors ? ' admin-alert--warning' }}" href="{{ path('app_admin_errors') }}">
+    {{ ux_icon(nbUnresolvedErrors ? 'material-symbols:error-outline' : 'material-symbols:check-circle-outline', {class: 'admin-alert-icon'}) }}
+    <span class="admin-alert-text">
+        {% if nbUnresolvedErrors %}
+            <strong>{{ nbUnresolvedErrors }} erreur{{ nbUnresolvedErrors > 1 ? 's' }} à régler</strong>
+            Imports, recherches ou pages qui ont planté.
+        {% else %}
+            <strong>Aucune erreur à régler</strong>
+            Tout tourne normalement.
+        {% endif %}
+    </span>
+    {{ ux_icon('material-symbols:chevron-right', {class: 'admin-alert-arrow'}) }}
+</a>
 
 <section class="admin-group" aria-labelledby="admin-library">
     <h2 class="admin-heading" id="admin-library">Bibliothèque</h2>

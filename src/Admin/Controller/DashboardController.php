@@ -3,6 +3,7 @@
 namespace App\Admin\Controller;
 
 use App\Account\Repository\UserRepository;
+use App\Admin\Repository\ErrorReportRepository;
 use App\Import\Enum\ImportStatus;
 use App\Import\Repository\ImportJobRepository;
 use App\Library\Repository\AlbumRepository;
@@ -15,7 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class DashboardController extends AbstractController
 {
     #[Route('/admin', name: 'app_admin')]
-    public function index(ImportJobRepository $importJobRepository, UserRepository $userRepository, AlbumRepository $albumRepository, ArtistRepository $artistRepository, TrackRepository $trackRepository): Response
+    public function index(ErrorReportRepository $errorReportRepository, ImportJobRepository $importJobRepository, UserRepository $userRepository, AlbumRepository $albumRepository, ArtistRepository $artistRepository, TrackRepository $trackRepository): Response
     {
         return $this->render('admin/index.html.twig', [
             'nbTracks' => $trackRepository->count(),
@@ -30,6 +31,8 @@ final class DashboardController extends AbstractController
 
             'totalDuration' => $trackRepository->totalDuration(),
             'nbCleaned' => $trackRepository->countCleaned(),
+
+            'nbUnresolvedErrors' => $errorReportRepository->count(['resolvedAt' => null]),
         ]);
     }
 }

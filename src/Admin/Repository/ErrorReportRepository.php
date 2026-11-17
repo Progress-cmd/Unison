@@ -16,28 +16,15 @@ class ErrorReportRepository extends ServiceEntityRepository
         parent::__construct($registry, ErrorReport::class);
     }
 
-//    /**
-//     * @return ErrorReport[] Returns an array of ErrorReport objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('e.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?ErrorReport
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findUnresolved(): array
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.resolvedAt IS NULL')
+            ->orderBy('e.createdAt', 'DESC')
+            ->leftJoin('e.importJob', 'j')
+            ->addSelect('j')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }
