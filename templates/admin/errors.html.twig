@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - Erreurs{% endblock %}
+
+{% block section %}admin{% endblock %}
+
+{% block body %}
+<header class="admin-header">
+    <h1>Administration</h1>
+    <p class="admin-subtitle">Ce qui a planté, du plus récent au plus ancien.</p>
+</header>
+{% include 'admin/_tabs.html.twig' with {active: 'errors'} %}
+
+{# Label and icon of each ErrorSource value. #}
+{% set sources = {
+    import: {label: 'Import', icon: 'material-symbols:download'},
+    youtube_music: {label: 'YouTube Music', icon: 'material-symbols:smart-display-outline'},
+    server: {label: 'Serveur', icon: 'material-symbols:dns-outline'},
+} %}
+
+<ul class="error-list">
+    {% for error in errors %}
+        {% set source = sources[error.source.value] %}
+        <li class="error-item error-item--{{ error.source.value }}">
+            <div class="error-head">
+                <span class="error-source">
+                    {{ ux_icon(source.icon) }}
+                    {{ source.label }}
+                </span>
+                <time class="error-date" datetime="{{ error.createdAt|date('c') }}">{{ error.createdAt|date('d/m/Y à H:i') }}</time>
+            </div>
+
+            {% if error.context %}
+                {% if error.context starts with 'http' %}
+                    <a class="error-context" href="{{ error.context }}" target="_blank" rel="noopener noreferrer">{{ error.context }}</a>
+                {% else %}
+                    <p class="error-context">{{ error.context }}</p>
+                {% endif %}
+            {% endif %}
+
+            <p class="error-message">{{ error.message }}</p>
+
+            <div class="error-actions">
+                {% if error.importJob %}
+                    <form method="post" action="{{ path('app_admin_errors_retry', {id: error.id}) }}">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('error_retry') }}">
+                        <button type="submit" class="error-action error-action--retry">
+                            {{ ux_icon('material-symbols:refresh') }}
+                            Relancer
+                        </button>
+                    </form>
+                {% endif %}
+                <form method="post" action="{{ path('app_admin_errors_resolve', {id: error.id}) }}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('error_resolve') }}">
+                    <button type="submit" class="error-action error-action--resolve">
+                        {{ ux_icon('material-symbols:check-rounded') }}
+                        Réglé
+                    </button>
+                </form>
+            </div>
+        </li>
+    {% else %}
+        <li class="error-empty">
+            {{ ux_icon('material-symbols:check-circle-outline') }}
+            Aucune erreur à régler.
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

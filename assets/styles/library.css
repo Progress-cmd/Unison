@@ -29,45 +29,10 @@
     }
 }
 
-/* --- Tabs at the top of the library pages --- */
-
-.library-tabs {
-    display: flex;
-    gap: 24px;
-    margin-bottom: 24px;
-    border-bottom: 1px solid var(--color-border);
-    overflow-x: auto;
-}
-
-.library-tabs a {
-    flex: none;
-    padding: 8px 0;
-    margin-bottom: -1px;
-    border-bottom: 2px solid transparent;
-    color: var(--color-text-muted);
-    text-decoration: none;
-    white-space: nowrap;
-}
-
-.library-tabs a:hover {
-    color: var(--color-text);
-}
-
-.library-tabs a[aria-current="page"] {
-    border-bottom-color: var(--color-accent);
-    color: var(--color-text);
-    font-weight: 500;
-}
-
-/* A section title right under the tabs needs no extra space above it. */
-.library-tabs + h2 {
-    margin-top: 0;
-}
-
 /* --- Detail page header (an album, an artist, a playlist) --- */
 
 /* "← Albums" link between the tabs and the header. */
-.library-tabs + .back-link {
+.tabs + .back-link {
     margin-bottom: 16px;
 }
 

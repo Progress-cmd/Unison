@@ -34,6 +34,9 @@ class ImportJob
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $durationMs = null;
+
     public function __construct(string $url, User $requestedBy)
     {
         $this->url = $url;
@@ -96,5 +99,17 @@ class ImportJob
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function getDurationMs(): ?int
+    {
+        return $this->durationMs;
+    }
+
+    public function setDurationMs(?int $durationMs): static
+    {
+        $this->durationMs = $durationMs;
+
+        return $this;
     }
 }
