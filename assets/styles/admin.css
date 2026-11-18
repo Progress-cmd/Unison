@@ -142,6 +142,16 @@
     color: var(--color-text-muted);
 }
 
+.stat-note-warning {
+    color: var(--color-warning);
+    font-weight: 600;
+}
+
+/* Phone: the search card takes the whole row under the two side figures. */
+.stat--wide {
+    grid-column: 1 / -1;
+}
+
 /* --- Imports: a bar split by status, and its legend --- */
 
 .admin-card {
@@ -230,6 +240,30 @@
     color: var(--color-text-muted);
 }
 
+/* Below the legend, separated by a thin line. */
+.import-durations {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 14px 0 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-border);
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.import-durations svg {
+    flex: none;
+    width: 18px;
+    height: 18px;
+}
+
+.import-durations strong {
+    color: var(--color-text);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
 @media (min-width: 640px) {
     .stat-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -237,6 +271,15 @@
 
     .import-legend {
         grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    /* The three side figures on one row. */
+    .stat-grid--side {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .stat--wide {
+        grid-column: auto;
     }
 }
 

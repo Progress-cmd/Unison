@@ -4,6 +4,7 @@ namespace App\Import\Controller;
 
 use App\Account\Entity\User;
 use App\Admin\Entity\ErrorReport;
+use App\Admin\Entity\SearchTiming;
 use App\Admin\Enum\ErrorSource;
 use App\Import\Entity\ImportJob;
 use App\Import\Form\ImportType;
@@ -100,11 +101,15 @@ final class ImportController extends AbstractController
     {
         $query = trim($request->query->getString('q'));
 
+        $startTime = microtime(true);
+
         try {
             $results = $youTubeMusicSearch->search($query);
             $albums = $youTubeMusicSearch->searchAlbums($query);
         } catch (\RuntimeException $e) {
             $error = new ErrorReport(ErrorSource::YouTubeMusic, $e->getPrevious()?->getMessage() ?? $e->getMessage(), mb_substr($query, 0, 255), null);
+
+            $em->persist(new SearchTiming((int) round((microtime(true) - $startTime) * 1000), true));
 
             $em->persist($error);
             $em->flush();
@@ -113,6 +118,9 @@ final class ImportController extends AbstractController
                 'error' => true,
             ]);
         }
+
+        $em->persist(new SearchTiming((int) round((microtime(true) - $startTime) * 1000), false));
+        $em->flush();
 
         $existingUrlsTrack = $trackRepository->findExistingSourceUrls(array_column($results, 'url'));
         $existingUrlsAlbum = $albumRepository->findExistingSourceUrls(array_column($albums, 'url'));

@@ -4,6 +4,7 @@ namespace App\Admin\Controller;
 
 use App\Account\Repository\UserRepository;
 use App\Admin\Repository\ErrorReportRepository;
+use App\Admin\Repository\SearchTimingRepository;
 use App\Import\Enum\ImportStatus;
 use App\Import\Repository\ImportJobRepository;
 use App\Library\Repository\AlbumRepository;
@@ -16,8 +17,10 @@ use Symfony\Component\Routing\Attribute\Route;
 final class DashboardController extends AbstractController
 {
     #[Route('/admin', name: 'app_admin')]
-    public function index(ErrorReportRepository $errorReportRepository, ImportJobRepository $importJobRepository, UserRepository $userRepository, AlbumRepository $albumRepository, ArtistRepository $artistRepository, TrackRepository $trackRepository): Response
+    public function index(SearchTimingRepository $searchTimingRepository, ErrorReportRepository $errorReportRepository, ImportJobRepository $importJobRepository, UserRepository $userRepository, AlbumRepository $albumRepository, ArtistRepository $artistRepository, TrackRepository $trackRepository): Response
     {
+        $since = new \DateTimeImmutable('-30 days');
+
         return $this->render('admin/index.html.twig', [
             'nbTracks' => $trackRepository->count(),
             'nbArtists' => $artistRepository->count(),
@@ -33,6 +36,11 @@ final class DashboardController extends AbstractController
             'nbCleaned' => $trackRepository->countCleaned(),
 
             'nbUnresolvedErrors' => $errorReportRepository->count(['resolvedAt' => null]),
+            'importDurations' => $importJobRepository->durationStats(),
+
+            'averageDuration' => $searchTimingRepository->averageDuration($since),
+            'nbSuccessedSearch' => $searchTimingRepository->countSince($since, false),
+            'nbFailedSearch' => $searchTimingRepository->countSince($since, true),
         ]);
     }
 }

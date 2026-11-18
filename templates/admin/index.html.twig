@@ -82,6 +82,17 @@
                 </li>
             {% endfor %}
         </ul>
+
+        {# Work time of the tracks imported successfully (milliseconds, null before any measure). #}
+        {% if importDurations.average is not null %}
+            <p class="import-durations">
+                {{ ux_icon('material-symbols:timer-outline') }}
+                <span>
+                    En moyenne <strong>{{ (importDurations.average / 1000)|number_format(1, ',', ' ') }} s</strong> par titre,
+                    <strong>{{ (importDurations.longest / 1000)|number_format(1, ',', ' ') }} s</strong> au plus long
+                </span>
+            </p>
+        {% endif %}
     </section>
 
     <dl class="stat-grid stat-grid--side">
@@ -95,6 +106,26 @@
             {% if nbTracks %}
                 <p class="stat-note">{{ (nbCleaned / nbTracks * 100)|round }} % de la bibliothèque</p>
             {% endif %}
+        </div>
+        {# YouTube Music answer time over the last 30 days; failures (time-outs) are counted apart. #}
+        {% set nbSearches = nbSuccessedSearch + nbFailedSearch %}
+        <div class="stat stat--wide">
+            <dt>Recherche YouTube Music</dt>
+            <dd>
+                {% if averageDuration is not null %}
+                    {{ (averageDuration / 1000)|number_format(1, ',', ' ') }}<small>s</small>
+                {% else %}
+                    –
+                {% endif %}
+            </dd>
+            <p class="stat-note">
+                {% if nbSearches %}
+                    En moyenne sur {{ nbSearches }} recherche{{ nbSearches > 1 ? 's' }} en 30 jours
+                    {%- if nbFailedSearch %}, <span class="stat-note-warning">{{ nbFailedSearch }} en échec</span>{% endif %}
+                {% else %}
+                    Aucune recherche ces 30 derniers jours
+                {% endif %}
+            </p>
         </div>
     </dl>
 </div>

@@ -44,10 +44,13 @@ class ImportTrackHandler
 
         $job = null !== $message->jobId ? $this->importJobRepository->find($message->jobId) : null;
 
+        $startTime = microtime(true);
+
         try {
             $track = $this->trackImporter->import($message->url, $user, $album, $message->trackNumber);
 
             $job?->setStatus(ImportStatus::Done);
+            $job?->setDurationMs((int) round((microtime(true) - $startTime) * 1000));
             $job?->setTitle($track->getTitle());
         } catch (TrackAlreadyImportedException $e) {
             $job?->setStatus(ImportStatus::Duplicate);

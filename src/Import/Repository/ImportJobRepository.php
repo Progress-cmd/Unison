@@ -49,4 +49,13 @@ class ImportJobRepository extends ServiceEntityRepository
             ->getSingleColumnResult()
         ;
     }
+
+    public function durationStats(): array
+    {
+        return $this->createQueryBuilder('i')
+            ->select('AVG(i.durationMs) AS average, MAX(i.durationMs) AS longest')
+            ->getQuery()
+            ->getSingleResult()
+        ;
+    }
 }
