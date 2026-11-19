@@ -10,6 +10,10 @@
         pagehide@window->player#saveState
         turbo:load@document->player#refreshFavorite
         keydown@window->player#shortcut
+        touchstart->player#swipeStart:passive
+        touchmove->player#swipeMove:passive
+        touchend->player#swipeEnd
+        touchcancel->player#swipeEnd
     "
     data-turbo-permanent
     data-player-save-url-value="{{ path('app_playback_state_save') }}"
@@ -149,6 +153,19 @@
         >
     </div>
 
+    {# Phone, full screen: shows the queue in place of the cover, so nothing needs scrolling. #}
+    <button
+        type="button"
+        class="player-queue-toggle"
+        aria-pressed="false"
+        aria-label="Afficher la file d'attente"
+        data-player-target="queueToggle"
+        data-action="player#toggleQueue"
+    >
+        {{ ux_icon('material-symbols:queue-music') }}
+        <span>À suivre</span>
+    </button>
+
     <section class="player-upcoming">
         <h2>À suivre</h2>
         <ol class="player-queue" data-player-target="upcoming"></ol>
@@ -171,6 +188,27 @@
             timeupdate->player#updateProgress
             ended->player#trackEnded
             seeked->player#updatePositionState
+            error->player#recover
         "
     ></audio>
+
+    {# Shown once, on Android browsers other than Firefox (see showBackgroundTip()):
+       with the default battery setting, Android puts them to sleep with the screen off. #}
+    <dialog class="background-tip" data-player-target="tip" aria-labelledby="background-tip-title">
+        <h2 id="background-tip-title">Écouter écran éteint</h2>
+        <p>
+            Android met <strong data-player-target="tipBrowser">ton navigateur</strong> en veille quand l'écran est éteint :
+            la musique s'arrête après un ou deux titres.
+        </p>
+        <p>Pour l'éviter, un réglage à faire une seule fois :</p>
+        <ol class="background-tip-steps">
+            <li>Ouvre les <strong>Paramètres</strong> du téléphone</li>
+            <li><strong>Applications</strong>, puis <strong data-player-target="tipBrowser">ton navigateur</strong></li>
+            <li><strong>Batterie</strong>, puis <strong>Sans restriction</strong></li>
+        </ol>
+        <p class="background-tip-note">Les noms varient un peu selon le téléphone. Firefox n'a pas besoin de ce réglage.</p>
+        <form method="dialog">
+            <button type="submit" class="btn">Compris</button>
+        </form>
+    </dialog>
 </div>

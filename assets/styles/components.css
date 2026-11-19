@@ -250,6 +250,24 @@ dialog form[method="dialog"] button:hover {
     color: var(--color-text-muted);
 }
 
+/* A checkbox and its text on one line ("Se souvenir de moi"), outside the full-width input look. */
+.form .form-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+.form .form-check input {
+    display: inline;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    padding: 0;
+    accent-color: var(--color-accent);
+}
+
 /* --- Alerts --- */
 
 .alert {

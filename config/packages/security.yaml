@@ -29,6 +29,14 @@ security:
                 path: app_logout
                 enable_csrf: true
 
+            # "Se souvenir de moi": a signed cookie that logs back in when the session is gone
+            # (PHP deletes idle sessions after 24 min, Android kills Firefox in background).
+            # It holds the password hash: changing the password invalidates it everywhere.
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 2592000 # 30 days
+                signature_properties: ['password']
+
             # Activate different ways to authenticate:
             # https://symfony.com/doc/current/security.html#the-firewall
 

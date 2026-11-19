@@ -1,5 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 import SoundAnalyser from '../player/sound_analyser.js';
+import TrackCache from '../player/track_cache.js';
 
 export default class extends Controller
 {
@@ -21,6 +22,9 @@ export default class extends Controller
         'favorite',
         'favoriteTrack',
         'add',
+        'tip',
+        'tipBrowser',
+        'queueToggle',
     ];
 
     static values = {
@@ -42,6 +46,11 @@ export default class extends Controller
     repeat = 'off';
     shuffle = false;
     sourceQueue = [];
+    cache = new TrackCache();
+    lastPrepare = 0;
+    // When the <audio> fails (network lost): where it was, and how many reloads in a row.
+    errorPosition = null;
+    failures = 0;
 
     initialize()
     {
@@ -49,7 +58,7 @@ export default class extends Controller
         this.restoreState();
 
         if ('mediaSession' in navigator) {
-            navigator.mediaSession.setActionHandler('play', () => this.audioTarget.play());
+            navigator.mediaSession.setActionHandler('play', () => this.resume());
             navigator.mediaSession.setActionHandler('pause', () => this.audioTarget.pause());
             navigator.mediaSession.setActionHandler('previoustrack', () => this.previous());
             navigator.mediaSession.setActionHandler('nexttrack', () => this.next());
@@ -71,6 +80,8 @@ export default class extends Controller
         this.arrangeQueue();
 
         this.loadCurrent();
+
+        this.showBackgroundTip();
     }
 
     toggle()
@@ -80,7 +91,7 @@ export default class extends Controller
         }
 
         if (this.audioTarget.paused) {
-            this.audioTarget.play();
+            this.resume();
         } else {
             this.audioTarget.pause();
         }
@@ -131,11 +142,86 @@ export default class extends Controller
         this.setExpanded(false);
     }
 
+    // Phone, full screen: the queue takes the place of the cover, and back.
+    toggleQueue()
+    {
+        this.setQueueOpen(!this.element.classList.contains('is-queue-open'));
+    }
+
+    // --- Swipe down to close the full-screen player (phone) ---
+
+    swipeStart(event)
+    {
+        if (!this.element.classList.contains('is-expanded') || window.matchMedia('(min-width: 1024px)').matches) {
+            return;
+        }
+
+        // The sliders follow the finger sideways; a scrolled queue scrolls back up first.
+        const queue = event.target.closest('.player-upcoming');
+
+        if (event.target.closest('input[type="range"]') || (queue && queue.scrollTop > 0)) {
+            return;
+        }
+
+        const touch = event.touches[0];
+
+        this.swipe = { x: touch.clientX, y: touch.clientY, time: Date.now(), distance: 0 };
+        this.element.style.transition = 'none';
+    }
+
+    swipeMove(event)
+    {
+        if (!this.swipe) {
+            return;
+        }
+
+        const touch = event.touches[0];
+        const dx = touch.clientX - this.swipe.x;
+        const dy = touch.clientY - this.swipe.y;
+
+        // Mostly sideways at the start: not a swipe down, let it be.
+        if (this.swipe.distance === 0 && Math.abs(dx) > Math.abs(dy)) {
+            this.swipeCancel();
+            return;
+        }
+
+        this.swipe.distance = Math.max(0, dy);
+        this.element.style.transform = `translateY(${this.swipe.distance}px)`;
+    }
+
+    swipeEnd()
+    {
+        if (!this.swipe) {
+            return;
+        }
+
+        const { distance, time } = this.swipe;
+        const speed = distance / Math.max(1, Date.now() - time);
+
+        this.swipe = null;
+
+        // Far enough, or a quick flick: close. Otherwise the card slides back up.
+        if (distance > 140 || (distance > 50 && speed > 0.6)) {
+            this.setExpanded(false);
+        } else {
+            this.swipeCancel();
+        }
+    }
+
+    swipeCancel()
+    {
+        this.swipe = null;
+        this.element.style.transition = 'transform 0.2s ease';
+        this.element.style.transform = '';
+    }
+
     toggleRepeat()
     {
         const nextMode = { off: 'all', all: 'one', one: 'off' };
 
         this.setRepeat(nextMode[this.repeat]);
+
+        this.prepareAhead();
 
         this.saveState();
     }
@@ -149,6 +235,8 @@ export default class extends Controller
         this.arrangeQueue();
 
         this.renderUpcoming();
+
+        this.prepareAhead();
 
         this.saveState();
     }
@@ -175,6 +263,10 @@ export default class extends Controller
         this.startAnimation();
 
         this.updatePositionState();
+
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.playbackState = 'playing';
+        }
     }
 
     showPaused()
@@ -187,6 +279,11 @@ export default class extends Controller
         this.saveState();
 
         this.updatePositionState();
+
+        // Between two tracks the <audio> pauses for a moment: the notification must stay.
+        if ('mediaSession' in navigator && !this.audioTarget.ended) {
+            navigator.mediaSession.playbackState = 'paused';
+        }
     }
 
     updateDuration()
@@ -197,15 +294,18 @@ export default class extends Controller
         this.updatePositionState();
     }
 
-        updateProgress()
+    updateProgress()
     {
-        this.progressTarget.value = this.audioTarget.currentTime;
-        this.elapsedTarget.textContent = this.formatTime(this.audioTarget.currentTime);
+        // Screen off or app in background: nobody sees the player, the phone keeps its strength for the sound.
+        if (!document.hidden) {
+            this.progressTarget.value = this.audioTarget.currentTime;
+            this.elapsedTarget.textContent = this.formatTime(this.audioTarget.currentTime);
 
-        const bars = Array.from(this.barsTarget.children);
-        const played = bars.length * this.audioTarget.currentTime / this.audioTarget.duration;
+            const bars = Array.from(this.barsTarget.children);
+            const played = bars.length * this.audioTarget.currentTime / this.audioTarget.duration;
 
-        bars.forEach((bar, index) => bar.classList.toggle('is-played', index < played));
+            bars.forEach((bar, index) => bar.classList.toggle('is-played', index < played));
+        }
 
         if (!this.audioTarget.paused && Date.now() - this.lastSave > 15000) {
             this.saveState();
@@ -225,6 +325,17 @@ export default class extends Controller
             this.listenSent = true;
             this.recordListen();
         }
+
+        // Playing well again 5 s past the failure: the next failure starts a new count.
+        if (this.errorPosition !== null && this.audioTarget.currentTime > this.errorPosition + 5) {
+            this.errorPosition = null;
+            this.failures = 0;
+        }
+
+        // Downloads the next track, then tries again now and then if the network was asleep.
+        if (Date.now() - this.lastPrepare > 20000) {
+            this.prepareAhead();
+        }
     }
 
     trackEnded()
@@ -243,7 +354,130 @@ export default class extends Controller
         this.next();
     }
 
+    // The <audio> failed, most often because the network was cut while it was fetching
+    // the rest of the track. It never skips to the next track: it reloads this one where
+    // it stopped, a few times with a growing delay, then waits for the play button.
+    recover()
+    {
+        if (this.errorPosition === null) {
+            this.errorPosition = this.audioTarget.currentTime;
+        }
+
+        this.failures++;
+
+        clearTimeout(this.retryTimer);
+
+        if (this.failures > 5) {
+            this.showPaused();
+            return;
+        }
+
+        const track = this.queue[this.index];
+
+        this.retryTimer = setTimeout(() => {
+            if (track === this.queue[this.index]) {
+                this.reload();
+            }
+        }, Math.min(2000 * this.failures, 15000));
+    }
+
     // --- Internal helpers ---
+
+    // The first time a track is started on an Android browser other than Firefox, explains the
+    // battery setting without which music stops with the screen off. Once per device.
+    showBackgroundTip()
+    {
+        const agent = navigator.userAgent;
+
+        if (!/Android/i.test(agent) || /Firefox/i.test(agent)) {
+            return;
+        }
+
+        try {
+            if (localStorage.getItem('unison.backgroundTip')) {
+                return;
+            }
+
+            localStorage.setItem('unison.backgroundTip', 'seen');
+        } catch {
+            // No storage (private browsing…): show it once per visit at most.
+            if (this.tipShown) {
+                return;
+            }
+        }
+
+        this.tipShown = true;
+
+        const browsers = [['SamsungBrowser', 'Samsung Internet'], ['EdgA', 'Edge'], ['OPR', 'Opera'], ['Chrome', 'Chrome']];
+        const name = browsers.find(([token]) => agent.includes(token))?.[1] ?? 'ton navigateur';
+
+        this.tipBrowserTargets.forEach(target => { target.textContent = name; });
+
+        this.tipTarget.showModal();
+    }
+
+    // Play, or after a failure, reload the track where it stopped.
+    resume()
+    {
+        if (this.audioTarget.error) {
+            this.failures = 0;
+            this.reload();
+            return;
+        }
+
+        this.audioTarget.play().catch(() => {});
+    }
+
+    reload()
+    {
+        const track = this.queue[this.index];
+        const position = this.errorPosition ?? this.audioTarget.currentTime;
+
+        this.audioTarget.src = this.sourceOf(track);
+
+        this.audioTarget.addEventListener('loadedmetadata', () => {
+            this.audioTarget.currentTime = position;
+        }, { once: true });
+
+        this.audioTarget.play().catch(() => {});
+    }
+
+    // The track after the current one, as next() would pick it; null at the end of the queue.
+    upcomingTrack()
+    {
+        if (this.index < this.queue.length - 1) {
+            return this.queue[this.index + 1];
+        }
+
+        return this.repeat === 'all' ? this.queue[0] : null;
+    }
+
+    // The local copy of a track when playing from memory, else its stream address.
+    sourceOf(track)
+    {
+        return this.cache.get(track.url) ?? track.url;
+    }
+
+    // The tracks worth keeping in memory: the current one (if it came from there) and the next one.
+    aheadUrls()
+    {
+        return [this.queue[this.index], this.upcomingTrack()].filter(Boolean).map(track => track.url);
+    }
+
+    // Downloads the next track in full, and frees the others. The current one isn't downloaded
+    // a second time: the <audio> is already streaming it.
+    prepareAhead()
+    {
+        this.lastPrepare = Date.now();
+
+        this.cache.keep(this.aheadUrls());
+
+        const next = this.upcomingTrack();
+
+        if (next) {
+            this.cache.prefetch(next.url);
+        }
+    }
 
     async loadCurrent(autoplay = true)
     {
@@ -259,8 +493,13 @@ export default class extends Controller
             }
         }
 
+        clearTimeout(this.retryTimer);
+        this.errorPosition = null;
+        this.failures = 0;
+
         document.documentElement.dataset.currentUrl = track.url;
-        this.audioTarget.src = track.url;
+        // From memory when downloaded ahead, else streamed (the first track starts at once).
+        this.audioTarget.src = this.sourceOf(track);
         this.coverTarget.src = track.cover;
         this.titleTarget.textContent = track.title;
         this.artistsTarget.textContent = track.artists;
@@ -269,10 +508,16 @@ export default class extends Controller
 
         this.renderUpcoming();
 
+        // Frees what is no longer needed at once, but waits about 10 s of listening before
+        // downloading the next track: the start of this one keeps the network and the phone for itself,
+        // and a page just opened (track loaded but not played) downloads nothing.
+        this.cache.keep(this.aheadUrls());
+        this.lastPrepare = Date.now() - 10000;
+
         this.dispatch('change', { detail: { url: track.url } });
 
         if (autoplay) {
-            this.audioTarget.play();
+            this.audioTarget.play().catch(() => {});
 
             this.saveState();
         }
@@ -323,6 +568,11 @@ export default class extends Controller
         const apply = () => {
             this.element.classList.toggle('is-expanded', expanded);
             this.expandTarget.setAttribute('aria-expanded', expanded);
+
+            // Back to the cover next time, and no leftover of a swipe.
+            this.setQueueOpen(false);
+            this.element.style.transform = '';
+            this.element.style.transition = '';
         };
 
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -334,6 +584,13 @@ export default class extends Controller
         } else {
             apply();
         }
+    }
+
+    setQueueOpen(open)
+    {
+        this.element.classList.toggle('is-queue-open', open);
+        this.queueToggleTarget.setAttribute('aria-pressed', open);
+        this.queueToggleTarget.setAttribute('aria-label', open ? 'Revenir à la pochette' : 'Afficher la file d\'attente');
     }
 
     setRepeat(mode)
@@ -440,7 +697,7 @@ export default class extends Controller
             method: 'POST',
             body: JSON.stringify(state),
             keepalive: true,
-        });
+        }).catch(() => {});
     }
 
     async restoreState()
@@ -502,14 +759,13 @@ export default class extends Controller
         this.addTarget.dataset.playlistPickerUrlParam = track.playlistsUrl;
         this.addTarget.dataset.playlistPickerTitleParam = track.title;
 
-        const response = await fetch(`${this.favoriteUrlValue}?track=${track.id}`);
+        const response = await fetch(`${this.favoriteUrlValue}?track=${track.id}`).catch(() => null);
 
-        if (!response.ok) {
+        if (!response?.ok) {
             return;
         }
 
         const { favorite } = await response.json();
-
 
         this.favoriteTarget.setAttribute('aria-pressed', favorite);
         this.favoriteTarget.setAttribute('aria-label', favorite ? 'Retirer des favoris' : 'Ajouter aux favoris');
@@ -586,16 +842,27 @@ export default class extends Controller
             return;
         }
 
-        const artwork = track.cover ? [{ src: await this.squareCover(track.cover) }] : [];
+        // Title and artists at once, with the plain cover: in background, Firefox can take
+        // a long time to decode the picture, and the notification would wait for it.
+        this.setMetadata(track, track.cover);
 
-        if (track !== this.queue[this.index]) {
+        if (!track.cover) {
             return;
         }
 
+        const square = await this.squareCover(track.cover);
+
+        if (track === this.queue[this.index]) {
+            this.setMetadata(track, square);
+        }
+    }
+
+    setMetadata(track, cover)
+    {
         navigator.mediaSession.metadata = new MediaMetadata({
             title: track.title,
             artist: track.artists,
-            artwork: artwork,
+            artwork: cover ? [{ src: cover }] : [],
         });
     }
 
@@ -651,6 +918,6 @@ export default class extends Controller
             method: 'POST',
             body: JSON.stringify({'track': this.queue[this.index].id, '_token': this.listenTokenValue}),
             keepalive: true,
-        });
+        }).catch(() => {});
     }
 }
