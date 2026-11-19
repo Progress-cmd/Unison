@@ -5,6 +5,9 @@
     bottom: 0;
     left: 0;
     right: 0;
+    /* Above the page: rows that animate (the YouTube Music results) would else slide over it.
+       Same level as the mini-player; the full-screen player (10) and dialogs stay above. */
+    z-index: 5;
     height: var(--nav-height);
     display: flex;
     align-items: stretch;

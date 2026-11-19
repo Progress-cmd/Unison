@@ -227,6 +227,10 @@
         "track track track"
         "controls controls controls"
         "upcoming upcoming upcoming";
+    /* Each row keeps the height of its content. Without it, Firefox squeezes the rows
+       when the screen is shorter than the card, and the controls cover "À suivre":
+       the card scrolls instead. */
+    grid-auto-rows: max-content;
     align-content: safe center;
     gap: 12px 16px;
     padding: 24px;
@@ -250,7 +254,8 @@
     display: block;
     grid-area: cover;
     justify-self: center;
-    width: min(260px, 100%);
+    /* Smaller on a short screen, so the controls stay in view without scrolling. */
+    width: min(260px, 100%, 34dvh);
     height: auto;
     aspect-ratio: 1;
     margin-bottom: 4px;
@@ -421,6 +426,97 @@
     font-size: 12px;
 }
 
+/* The queue button only exists in the phone's full-screen player (see below). */
+.player-queue-toggle {
+    display: none;
+}
+
+/* --- Phone: full-screen player that fits the screen --- */
+
+/* Nothing to scroll: the cover takes the space left by the other rows, and the queue
+   shows in the cover's place behind the "À suivre" button. */
+@media (max-width: 1023px) {
+    .player.is-expanded {
+        grid-template-rows: auto minmax(0, 1fr) auto auto auto auto auto auto;
+        grid-template-areas:
+            "close . ."
+            "cover cover cover"
+            "add . favorite"
+            "elapsed . duration"
+            "wave wave wave"
+            "track track track"
+            "controls controls controls"
+            "queue queue queue";
+        align-content: stretch;
+        gap: 10px 16px;
+        padding: calc(12px + env(safe-area-inset-top)) 24px calc(12px + env(safe-area-inset-bottom));
+        overflow: hidden;
+    }
+
+    /* As big as the free space allows, square, never stretched. */
+    .player.is-expanded .track-cover {
+        align-self: center;
+        width: auto;
+        height: auto;
+        max-width: min(100%, 340px);
+        max-height: 100%;
+        min-height: 0;
+        margin-bottom: 0;
+    }
+
+    .player.is-expanded .player-upcoming {
+        display: none;
+    }
+
+    .player.is-expanded.is-queue-open .track-cover {
+        display: none;
+    }
+
+    /* Exactly the cover's space (stretch: .player centres its items), scrolling inside. */
+    .player.is-expanded.is-queue-open .player-upcoming {
+        display: block;
+        grid-area: cover;
+        align-self: stretch;
+        max-height: none;
+        min-height: 0;
+        margin: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    .player.is-expanded .player-queue-toggle {
+        grid-area: queue;
+        justify-self: center;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        background: none;
+        border: 1px solid rgb(255 255 255 / 20%);
+        border-radius: 999px;
+        color: rgb(255 255 255 / 80%);
+        font: inherit;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    .player.is-expanded .player-queue-toggle svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .player.is-expanded .player-queue-toggle[aria-pressed="true"] {
+        border-color: var(--color-accent);
+        color: white;
+        background: rgb(255 255 255 / 8%);
+    }
+
+    /* Nothing coming next: no button. */
+    .player.is-expanded:has(.player-queue:empty) .player-queue-toggle {
+        visibility: hidden;
+    }
+}
+
 /* --- Phone: floating mini-player --- */
 
 /* A black rounded pill above the navigation bar: play, title and artists, next.
@@ -496,6 +592,30 @@
     .player:not(.is-expanded) .player-wave {
         display: none;
     }
+}
+
+/* --- "Écouter écran éteint" (Android browsers, shown once) --- */
+
+.background-tip p {
+    margin: 0 0 12px;
+    line-height: 1.5;
+}
+
+.background-tip-steps {
+    margin: 0 0 12px;
+    padding-left: 22px;
+    line-height: 1.7;
+}
+
+.background-tip-note {
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.background-tip form {
+    display: flex;
+    justify-content: flex-end;
+    margin: 4px 0 0;
 }
 
 /* --- Opening and closing animation --- */

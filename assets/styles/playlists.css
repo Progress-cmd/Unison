@@ -135,10 +135,12 @@
 /* Phone: a sheet that rises from the bottom of the screen, full width.
    Large screen (see below): the usual centred dialog. */
 .playlist-picker {
-    margin: auto 0 0;
+    /* --keyboard: height of the on-screen keyboard, --visible: height left above it
+       (both set by playlist_picker_controller.js while the sheet is open). */
+    margin: auto 0 var(--keyboard, 0px);
     width: 100%;
     max-width: 100%;
-    max-height: 90dvh;
+    max-height: min(90dvh, calc(var(--visible, 100dvh) - 16px));
     padding: 24px 24px calc(20px + env(safe-area-inset-bottom));
     border-width: 1px 0 0;
     border-radius: 16px 16px 0 0;
@@ -191,9 +193,9 @@
     margin-bottom: 8px;
 }
 
-/* The list scrolls on its own; search and "Fermer" stay in view. */
+/* The list scrolls on its own; search and "Fermer" stay in view, even above the keyboard. */
 .playlist-picker ul {
-    max-height: 50dvh;
+    max-height: min(50dvh, calc(var(--visible, 100dvh) - 260px));
     margin: 0;
     padding: 0;
     overflow-y: auto;
