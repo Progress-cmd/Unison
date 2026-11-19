@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - Modifier {{ title }}{% endblock %}
+
+{% block section %}admin{% endblock %}
+
+{% block body %}
+<header class="admin-header">
+    <h1>Administration</h1>
+    <p class="admin-subtitle">Corriger ou supprimer ce qui a été importé.</p>
+</header>
+{% include 'admin/_tabs.html.twig' with {active: 'content'} %}
+<a class="back-link" href="{{ path('app_admin_content') }}">
+    {{ ux_icon('material-symbols:arrow-back') }}
+    Contenu
+</a>
+
+<section class="admin-card content-form" aria-labelledby="content-form-title">
+    <h2 class="content-form-title" id="content-form-title">Modifier « {{ title }} »</h2>
+
+    {{ form_start(form, {attr: {class: 'form'}}) }}
+        {{ form_row(form.title) }}
+        {{ form_row(form.artists) }}
+
+        <div class="content-form-actions">
+            <button type="submit" class="btn">Enregistrer</button>
+            <a class="content-form-cancel" href="{{ path('app_admin_content') }}">Annuler</a>
+        </div>
+    {{ form_end(form) }}
+</section>
+
+<section class="admin-card content-danger" aria-labelledby="content-danger-title">
+    <h2 class="admin-heading" id="content-danger-title">Supprimer</h2>
+
+    <div class="content-danger-row">
+        <p>Le titre, son fichier et sa pochette. Il disparaît aussi des favoris, des playlists et de l'historique.</p>
+        <form action="{{ path('app_admin_content_delete_track', {id: track.id}) }}" method="post" data-turbo-confirm="Supprimer « {{ track.title }} » et son fichier ?">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('track_delete') }}">
+            <button class="btn btn-danger" type="submit">
+                {{ ux_icon('material-symbols:delete') }}
+                Supprimer le titre
+            </button>
+        </form>
+    </div>
+
+    {% if track.album %}
+        {# The whole album is deleted from its own page, where all its tracks can be seen. #}
+        <div class="content-danger-row">
+            <p>Pour supprimer tout l'album « {{ track.album.title }} », passe par sa page.</p>
+            <a class="btn btn-secondary" href="{{ path('app_admin_content_album', {id: track.album.id}) }}">
+                Voir l'album
+                {{ ux_icon('material-symbols:chevron-right') }}
+            </a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

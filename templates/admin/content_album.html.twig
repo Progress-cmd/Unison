@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - {{ album.title }}{% endblock %}
+
+{% block section %}admin{% endblock %}
+
+{% block body %}
+<header class="admin-header">
+    <h1>Administration</h1>
+    <p class="admin-subtitle">Corriger ou supprimer ce qui a été importé.</p>
+</header>
+{% include 'admin/_tabs.html.twig' with {active: 'content'} %}
+<a class="back-link" href="{{ path('app_admin_content') }}">
+    {{ ux_icon('material-symbols:arrow-back') }}
+    Contenu
+</a>
+
+{% set count = album.tracks|length %}
+<section class="admin-card content-album" aria-labelledby="content-album-title">
+    {% if album.cover %}
+        <img class="content-album-cover" src="{{ album.cover }}" alt="">
+    {% else %}
+        <span class="content-album-cover"></span>
+    {% endif %}
+
+    <div class="content-album-info">
+        <h2 class="content-form-title" id="content-album-title">{{ album.title }}</h2>
+        <p class="content-meta">
+            {{ album.artists|map(a => a.name)|join(', ') }}
+            {% if album.year %}· {{ album.year }}{% endif %}
+            · {{ count }} titre{{ count > 1 ? 's' }}
+        </p>
+        <a class="content-album-link" href="{{ path('app_albums_show', {id: album.id}) }}">
+            Voir dans la bibliothèque
+            {{ ux_icon('material-symbols:chevron-right') }}
+        </a>
+    </div>
+</section>
+
+<ul class="content-list">
+    {% for track in album.tracks %}
+        {% include 'admin/_content_track.html.twig' with {showNumber: true, showAlbum: false} %}
+    {% else %}
+        <li class="content-empty">Cet album n'a plus aucun titre.</li>
+    {% endfor %}
+</ul>
+
+<section class="admin-card content-danger" aria-labelledby="content-danger-title">
+    <h2 class="admin-heading" id="content-danger-title">Supprimer</h2>
+
+    <div class="content-danger-row">
+        <p>L'album et ses {{ count }} titre{{ count > 1 ? 's' }}, avec leurs fichiers. Ils disparaissent aussi des favoris, des playlists et de l'historique.</p>
+        <form action="{{ path('app_admin_content_delete_album', {id: album.id}) }}" method="post" data-turbo-confirm="Supprimer l'album « {{ album.title }} » et ses {{ count }} titre{{ count > 1 ? 's' }} ?">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('album_delete') }}">
+            <button class="btn btn-danger" type="submit">
+                {{ ux_icon('material-symbols:delete') }}
+                Supprimer l'album
+            </button>
+        </form>
+    </div>
+</section>
+{% endblock %}

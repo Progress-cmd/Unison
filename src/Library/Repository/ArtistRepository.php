@@ -42,4 +42,27 @@ class ArtistRepository extends ServiceEntityRepository
 
         return $artist;
     }
+
+    public function removeOrphans(): int
+    {
+        return $this->createQueryBuilder('a')
+            ->delete()
+            ->andWhere('a.tracks IS EMPTY')
+            ->andWhere('a.albums IS EMPTY')
+            ->getQuery()
+            ->execute()
+        ;
+    }
+
+    public function search(string $search, int $limit = 10): array
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.name LIKE :search')
+            ->setParameter('search', '%'.$search.'%')
+            ->setMaxResults($limit)
+            ->orderBy('a.name', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }
