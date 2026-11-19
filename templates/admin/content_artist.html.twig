@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - {{ artist.name }}{% endblock %}
+
+{% block section %}admin{% endblock %}
+
+{% block body %}
+<header class="admin-header">
+    <h1>Administration</h1>
+    <p class="admin-subtitle">Corriger ou supprimer ce qui a été importé.</p>
+</header>
+{% include 'admin/_tabs.html.twig' with {active: 'content'} %}
+<a class="back-link" href="{{ path('app_admin_content') }}">
+    {{ ux_icon('material-symbols:arrow-back') }}
+    Contenu
+</a>
+
+{% set trackCount = artist.tracks|length %}
+{% set albumCount = artist.albums|length %}
+<section class="admin-card content-album" aria-labelledby="content-artist-title">
+    {% if artist.image %}
+        <img class="content-album-cover content-cover--round" src="{{ artist.image }}" alt="">
+    {% else %}
+        <span class="content-album-cover content-cover--round"></span>
+    {% endif %}
+
+    <div class="content-album-info">
+        <h2 class="content-form-title" id="content-artist-title">{{ artist.name }}</h2>
+        <p class="content-meta">
+            {{ trackCount }} titre{{ trackCount > 1 ? 's' }}
+            · {{ albumCount }} album{{ albumCount > 1 ? 's' }}
+        </p>
+        <a class="content-album-link" href="{{ path('app_artists_show', {id: artist.id}) }}">
+            Voir dans la bibliothèque
+            {{ ux_icon('material-symbols:chevron-right') }}
+        </a>
+    </div>
+</section>
+
+{# Merge: this artist disappears, its tracks and albums go to the chosen one. #}
+<section class="admin-card content-merge" aria-labelledby="content-merge-title">
+    <h2 class="admin-heading" id="content-merge-title">Fusionner</h2>
+    <p class="content-merge-help">
+        Pour un doublon (« Linkin Park » et « LINKIN PARK »…) : choisis l'artiste à garder.
+        « {{ artist.name }} » disparaît, ses titres et albums passent à l'autre.
+    </p>
+
+    {{ form_start(form, {attr: {class: 'form content-merge-form', 'data-turbo-confirm': 'Fusionner « ' ~ artist.name ~ ' » dans l\'artiste choisi ? « ' ~ artist.name ~ ' » sera supprimé.'}}) }}
+        {{ form_row(form.target) }}
+        <button type="submit" class="btn">Fusionner</button>
+    {{ form_end(form) }}
+</section>
+
+<h2 class="admin-heading">Titres</h2>
+<ul class="content-list">
+    {% for track in artist.tracks %}
+        {% include 'admin/_content_track.html.twig' %}
+    {% else %}
+        <li class="content-empty">Cet artiste n'a aucun titre.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

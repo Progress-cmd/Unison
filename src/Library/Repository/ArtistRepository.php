@@ -53,4 +53,16 @@ class ArtistRepository extends ServiceEntityRepository
             ->execute()
         ;
     }
+
+    public function search(string $search, int $limit = 10): array
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.name LIKE :search')
+            ->setParameter('search', '%'.$search.'%')
+            ->setMaxResults($limit)
+            ->orderBy('a.name', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }
