@@ -14,10 +14,11 @@
             <p class="alert alert-error">Identifiants invalides.</p>
         {% endif %}
     {% endif %}
-    <form method="post" class="form">
-        <label>Adresse e-mail <input type="email" name="_username" value="{{ last_username }}" required autofocus></label>
+    <form method="post" class="form" data-controller="login">
+        <label>Adresse e-mail <input type="email" name="_username" value="{{ last_username }}" required autofocus data-login-target="email"></label>
         <label>Mot de passe <input type="password" name="_password" required></label>
-        <a class="login-forgot" href="{{ path('app_forgot_password') }}">Mot de passe oublié ?</a>
+        {# The address goes along: the one of a failed attempt here, the one typed in login_controller.js. #}
+        <a class="login-forgot" href="{{ path('app_forgot_password', last_username ? {email: last_username} : {}) }}" data-action="login#forgot">Mot de passe oublié ?</a>
         <label class="form-check">
             <input type="checkbox" name="_remember_me" checked>
             Se souvenir de moi

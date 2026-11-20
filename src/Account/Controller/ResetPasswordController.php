@@ -41,7 +41,8 @@ final class ResetPasswordController extends AbstractController
         RateLimiterFactoryInterface $forgotPasswordLimiter,
         EntityManagerInterface $em,
     ): Response {
-        $form = $this->createForm(ForgotPasswordType::class);
+        // Filled with the address brought from the login page (?email=), if any.
+        $form = $this->createForm(ForgotPasswordType::class, ['email' => $request->query->getString('email')]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
