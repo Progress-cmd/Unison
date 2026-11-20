@@ -3,11 +3,23 @@
 namespace App\Import\Service;
 
 use App\Import\Exception\VideoUnavailableException;
+use App\Import\Exception\YouTubeRateLimitedException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class YtDlpClient
 {
+    // Checked before ERROR_MESSAGES: when YouTube limits the session, yt-dlp says « Video
+    // unavailable. This content isn't available, try again later. … rate-limited », which
+    // isn't the video's fault.
+    private const RATE_LIMITED = '/try again later|rate-limited|http error 429|too many requests/i';
+
+    // How many times a track waits for the limit to lift before being given up (to Messenger's
+    // own retries). 3 × 15 min stays under the hour after which the queue would hand the
+    // message out again.
+    private const RATE_LIMIT_PAUSES = 3;
+
     private const ERROR_MESSAGES = [
         '/sign in to confirm your age|age.?restricted|inappropriate for some users/i'
             => ["YouTube exige une vérification d'âge pour cette vidéo", true],
@@ -43,10 +55,6 @@ class YtDlpClient
         '/page needs to be reloaded/i'
             => ['Cookies périmés : YouTube ne reconnaît plus la session', false],
 
-        '/http error 429|too many requests|rate.?limit|throttl/i'
-            => ['YouTube limite les téléchargements (trop de requêtes d\'affilée) — '
-            . 'patientez quelques minutes avant de relancer', false],
-
         '/http error 403|forbidden/i'
             => ['YouTube a refusé le téléchargement (403) — généralement temporaire, réessayez', false],
 
@@ -57,6 +65,7 @@ class YtDlpClient
     ];
 
     public function __construct(
+        private readonly LoggerInterface $logger,
         #[Autowire('%env(resolve:MUSIC_DIR)%')]
         private readonly string $musicDir,
         // YouTube cookies (Netscape format, from a secondary account) for age-restricted videos.
@@ -64,6 +73,7 @@ class YtDlpClient
         // must be writable by www-data.
         #[Autowire('%env(default::YTDLP_COOKIES)%')]
         private readonly ?string $cookiesFile = null,
+        private readonly int $rateLimitPause = 15 * 60,
     ) {}
 
     public function fetchMetadata(string $url): array
@@ -96,6 +106,9 @@ class YtDlpClient
             '-f', 'ba[ext=m4a][audio_channels<=2]/ba[ext=m4a]/ba/b',
             '-x', '--audio-format', 'm4a',
             '--no-playlist', '--no-overwrites',
+            // A pause of 10 to 20 s before each download, as yt-dlp advises (-t sleep): a bulk
+            // import then stays under YouTube's limit instead of running into it.
+            '--sleep-interval', '10', '--max-sleep-interval', '20',
             '-P', $this->musicDir,
             '-o', '%(id)s.%(ext)s',
             '--print', 'after_move:filepath',
@@ -107,20 +120,36 @@ class YtDlpClient
 
     private function run(array $arguments, int $timeout = 600): string
     {
-        $commonArguments = ['yt-dlp', '--js-runtimes', 'quickjs'];
+        // --sleep-requests: a second between the requests of one extraction (yt-dlp's advice).
+        $commonArguments = ['yt-dlp', '--js-runtimes', 'quickjs', '--sleep-requests', '1'];
 
         if ($this->cookiesFile && is_file($this->cookiesFile)) {
             array_push($commonArguments, '--cookies', $this->cookiesFile);
         }
 
-        $process = new Process(array_merge($commonArguments, $arguments));
+        for ($pause = 1; ; ++$pause) {
+            $process = new Process(array_merge($commonArguments, $arguments));
+            $process->setTimeout($timeout);
 
-        $process->setTimeout($timeout);
+            try {
+                $process->mustRun();
+                break;
+            } catch (\RuntimeException $e) {
+                $failure = $this->failure($process->getErrorOutput(), $e);
 
-        try {
-            $process->mustRun();
-        } catch (\RuntimeException $e) {
-            throw $this->failure($process->getErrorOutput(), $e);
+                if (!$failure instanceof YouTubeRateLimitedException || $pause > self::RATE_LIMIT_PAUSES) {
+                    throw $failure;
+                }
+
+                // Otherwise every track left in the queue would fail one after the other in a
+                // few minutes. The worker only imports: it waits, the queue stays as it is.
+                $this->logger->error('YouTube limite les téléchargements : pause de {minutes} min ({pause}/{pauses}) avant de réessayer.', [
+                    'minutes' => intdiv($this->rateLimitPause, 60),
+                    'pause' => $pause,
+                    'pauses' => self::RATE_LIMIT_PAUSES,
+                ]);
+                sleep($this->rateLimitPause);
+            }
         }
 
         $output = trim($process->getOutput());
@@ -144,6 +173,13 @@ class YtDlpClient
 
         if (is_null($lastError)) {
             return new \RuntimeException("yt-dlp a échoué sans donner de raison : ".trim($stderr), previous: $previous);
+        }
+
+        if (preg_match(self::RATE_LIMITED, $lastError)) {
+            return new YouTubeRateLimitedException(
+                'YouTube limite les téléchargements (trop de requêtes d\'affilée) : nouvel essai automatique plus tard',
+                previous: $previous,
+            );
         }
 
         foreach (self::ERROR_MESSAGES as $pattern => [$message, $permanent]) {
