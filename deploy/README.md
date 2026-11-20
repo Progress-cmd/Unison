@@ -55,7 +55,7 @@ Reconstruction complète : `sudo docker compose build app`, puis base et reste c
    sudo mv /srv/stacks/unison/app /srv/stacks/unison/app-v1
    sudo cp /srv/secrets/unison.env /srv/secrets/unison-v1.env
    ```
-2. **Le code de la v2** : `git clone https://github.com/Progress-cmd/Unison.git /srv/stacks/unison/app`, puis `git -C /srv/stacks/unison/app checkout v2.x.y`.
+2. **Le code de la v2** : `git clone https://github.com/Progress-cmd/Unison.git /srv/stacks/unison/app`, puis `git -C /srv/stacks/unison/app checkout v2.23.0` (la première version qui contient ce dossier `deploy/`, ou une plus récente).
 3. **Les fichiers de la stack** : copier `app/deploy/compose.yaml` en `/srv/stacks/unison/compose.yaml` et `app/deploy/README.md` en `/srv/stacks/unison/README.md`.
 4. **Les secrets** : réécrire `/srv/secrets/unison.env` d'après `app/deploy/unison.env.exemple` (droits 600). La clé Resend est celle de la v1 (`unison-v1.env`).
 5. **Les dossiers** : `sudo install -d /srv/data/unison/{db,music,covers,youtube}`. Reprendre les cookies de la v1 : `sudo cp -a /srv/data/unison-v1/music/.config/cookies.txt /srv/data/unison/youtube/`.
