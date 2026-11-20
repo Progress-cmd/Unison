@@ -6,3 +6,10 @@ framework:
             policy: sliding_window
             limit: 5
             interval: '15 minutes'
+
+        # Errors sent by the browsers (assets/error_reporter.js): enough to see a problem,
+        # not enough for a page stuck in a loop to fill the Erreurs page.
+        browser_error:
+            policy: sliding_window
+            limit: 20
+            interval: '10 minutes'

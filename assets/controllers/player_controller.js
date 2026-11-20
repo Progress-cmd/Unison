@@ -1,6 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 import SoundAnalyser from '../player/sound_analyser.js';
 import TrackCache from '../player/track_cache.js';
+import { reportError } from '../error_reporter.js';
 
 export default class extends Controller
 {
@@ -499,6 +500,15 @@ export default class extends Controller
 
         if (this.failures > 5) {
             this.showPaused();
+
+            // Given up: worth knowing on the Erreurs page (which track, which browser error).
+            const failed = this.queue[this.index];
+            const mediaError = this.audioTarget.error;
+
+            reportError(`Lecture abandonnée après 5 essais : « ${failed?.title} » (titre ${failed?.id})`, {
+                stack: mediaError ? `MediaError ${mediaError.code} ${mediaError.message}` : null,
+            });
+
             return;
         }
 
