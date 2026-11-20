@@ -46,6 +46,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(enumType: Theme::class, options: ['default' => 'system'])]
     private Theme $theme = Theme::System;
 
+    // Set by an admin: the account can't log in any more, its content stays.
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $disabledAt = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -157,6 +161,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setTheme(Theme $theme): static
     {
         $this->theme = $theme;
+
+        return $this;
+    }
+
+    public function getDisabledAt(): ?\DateTimeImmutable
+    {
+        return $this->disabledAt;
+    }
+
+    public function isDisabled(): bool
+    {
+        return null !== $this->disabledAt;
+    }
+
+    public function disable(): static
+    {
+        $this->disabledAt = new \DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function enable(): static
+    {
+        $this->disabledAt = null;
 
         return $this;
     }

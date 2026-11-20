@@ -1,0 +1,16 @@
+# Dev only: catches the emails sent by the app instead of delivering them.
+# Read them on http://localhost:8025
+# `docker compose` loads this file on its own: in production, start with
+# `docker compose -f compose.yaml …` so Mailpit doesn't run there.
+services:
+###> symfony/mailer ###
+  mailer:
+    image: axllent/mailpit:v1.31.5
+    container_name: unison-mailer
+    ports:
+      # Only reachable from this computer, not from the local network.
+      - "127.0.0.1:8025:8025"
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+###< symfony/mailer ###
