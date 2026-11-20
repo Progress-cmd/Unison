@@ -48,7 +48,8 @@ security:
     # Note: Only the *first* matching rule is applied
     access_control:
          - { path: ^/login, roles: PUBLIC_ACCESS }
-         # The "choose your password" page of the email link.
+         # "Mot de passe oublié ?" and the "choose your password" page of the email link.
+         - { path: ^/forgot-password, roles: PUBLIC_ACCESS }
          - { path: ^/reset-password, roles: PUBLIC_ACCESS }
          - { path: ^/admin, roles: ROLE_ADMIN }
          - { path: ^/, roles: ROLE_USER }

@@ -5,6 +5,7 @@ namespace App\Account\Service;
 use App\Account\Entity\User;
 use App\Account\Repository\ResetPasswordRequestRepository;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use SymfonyCasts\Bundle\ResetPassword\Model\ResetPasswordToken;
@@ -60,7 +61,7 @@ final class PasswordLinkSender
     }
 
     /**
-     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface when the email could not leave
+     * @throws TransportExceptionInterface when the email could not leave
      */
     private function send(User $user, string $kind, ResetPasswordToken $token): void
     {
@@ -74,6 +75,13 @@ final class PasswordLinkSender
                 'kind' => $kind,
             ]);
 
-        $this->mailer->send($email);
+        try {
+            $this->mailer->send($email);
+        } catch (TransportExceptionInterface $e) {
+            // The link never left: it mustn't count as sent (it would block a new request for an hour).
+            $this->resetPasswordRequestRepository->removeRequests($user);
+
+            throw $e;
+        }
     }
 }
