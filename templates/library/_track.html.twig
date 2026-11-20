@@ -1,15 +1,22 @@
 {% set artists = track.artists|map(artist => artist.name)|join(', ') %}
+{# The track as the player and the options sheet use it (same fields as App\Playback\Service\QueueItems). #}
+{% set item = {
+    id: track.id,
+    url: path('app_track_stream', {id: track.id}),
+    title: track.title,
+    artists: artists,
+    cover: track.cover,
+    waveform: track.waveform,
+    playlistsUrl: path('app_track_playlists', {id: track.id}),
+    album: track.album ? {title: track.album.title, url: path('app_albums_show', {id: track.album.id})} : null,
+    artistLinks: track.artists|map(artist => {name: artist.name, url: path('app_artists_show', {id: artist.id})}),
+} %}
 
 <li
-    class="track"
+    class="track{{ inPlaylist is defined ? ' track--in-playlist' }}"
     data-track-list-target="track"
-    data-id="{{ track.id }}"
-    data-url="{{ path('app_track_stream', {id: track.id}) }}"
-    data-title="{{ track.title }}"
-    data-artists="{{ artists }}"
-    data-cover="{{ track.cover }}"
-    data-waveform="{{ track.waveform }}"
-    data-playlists-url="{{ path('app_track_playlists', {id: track.id}) }}"
+    data-url="{{ item.url }}"
+    data-track="{{ item|json_encode }}"
     {% if inPlaylist is defined %}style="view-transition-name: track-{{ track.id }}"{% endif %}
 >
     <button
@@ -52,18 +59,18 @@
         {% endif %}
     </form>
 
-    {% if inPlaylist is not defined %}
-        <button
-            type="button"
-            class="icon-btn"
-            aria-label="Ajouter à une playlist"
-            data-action="playlist-picker#open"
-            data-playlist-picker-url-param="{{ path('app_track_playlists', {id: track.id}) }}"
-            data-playlist-picker-title-param="{{ track.title }}"
-        >
-            {{ ux_icon('material-symbols:playlist-add') }}
-        </button>
-    {% else %}
+    {# Écouter juste après, ajouter à la file ou à une playlist, voir l'album ou l'artiste. #}
+    <button
+        type="button"
+        class="icon-btn"
+        aria-label="Options de « {{ track.title }} »"
+        aria-haspopup="dialog"
+        data-action="track-options#open"
+    >
+        {{ ux_icon('material-symbols:more-vert') }}
+    </button>
+
+    {% if inPlaylist is defined %}
         <form method="post" action="{{ path('app_playlist_remove_track', {id: playlist.id}) }}">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token('playlist_remove_track') }}">
             <input type="hidden" name="track" value="{{ track.id }}">

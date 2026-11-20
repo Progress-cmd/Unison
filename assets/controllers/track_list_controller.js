@@ -11,15 +11,7 @@ export default class extends Controller
 
     play(event)
     {
-        const tracks = this.trackTargets.map(row => ({
-            id: Number(row.dataset.id),
-            url: row.dataset.url,
-            title: row.dataset.title,
-            artists: row.dataset.artists,
-            cover: row.dataset.cover,
-            waveform: row.dataset.waveform,
-            playlistsUrl: row.dataset.playlistsUrl,
-        }));
+        const tracks = this.trackTargets.map(row => JSON.parse(row.dataset.track));
 
         this.dispatch('play', { detail: { tracks: tracks, index: event.params.index } });
     }

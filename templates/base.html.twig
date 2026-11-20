@@ -16,7 +16,7 @@
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
-    <body data-controller="playlist-picker">
+    <body data-controller="playlist-picker track-options">
         {% if app.user %}
             {% set section = block('section') is defined ? block('section') : '' %}
             {% include 'shared/_navbar.html.twig' %}
@@ -36,6 +36,7 @@
         {% if app.user %}
             {% include 'playback/_player.html.twig' %}
             {% include 'playlist/_picker_dialog.html.twig' %}
+            {% include 'shared/_track_options.html.twig' %}
         {% endif %}
     </body>
 </html>
