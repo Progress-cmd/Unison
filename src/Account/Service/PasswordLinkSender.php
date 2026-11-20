@@ -5,9 +5,11 @@ namespace App\Account\Service;
 use App\Account\Entity\User;
 use App\Account\Repository\ResetPasswordRequestRepository;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use SymfonyCasts\Bundle\ResetPassword\Model\ResetPasswordToken;
 use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
 
@@ -25,6 +27,13 @@ final class PasswordLinkSender
         private readonly ResetPasswordHelperInterface $resetPasswordHelper,
         private readonly ResetPasswordRequestRepository $resetPasswordRequestRepository,
         private readonly MailerInterface $mailer,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        // The public address of the site. The links of the emails always start with it, whatever
+        // address the request came from: an account created from the admin address (reachable
+        // through Netbird only) must get a link its owner can open, and a forged Host header
+        // can't send someone to another site.
+        #[Autowire('%env(DEFAULT_URI)%')]
+        private readonly string $publicUrl,
     ) {
     }
 
@@ -71,7 +80,7 @@ final class PasswordLinkSender
             ->htmlTemplate('emails/password_link.html.twig')
             ->context([
                 'username' => $user->getUsername(),
-                'token' => $token->getToken(),
+                'link' => rtrim($this->publicUrl, '/') . $this->urlGenerator->generate('app_reset_password_token', ['token' => $token->getToken()]),
                 'kind' => $kind,
             ]);
 
