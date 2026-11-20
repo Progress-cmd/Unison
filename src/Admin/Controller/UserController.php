@@ -46,7 +46,7 @@ final class UserController extends AbstractController
             $em->flush();
 
             try {
-                $passwordLinkSender->send($user, true);
+                $passwordLinkSender->sendWelcome($user);
                 $this->addFlash('success', 'Compte « ' . $user->getUsername() . ' » créé. Un e-mail est parti à ' . $user->getEmail() . ' pour choisir son mot de passe.');
             } catch (TransportExceptionInterface) {
                 $this->addFlash('error', 'Compte « ' . $user->getUsername() . ' » créé, mais l\'e-mail n\'a pas pu partir. Réessaie avec « Réinitialiser le mot de passe » sur sa page.');
@@ -98,7 +98,7 @@ final class UserController extends AbstractController
         }
 
         try {
-            $passwordLinkSender->send($user, false);
+            $passwordLinkSender->sendReset($user);
             $this->addFlash('success', 'Lien envoyé à ' . $user->getEmail() . '.');
         } catch (TransportExceptionInterface) {
             $this->addFlash('error', 'L\'e-mail n\'a pas pu partir. Réessaie plus tard.');

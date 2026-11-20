@@ -27,6 +27,10 @@ security:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
+                # Always the home page after logging in. Otherwise Symfony goes back to the last
+                # address refused while logged out, which can be a request of the player
+                # (/favorites/state…) sent right at logout: the login then seemed to fail.
+                always_use_default_target_path: true
             logout:
                 path: app_logout
                 enable_csrf: true
@@ -48,7 +52,8 @@ security:
     # Note: Only the *first* matching rule is applied
     access_control:
          - { path: ^/login, roles: PUBLIC_ACCESS }
-         # The "choose your password" page of the email link.
+         # "Mot de passe oublié ?" and the "choose your password" page of the email link.
+         - { path: ^/forgot-password, roles: PUBLIC_ACCESS }
          - { path: ^/reset-password, roles: PUBLIC_ACCESS }
          - { path: ^/admin, roles: ROLE_ADMIN }
          - { path: ^/, roles: ROLE_USER }

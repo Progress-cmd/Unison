@@ -1,0 +1,8 @@
+framework:
+    rate_limiter:
+        # "Mot de passe oublié ?": a few requests per address of the visitor, then a pause.
+        # Stops someone from trying address after address (each account also gets one link per hour at most).
+        forgot_password:
+            policy: sliding_window
+            limit: 5
+            interval: '15 minutes'

@@ -313,3 +313,30 @@ dialog form[method="dialog"] button:hover {
     color: var(--color-text-muted);
     overflow-wrap: anywhere;
 }
+
+/* "Mot de passe oublié ?" under the password field, and the way back to the login form. */
+.login-forgot {
+    align-self: flex-end;
+    margin-top: -8px;
+    font-size: 14px;
+    color: var(--color-link);
+}
+
+.login-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 20px;
+    font-size: 14px;
+    color: var(--color-text-muted);
+    text-decoration: none;
+}
+
+.login-back:hover {
+    color: var(--color-text);
+}
+
+.login-back svg {
+    width: 18px;
+    height: 18px;
+}

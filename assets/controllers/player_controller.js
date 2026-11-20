@@ -902,11 +902,16 @@ export default class extends Controller
 
         const response = await fetch(`${this.favoriteUrlValue}?track=${track.id}`).catch(() => null);
 
-        if (!response?.ok) {
+        // Logged out meanwhile (the logout form also triggers this): the answer is the login page.
+        if (!response?.ok || response.redirected) {
             return;
         }
 
-        const { favorite } = await response.json();
+        const { favorite } = await response.json().catch(() => ({}));
+
+        if (favorite === undefined) {
+            return;
+        }
 
         this.favoriteTarget.setAttribute('aria-pressed', favorite);
         this.favoriteTarget.setAttribute('aria-label', favorite ? 'Retirer des favoris' : 'Ajouter aux favoris');
