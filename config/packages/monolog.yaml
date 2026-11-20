@@ -3,7 +3,7 @@ monolog:
         - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
 
 # Dev: everything in the container's logs (docker compose logs app), as before Monolog,
-# without the "event notified" lines that drown the rest.
+# without the "event notified" lines nor the deprecation notices that drown the rest.
 when@dev:
     monolog:
         handlers:
@@ -11,7 +11,7 @@ when@dev:
                 type: stream
                 path: php://stderr
                 level: debug
-                channels: ["!event"]
+                channels: ["!event", "!deprecation"]
             console:
                 type: console
                 process_psr_3_messages: false
