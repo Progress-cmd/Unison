@@ -4,6 +4,7 @@
     data-controller="player"
     data-action="
         track-list:play@window->player#play
+        track-list:queue@window->player#extendQueue
         discover:play@window->player#play
         track-options:play-next@window->player#playNext
         track-options:add-to-queue@window->player#addToQueue
@@ -11,6 +12,7 @@
         click@window->player#wakeSound
         pagehide@window->player#saveState
         turbo:load@document->player#refreshFavorite
+        turbo:submit-end@document->player#refreshFavorite
         turbo:visit@document->player#collapseOnVisit
         keydown@window->player#shortcut
         touchstart->player#swipeStart:passive

@@ -1,0 +1,19 @@
+{# The listens of one page, with a heading each time the day changes. `previousDay`: the day
+   of the last row already on the page, so a day split across two pages keeps one heading. #}
+{% set today = 'now'|date('Y-m-d') %}
+{% set yesterday = '-1 day'|date('Y-m-d') %}
+
+{% for listen in page %}
+    {% set day = listen.listenedAt|date('Y-m-d') %}
+    {% if day != previousDay %}
+        <li class="history-day">{{ day == today ? "Aujourd'hui" : (day == yesterday ? 'Hier' : listen.listenedAt|date('d/m/Y')) }}</li>
+    {% endif %}
+    {% set previousDay = day %}
+    {% include 'library/_track.html.twig' with {track: listen.track} %}
+{% else %}
+    {% if not page.hasPreviousPage %}
+        <li>Aucune écoute pour l'instant.</li>
+    {% endif %}
+{% endfor %}
+
+{% include 'shared/_more_rows.html.twig' with {nextParams: {day: previousDay}} %}

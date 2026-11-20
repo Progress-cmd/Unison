@@ -1,0 +1,12 @@
+{# Last row of a long list while more remain: reaching it loads the next page in its place
+   (infinite_scroll_controller.js). `nextParams`: extra query parameters for that page. #}
+{% if page.hasNextPage %}
+    <li
+        class="list-more"
+        data-infinite-scroll-target="more"
+        data-url="{{ path(app.current_route, app.current_route_parameters|merge(nextParams ?? {})|merge({page: page.pageNumber + 1})) }}"
+    >
+        <span data-infinite-scroll-target="status">Chargement…</span>
+        <button type="button" class="btn btn-secondary" hidden data-action="infinite-scroll#retry">Réessayer</button>
+    </li>
+{% endif %}

@@ -29,7 +29,7 @@
                 </h2>
                 <ul class="track-list" data-controller="track-list" data-action="player:change@window->track-list#highlight">
                     {% for result in results %}
-                        {% include 'library/_track.html.twig' with {index: loop.index0, track: result} %}
+                        {% include 'library/_track.html.twig' with {track: result} %}
                     {% else %}
                         <li>Rien dans ta bibliothèque pour « {{ q }} ».</li>
                     {% endfor %}

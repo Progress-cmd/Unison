@@ -1,11 +1,19 @@
+{# A list of track rows. With `page` (one page of a long list): its 50 rows, and the next
+   ones arrive while scrolling (infinite_scroll_controller.js). Otherwise: all of `tracks`. #}
 <ul
     class="track-list"
-    data-controller="track-list"
+    data-controller="track-list infinite-scroll"
     data-action="player:change@window->track-list#highlight"
+    {% if page is defined %}data-track-list-queue-url-value="{{ path(app.current_route, app.current_route_parameters) }}"{% endif %}
+    {% if favoritesList ?? false %}data-favorites-list{% endif %}
 >
-    {% for track in tracks %}
-        {% include 'library/_track.html.twig' with {index: loop.index0} %}
+    {% if page is defined %}
+        {% include 'library/_track_rows.html.twig' %}
     {% else %}
-        <li>Aucun morceau pour l'instant.</li>
-    {% endfor %}
+        {% for track in tracks %}
+            {% include 'library/_track.html.twig' %}
+        {% else %}
+            <li>Aucun morceau pour l'instant.</li>
+        {% endfor %}
+    {% endif %}
 </ul>

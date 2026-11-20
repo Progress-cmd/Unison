@@ -3,23 +3,37 @@
 namespace App\Library\Controller;
 
 use App\Account\Entity\User;
-use App\Library\Repository\TrackRepository;
 use App\Library\Entity\FavoriteTrack;
 use App\Library\Repository\FavoriteTrackRepository;
+use App\Library\Repository\TrackRepository;
+use App\Playback\Service\ListQueue;
+use App\Shared\Pagination\ListPage;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Window;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\UX\Turbo\TurboBundle;
 
 final class FavoriteController extends AbstractController
 {
     #[Route('/library/favorites', name: 'app_favorites')]
-    public function index(#[CurrentUser] User $user, TrackRepository $trackRepository, FavoriteTrackRepository $favoriteTrackRepository): Response
+    public function index(Request $request, #[CurrentUser] User $user, TrackRepository $trackRepository, FavoriteTrackRepository $favoriteTrackRepository, ListQueue $listQueue): Response
     {
-        return $this->render('library/favorites.html.twig', [
-            'tracks' => $trackRepository->findFavorites($user),
+        // Playing a track: the whole list as a queue (JSON for the player).
+        $queue = $listQueue->response($request, fn (Window $window) => $trackRepository->paginateFavorites($user, $window)->getItems());
+
+        if ($queue) {
+            return $queue;
+        }
+
+        $page = $trackRepository->paginateFavorites($user, ListPage::window($request));
+
+        // The next 50, while scrolling: the rows alone.
+        return $this->render(ListPage::isNextRows($request) ? 'library/_track_rows.html.twig' : 'library/favorites.html.twig', [
+            'page' => $page,
             'favoriteIds' => $favoriteTrackRepository->findTrackIds($user),
         ]);
     }
@@ -50,6 +64,17 @@ final class FavoriteController extends AbstractController
         }
 
         $em->flush();
+
+        // From the page (Turbo): only the hearts of this track change, the page stays where it is.
+        // Reloading it would lose the rows loaded while scrolling.
+        if (TurboBundle::STREAM_FORMAT === $request->getPreferredFormat()) {
+            $request->setRequestFormat(TurboBundle::STREAM_FORMAT);
+
+            return $this->render('library/favorite_toggle.stream.html.twig', [
+                'track' => $track,
+                'isFavorite' => $em->contains($favoriteTrack),
+            ]);
+        }
 
         return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_home'));
     }

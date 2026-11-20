@@ -1,0 +1,11 @@
+{# Every heart of this track on the page (several rows can show it). #}
+<turbo-stream action="replace" targets=".track-favorite-{{ track.id }}">
+    <template>
+        {% include 'library/_favorite_button.html.twig' %}
+    </template>
+</turbo-stream>
+
+{# No longer a favourite: its rows leave the favourite lists (favourites page, home). #}
+{% if not isFavorite %}
+    <turbo-stream action="remove" targets="[data-favorites-list] .track-{{ track.id }}"></turbo-stream>
+{% endif %}

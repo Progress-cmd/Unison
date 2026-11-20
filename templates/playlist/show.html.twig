@@ -56,7 +56,7 @@
     data-action="player:change@window->track-list#highlight"
 >
     {% for playlistTrack in playlist.playlistTracks %}
-        {% include 'library/_track.html.twig' with {index: loop.index0, track: playlistTrack.track, inPlaylist: true, user: playlistTrack.addedBy.username, isFirst: loop.first, isLast: loop.last} %}
+        {% include 'library/_track.html.twig' with {track: playlistTrack.track, inPlaylist: true, user: playlistTrack.addedBy.username, isFirst: loop.first, isLast: loop.last} %}
     {% else %}
         <li>Aucun morceau pour l'instant.</li>
     {% endfor %}

@@ -8,22 +8,10 @@
 <h1>Historique</h1>
 <ul
     class="track-list"
-    data-controller="track-list"
+    data-controller="track-list infinite-scroll"
     data-action="player:change@window->track-list#highlight"
+    data-track-list-queue-url-value="{{ path('app_history') }}"
 >
-    {% set today = 'now'|date('Y-m-d') %}
-    {% set yesterday = '-1 day'|date('Y-m-d') %}
-    {% set previousDay = '' %}
-
-    {% for listen in listens %}
-        {% set day = listen.listenedAt|date('Y-m-d') %}
-        {% if day != previousDay %}
-            <li class="history-day">{{ day == today ? "Aujourd'hui" : (day == yesterday ? 'Hier' : listen.listenedAt|date('d/m/Y')) }}</li>
-        {% endif %}
-        {% set previousDay = day %}
-        {% include 'library/_track.html.twig' with {track: listen.track, index: loop.index0} %}
-    {% else %}
-        <li>Aucune écoute pour l'instant.</li>
-    {% endfor %}
+    {% include 'history/_rows.html.twig' %}
 </ul>
 {% endblock %}
