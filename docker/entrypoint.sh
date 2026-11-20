@@ -5,7 +5,11 @@ set -e
 # Les dossiers montés depuis le serveur (/srv/data/unison/…) doivent appartenir à www-data,
 # qui écrit les musiques et les pochettes. Seulement s'ils ne lui appartiennent pas déjà :
 # sur des milliers de fichiers, un chown à chaque démarrage prendrait du temps.
-for dir in "${MUSIC_DIR:-}" /var/www/html/public/covers; do
+# Le dossier des cookies YouTube aussi : yt-dlp réécrit le fichier.
+cookies_dir=""
+[ -n "${YTDLP_COOKIES:-}" ] && cookies_dir=$(dirname "$YTDLP_COOKIES")
+
+for dir in "${MUSIC_DIR:-}" /var/www/html/public/covers "$cookies_dir"; do
     if [ -n "$dir" ] && [ -d "$dir" ] && [ "$(stat -c %U "$dir")" != "www-data" ]; then
         chown -R www-data:www-data "$dir"
     fi

@@ -90,5 +90,6 @@ RUN chmod +x /usr/local/bin/unison-entrypoint
 ENTRYPOINT ["unison-entrypoint"]
 CMD ["apache2-foreground"]
 
+# Avec l'en-tête Host du site : en prod, Symfony refuse les autres adresses (SYMFONY_TRUSTED_HOSTS).
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-  CMD curl -fsS -o /dev/null http://localhost/login || exit 1
+  CMD curl -fsS -o /dev/null -H "Host: ${DEFAULT_URI#*://}" http://localhost/login || exit 1
