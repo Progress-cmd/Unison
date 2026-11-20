@@ -27,6 +27,10 @@ security:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
+                # Always the home page after logging in. Otherwise Symfony goes back to the last
+                # address refused while logged out, which can be a request of the player
+                # (/favorites/state…) sent right at logout: the login then seemed to fail.
+                always_use_default_target_path: true
             logout:
                 path: app_logout
                 enable_csrf: true
