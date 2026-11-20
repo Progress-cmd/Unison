@@ -7,12 +7,19 @@ use App\Account\Repository\ResetPasswordRequestRepository;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
+use SymfonyCasts\Bundle\ResetPassword\Model\ResetPasswordToken;
 use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
 
-// Emails a "choose your password" link: to welcome a new account, or after an admin reset.
-// Nobody but the person ever sees or types their password.
+// Emails a "choose your password" link. Nobody but the person ever sees or types their password.
+// Three occasions, each with its own words in emails/password_link.html.twig.
 final class PasswordLinkSender
 {
+    private const SUBJECTS = [
+        'welcome' => 'Bienvenue sur Unison',
+        'reset' => 'Unison : choisis un nouveau mot de passe',
+        'forgotten' => 'Unison : mot de passe oublié',
+    ];
+
     public function __construct(
         private readonly ResetPasswordHelperInterface $resetPasswordHelper,
         private readonly ResetPasswordRequestRepository $resetPasswordRequestRepository,
@@ -20,25 +27,51 @@ final class PasswordLinkSender
     ) {
     }
 
+    // An admin created the account.
+    public function sendWelcome(User $user): void
+    {
+        $this->sendFresh($user, 'welcome');
+    }
+
+    // An admin reset the password.
+    public function sendReset(User $user): void
+    {
+        $this->sendFresh($user, 'reset');
+    }
+
+    /**
+     * The person asked from the login page ("Mot de passe oublié ?"). The bundle's limit stays:
+     * one link per hour, so nobody can flood someone's inbox by asking again and again.
+     *
+     * @throws \SymfonyCasts\Bundle\ResetPassword\Exception\TooManyPasswordRequestsException when a link left less than an hour ago
+     */
+    public function sendForgotten(User $user): void
+    {
+        $this->send($user, 'forgotten', $this->resetPasswordHelper->generateResetToken($user));
+    }
+
+    // From an admin: the older links are deleted, only the newest works. It also lifts the
+    // bundle's "one link per hour" limit, which is meant for strangers, not for the admin.
+    private function sendFresh(User $user, string $kind): void
+    {
+        $this->resetPasswordRequestRepository->removeRequests($user);
+
+        $this->send($user, $kind, $this->resetPasswordHelper->generateResetToken($user));
+    }
+
     /**
      * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface when the email could not leave
      */
-    public function send(User $user, bool $welcome): void
+    private function send(User $user, string $kind, ResetPasswordToken $token): void
     {
-        // Only the newest link works: the older ones are deleted. It also lifts the bundle's
-        // "one request per hour" limit, which is meant for strangers, not for the admin.
-        $this->resetPasswordRequestRepository->removeRequests($user);
-
-        $token = $this->resetPasswordHelper->generateResetToken($user);
-
         $email = (new TemplatedEmail())
             ->to(new Address($user->getEmail(), $user->getUsername()))
-            ->subject($welcome ? 'Bienvenue sur Unison' : 'Unison : choisis un nouveau mot de passe')
+            ->subject(self::SUBJECTS[$kind])
             ->htmlTemplate('emails/password_link.html.twig')
             ->context([
                 'username' => $user->getUsername(),
                 'token' => $token->getToken(),
-                'welcome' => $welcome,
+                'kind' => $kind,
             ]);
 
         $this->mailer->send($email);
