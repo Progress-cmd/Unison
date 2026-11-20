@@ -25,6 +25,7 @@ export default class extends Controller
         'tip',
         'tipBrowser',
         'queueToggle',
+        'toast',
     ];
 
     static values = {
@@ -246,6 +247,74 @@ export default class extends Controller
         this.index = event.params.index;
 
         this.loadCurrent();
+    }
+
+    // --- Queue, filled from a track's options (track-options:play-next / add-to-queue) ---
+
+    playNext(event)
+    {
+        const { track } = event.detail;
+
+        this.insertTrack(track, true);
+        this.notify(`« ${track.title} » sera joué juste après.`);
+    }
+
+    addToQueue(event)
+    {
+        const { track } = event.detail;
+
+        this.insertTrack(track, false);
+        this.notify(`« ${track.title} » ajouté à la file d'attente.`);
+    }
+
+    // Right after the current track, or at the end. Inserted in both orders, the one played
+    // (queue) and the original one (sourceQueue), so turning shuffle on or off keeps it.
+    insertTrack(track, afterCurrent)
+    {
+        // A copy: the same track can be queued twice, and the queue tells its rows apart by object.
+        const item = { ...track };
+
+        // Nothing loaded yet: the track becomes the queue. "Juste après" plays it at once.
+        if (!this.queue.length) {
+            this.queue = [item];
+            this.sourceQueue = this.queue;
+            this.index = 0;
+            this.loadCurrent(afterCurrent);
+
+            return;
+        }
+
+        const current = this.queue[this.index];
+        const insert = (list, position) => [...list.slice(0, position), item, ...list.slice(position)];
+
+        this.sourceQueue = insert(
+            this.sourceQueue,
+            afterCurrent ? this.sourceQueue.indexOf(current) + 1 : this.sourceQueue.length,
+        );
+
+        // Not shuffled, both orders are the same list.
+        this.queue = this.shuffle
+            ? insert(this.queue, afterCurrent ? this.index + 1 : this.queue.length)
+            : this.sourceQueue;
+        this.index = this.queue.indexOf(current);
+
+        this.renderUpcoming();
+
+        // The next track may have changed: free the old one, download the new one in about 10 s.
+        this.cache.keep(this.aheadUrls());
+        this.lastPrepare = Date.now() - 10000;
+
+        this.saveState();
+    }
+
+    // A short message above the player, for actions that change nothing visible on the page.
+    notify(message)
+    {
+        this.toastTarget.textContent = message;
+        this.toastTarget.hidden = false;
+
+        clearTimeout(this.toastTimer);
+        this.toastTimer = setTimeout(() => { this.toastTarget.hidden = true; }, 3000);
     }
 
     wakeSound()
@@ -716,7 +785,15 @@ export default class extends Controller
         const state = await response.json();
 
         this.queue = state.queue;
-        this.sourceQueue = state.sourceQueue.map(item => this.queue.find(track => track.id === item.id) ?? item);
+
+        // Each saved entry takes its own object from the queue: a track queued twice stays two entries.
+        const unused = [...this.queue];
+
+        this.sourceQueue = state.sourceQueue.map(item => {
+            const position = unused.findIndex(track => track.id === item.id);
+
+            return position === -1 ? item : unused.splice(position, 1)[0];
+        });
         this.index = state.currentIndex;
 
         this.shuffle = state.shuffle;

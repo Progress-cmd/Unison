@@ -5,6 +5,8 @@
     data-action="
         track-list:play@window->player#play
         discover:play@window->player#play
+        track-options:play-next@window->player#playNext
+        track-options:add-to-queue@window->player#addToQueue
         keydown.esc@window->player#collapse
         click@window->player#wakeSound
         pagehide@window->player#saveState
@@ -178,6 +180,9 @@
             </li>
         </template>
     </section>
+
+    {# "Ajouté à la file d'attente"…: confirms actions that change nothing visible. #}
+    <p class="player-toast" role="status" hidden data-player-target="toast"></p>
 
     <audio
         data-player-target="audio"

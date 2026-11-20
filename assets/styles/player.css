@@ -683,3 +683,33 @@
         transform: none;
     }
 }
+
+/* --- Toast: confirms the queue actions ("Ajouté à la file d'attente") --- */
+
+/* Above the player, centred on the page. */
+.player-toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(var(--nav-height) + var(--player-height) + 16px);
+    z-index: 6;
+    translate: -50% 0;
+    width: max-content;
+    max-width: calc(100vw - 32px);
+    margin: 0;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: var(--color-text);
+    color: var(--color-bg);
+    font-size: 14px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgb(0 0 0 / 20%);
+}
+
+@media (min-width: 1024px) {
+    /* Centred on the content, beside the sidebar, above the floating bar. */
+    .player-toast {
+        left: calc(50% + var(--sidebar-width) / 2);
+        bottom: calc(var(--player-height) + 32px);
+        max-width: calc(100vw - var(--sidebar-width) - 32px);
+    }
+}
