@@ -759,3 +759,283 @@ a.error-context:hover {
 .content-merge-form .btn {
     align-self: flex-start;
 }
+
+/* --- Accounts page --- */
+
+/* The heading on the left, the "Nouveau compte" button on the right. */
+.account-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.account-toolbar .admin-heading {
+    margin: 0;
+}
+
+/* One card holding all the accounts, like the content lists. */
+.account-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.account-list li + li {
+    border-top: 1px solid var(--color-border);
+}
+
+/* Each account is a link to its page.
+   Phone: avatar, name and chevron on the first line, the three numbers under them.
+   Wider: everything on one line, the numbers on the right. */
+.account-item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+        "avatar info chevron"
+        "stats stats stats";
+    align-items: center;
+    gap: 10px 12px;
+    padding: 12px 14px;
+    color: var(--color-text);
+    text-decoration: none;
+}
+
+.account-item:hover {
+    background: var(--color-accent-soft);
+}
+
+/* A disabled account stays in the list, faded. */
+.account-item.is-disabled .account-avatar,
+.account-item.is-disabled .account-info,
+.account-item.is-disabled .account-stats {
+    opacity: 0.55;
+}
+
+.account-chevron {
+    grid-area: chevron;
+    display: flex;
+    color: var(--color-text-muted);
+}
+
+.account-chevron svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* The first letter of the name in a coloured circle. */
+.account-avatar {
+    grid-area: avatar;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.account-info {
+    grid-area: info;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.account-name {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.account-you {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--color-text-muted);
+}
+
+.account-badge {
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--color-text);
+    color: var(--color-surface);
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.account-badge--off {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+}
+
+.account-email {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.account-stats {
+    grid-area: stats;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0;
+    padding-left: 52px;
+}
+
+.account-stats dt {
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+.account-stats dd {
+    margin: 2px 0 0;
+    font-size: 16px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 640px) {
+    .account-item {
+        grid-template-columns: auto minmax(0, 1fr) auto auto;
+        grid-template-areas: "avatar info stats chevron";
+    }
+
+    .account-stats {
+        grid-template-columns: repeat(3, 80px);
+        padding-left: 0;
+        text-align: right;
+    }
+}
+
+/* --- New account form --- */
+
+/* The sentence under "Nouveau compte", kept apart from the first field. */
+.account-form-intro {
+    margin: -8px 0 16px;
+}
+
+/* --- One account's page --- */
+
+/* Same layout as a row of the list, bigger, without the chevron. */
+.account-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+        "avatar info"
+        "stats stats";
+    align-items: center;
+    gap: 14px 14px;
+    max-width: 720px;
+    margin-bottom: 16px;
+}
+
+.account-avatar--large {
+    width: 56px;
+    height: 56px;
+    font-size: 28px;
+}
+
+.account-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 500;
+}
+
+.account-title .account-you {
+    font-family: var(--sans);
+    font-size: 15px;
+}
+
+.account-since {
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.account-card .account-stats {
+    padding-left: 70px;
+}
+
+@media (min-width: 640px) {
+    .account-card {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        grid-template-areas: "avatar info stats";
+    }
+
+    .account-card .account-stats {
+        grid-template-columns: repeat(3, 80px);
+        padding-left: 0;
+        text-align: right;
+    }
+}
+
+.account-panel {
+    max-width: 720px;
+    margin-bottom: 16px;
+}
+
+/* Phone: the sentence above its button. Wider: side by side. */
+.account-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.account-row + .account-row,
+.account-note + .account-row {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-border);
+}
+
+.account-row p,
+.account-note {
+    margin: 0;
+    font-size: 14px;
+    color: var(--color-text-muted);
+}
+
+.account-row strong {
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.account-row form {
+    margin: 0;
+}
+
+@media (min-width: 640px) {
+    .account-row {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+    }
+
+    .account-row .btn {
+        white-space: nowrap;
+    }
+}

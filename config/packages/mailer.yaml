@@ -1,0 +1,6 @@
+framework:
+    mailer:
+        dsn: '%env(MAILER_DSN)%'
+        # Every email leaves from the same address.
+        headers:
+            From: 'Unison <%env(MAILER_FROM)%>'

@@ -1,0 +1,131 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - {{ user.username }}{% endblock %}
+
+{% block section %}admin{% endblock %}
+
+{% block body %}
+<header class="admin-header">
+    <h1>Administration</h1>
+    <p class="admin-subtitle">Les comptes, et ce que chacun a apporté.</p>
+</header>
+{% include 'admin/_tabs.html.twig' with {active: 'accounts'} %}
+<a class="back-link" href="{{ path('app_admin_accounts') }}">
+    {{ ux_icon('material-symbols:arrow-back') }}
+    Comptes
+</a>
+
+{% set isAdmin = 'ROLE_ADMIN' in user.roles %}
+
+{# Who it is, and the same three numbers as in the list. #}
+<section class="admin-card account-card" aria-labelledby="account-title">
+    <span class="account-avatar account-avatar--large" aria-hidden="true">{{ user.username|first|upper }}</span>
+
+    <div class="account-info">
+        <h2 class="account-title" id="account-title">
+            {{ user.username }}
+            {% if isSelf %}<span class="account-you">(toi)</span>{% endif %}
+            {% if isAdmin %}<span class="account-badge">Admin</span>{% endif %}
+            {% if user.disabled %}<span class="account-badge account-badge--off">Désactivé</span>{% endif %}
+        </h2>
+        <span class="account-email">{{ user.email }}</span>
+        <span class="account-since">
+            Compte créé le {{ user.createdAt|date('d/m/Y') }}
+            {% if user.disabled %}· désactivé le {{ user.disabledAt|date('d/m/Y') }}{% endif %}
+        </span>
+    </div>
+
+    <dl class="account-stats">
+        <div>
+            <dt>Titres</dt>
+            <dd>{{ counts.tracks|number_format(0, ',', ' ') }}</dd>
+        </div>
+        <div>
+            <dt>Playlists</dt>
+            <dd>{{ counts.playlists|number_format(0, ',', ' ') }}</dd>
+        </div>
+        <div>
+            <dt>Écoutes</dt>
+            <dd>{{ counts.listens|number_format(0, ',', ' ') }}</dd>
+        </div>
+    </dl>
+</section>
+
+{# One row per action: what it does on the left, the button on the right (under it on phones). #}
+<section class="admin-card account-panel" aria-labelledby="account-actions-title">
+    <h2 class="admin-heading" id="account-actions-title">Gérer</h2>
+
+    {% if isSelf %}
+        <p class="account-note">C'est ton compte : son rôle, sa désactivation et sa suppression se font depuis un autre compte admin.</p>
+    {% else %}
+        <div class="account-row">
+            <p>
+                {% if isAdmin %}
+                    <strong>Administrateur.</strong> A accès à cette administration.
+                {% else %}
+                    <strong>Utilisateur.</strong> N'a pas accès à l'administration.
+                {% endif %}
+            </p>
+            <form action="{{ path('app_admin_accounts_toggle_admin', {id: user.id}) }}" method="post" data-turbo-confirm="{{ (isAdmin ? 'Retirer à ' : 'Donner à ') ~ user.username ~ ' l\'accès à l\'administration ? La personne devra se reconnecter.' }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('account_toggle_admin') }}">
+                <button class="btn btn-secondary" type="submit">
+                    {{ ux_icon(isAdmin ? 'material-symbols:remove-moderator-outline' : 'material-symbols:add-moderator-outline') }}
+                    {{ isAdmin ? 'Retirer admin' : 'Rendre admin' }}
+                </button>
+            </form>
+        </div>
+    {% endif %}
+
+    {% if not user.disabled %}
+        <div class="account-row">
+            <p>Envoie à {{ user.email }} un lien pour choisir un nouveau mot de passe.</p>
+            <form action="{{ path('app_admin_accounts_reset_password', {id: user.id}) }}" method="post" data-turbo-confirm="Envoyer à {{ user.username }} un e-mail pour choisir un nouveau mot de passe ?">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('account_reset_password') }}">
+                <button class="btn btn-secondary" type="submit">
+                    {{ ux_icon('material-symbols:lock-reset') }}
+                    Réinitialiser le mot de passe
+                </button>
+            </form>
+        </div>
+    {% endif %}
+
+    {% if not isSelf %}
+        <div class="account-row">
+            <p>
+                {% if user.disabled %}
+                    Ne peut plus se connecter. Ses titres et playlists sont toujours là.
+                {% else %}
+                    Empêche la connexion et déconnecte la personne tout de suite. Ses titres et playlists restent.
+                {% endif %}
+            </p>
+            <form action="{{ path('app_admin_accounts_toggle_disabled', {id: user.id}) }}" method="post"{% if not user.disabled %} data-turbo-confirm="Désactiver le compte de {{ user.username }} ? La personne sera déconnectée."{% endif %}>
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('account_toggle_disabled') }}">
+                <button class="btn btn-secondary" type="submit">
+                    {{ ux_icon(user.disabled ? 'material-symbols:person-check-outline' : 'material-symbols:person-off-outline') }}
+                    {{ user.disabled ? 'Réactiver' : 'Désactiver' }}
+                </button>
+            </form>
+        </div>
+    {% endif %}
+</section>
+
+{% if not isSelf %}
+    {# Deletion: the content goes to another account, only the personal data disappears. #}
+    <section class="admin-card content-danger account-panel" aria-labelledby="account-delete-title">
+        <h2 class="admin-heading" id="account-delete-title">Supprimer</h2>
+        <p class="content-merge-help">
+            Ses titres, albums et playlists passent au compte choisi.
+            Ses favoris, son historique d'écoute et sa lecture en cours sont effacés.
+            Pour garder le compte sans qu'il puisse se connecter, désactive-le plutôt.
+        </p>
+
+        {{ form_start(deleteForm, {attr: {class: 'form content-merge-form', 'data-turbo-confirm': 'Supprimer définitivement le compte de ' ~ user.username ~ ' ?'}}) }}
+            {{ form_row(deleteForm.heir) }}
+            <button type="submit" class="btn btn-danger">
+                {{ ux_icon('material-symbols:delete') }}
+                Supprimer le compte
+            </button>
+        {{ form_end(deleteForm) }}
+    </section>
+{% endif %}
+{% endblock %}

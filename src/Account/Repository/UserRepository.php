@@ -4,6 +4,7 @@ namespace App\Account\Repository;
 
 use App\Account\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -33,28 +34,42 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
-//    /**
-//     * @return User[] Returns an array of User objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('u.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * Every account, with the number of tracks it imported, its playlists and its listens.
+     * Each row: [0 => User, 'tracks' => …, 'playlists' => …, 'listens' => …].
+     */
+    public function findAllWithCounts(): array
+    {
+        return $this->withCounts()
+            ->orderBy('u.username', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
-//    public function findOneBySomeField($value): ?User
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    /**
+     * The same three numbers for a single account: ['tracks' => …, 'playlists' => …, 'listens' => …].
+     */
+    public function countsFor(User $user): array
+    {
+        $row = $this->withCounts()
+            ->andWhere('u = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getSingleResult()
+        ;
+
+        unset($row[0]);
+
+        return $row;
+    }
+
+    private function withCounts(): QueryBuilder
+    {
+        return $this->createQueryBuilder('u')
+            ->addSelect('(SELECT COUNT(t.id) FROM App\Library\Entity\Track t WHERE t.addedBy = u) AS tracks')
+            ->addSelect('(SELECT COUNT(p.id) FROM App\Playlist\Entity\Playlist p WHERE p.createdBy = u) AS playlists')
+            ->addSelect('(SELECT COUNT(l.id) FROM App\History\Entity\Listen l WHERE l.user = u) AS listens')
+        ;
+    }
 }

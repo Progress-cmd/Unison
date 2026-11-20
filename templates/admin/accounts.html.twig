@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - Comptes{% endblock %}
+
+{% block section %}admin{% endblock %}
+
+{% block body %}
+<header class="admin-header">
+    <h1>Administration</h1>
+    <p class="admin-subtitle">Les comptes, et ce que chacun a apporté.</p>
+</header>
+{% include 'admin/_tabs.html.twig' with {active: 'accounts'} %}
+
+<div class="account-toolbar">
+    <h2 class="admin-heading">
+        Comptes
+        <span class="admin-count">{{ rows|length }}</span>
+    </h2>
+    <a class="btn btn-secondary" href="{{ path('app_admin_accounts_new') }}">
+        {{ ux_icon('material-symbols:person-add') }}
+        Nouveau compte
+    </a>
+</div>
+
+<ul class="account-list">
+    {% for row in rows %}
+        {% set user = row[0] %}
+        <li>
+            {# The whole card opens the account's page, where the actions are. #}
+            <a class="account-item{{ user.disabled ? ' is-disabled' }}" href="{{ path('app_admin_account', {id: user.id}) }}">
+                <span class="account-avatar" aria-hidden="true">{{ user.username|first|upper }}</span>
+
+                <span class="account-info">
+                    <span class="account-name">
+                        {{ user.username }}
+                        {% if user == app.user %}<span class="account-you">(toi)</span>{% endif %}
+                        {% if 'ROLE_ADMIN' in user.roles %}<span class="account-badge">Admin</span>{% endif %}
+                        {% if user.disabled %}<span class="account-badge account-badge--off">Désactivé</span>{% endif %}
+                    </span>
+                    <span class="account-email">{{ user.email }}</span>
+                </span>
+
+                {# The three numbers: what the account brought and how much it listens. #}
+                <dl class="account-stats">
+                    <div>
+                        <dt>Titres</dt>
+                        <dd>{{ row.tracks|number_format(0, ',', ' ') }}</dd>
+                    </div>
+                    <div>
+                        <dt>Playlists</dt>
+                        <dd>{{ row.playlists|number_format(0, ',', ' ') }}</dd>
+                    </div>
+                    <div>
+                        <dt>Écoutes</dt>
+                        <dd>{{ row.listens|number_format(0, ',', ' ') }}</dd>
+                    </div>
+                </dl>
+
+                <span class="account-chevron" aria-hidden="true">{{ ux_icon('material-symbols:chevron-right') }}</span>
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

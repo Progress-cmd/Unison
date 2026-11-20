@@ -15,10 +15,11 @@
         "symfony/console": "7.4.*",
         "symfony/doctrine-messenger": "7.4.*",
         "symfony/dotenv": "7.4.*",
-        "symfony/flex": "^2",
+        "symfony/flex": "^2.12",
         "symfony/form": "7.4.*",
         "symfony/framework-bundle": "7.4.*",
         "symfony/http-client": "7.4.*",
+        "symfony/mailer": "7.4.*",
         "symfony/messenger": "7.4.*",
         "symfony/process": "7.4.*",
         "symfony/rate-limiter": "7.4.*",
@@ -29,7 +30,8 @@
         "symfony/ux-icons": "^3.7",
         "symfony/ux-turbo": "^3.7",
         "symfony/validator": "7.4.*",
-        "symfony/yaml": "7.4.*"
+        "symfony/yaml": "7.4.*",
+        "symfonycasts/reset-password-bundle": "^1.26"
     },
     "config": {
         "allow-plugins": {

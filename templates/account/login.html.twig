@@ -8,6 +8,8 @@
     {% if error %}
         {% if error.messageKey starts with 'Too many' %}
             <p class="alert alert-error">Trop de tentatives de connexion. Réessayez dans {{ error.messageData['%minutes%'] }} minute(s).</p>
+        {% elseif error.messageKey == constant('App\\Account\\Security\\UserChecker::DISABLED_MESSAGE') %}
+            <p class="alert alert-error">{{ error.messageKey }}</p>
         {% else %}
             <p class="alert alert-error">Identifiants invalides.</p>
         {% endif %}

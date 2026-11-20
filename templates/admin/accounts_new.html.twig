@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - Nouveau compte{% endblock %}
+
+{% block section %}admin{% endblock %}
+
+{% block body %}
+<header class="admin-header">
+    <h1>Administration</h1>
+    <p class="admin-subtitle">Les comptes, et ce que chacun a apporté.</p>
+</header>
+{% include 'admin/_tabs.html.twig' with {active: 'accounts'} %}
+<a class="back-link" href="{{ path('app_admin_accounts') }}">
+    {{ ux_icon('material-symbols:arrow-back') }}
+    Comptes
+</a>
+
+<section class="admin-card content-form" aria-labelledby="account-form-title">
+    <h2 class="content-form-title" id="account-form-title">Nouveau compte</h2>
+    <p class="help-text account-form-intro">La personne reçoit un e-mail pour choisir elle-même son mot de passe.</p>
+
+    {{ form_start(form, {attr: {class: 'form'}}) }}
+        {{ form_row(form.username) }}
+        {{ form_row(form.email) }}
+
+        {# Written by hand: the default checkbox row would stretch the box to full width. #}
+        <div>
+            <label class="form-check">
+                {{ form_widget(form.admin) }}
+                Administrateur
+            </label>
+            <p class="help-text">Donne accès à cette administration.</p>
+        </div>
+
+        <div class="content-form-actions">
+            <button type="submit" class="btn">Créer le compte</button>
+            <a class="content-form-cancel" href="{{ path('app_admin_accounts') }}">Annuler</a>
+        </div>
+    {{ form_end(form) }}
+</section>
+{% endblock %}
