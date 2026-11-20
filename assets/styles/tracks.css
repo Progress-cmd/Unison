@@ -10,6 +10,21 @@
     color: var(--color-text-muted);
 }
 
+/* Last row of a long list while the next 50 load (templates/shared/_more_rows.html.twig). */
+.track-list > li.list-more {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px 12px;
+    padding: 20px 8px;
+    font-size: 14px;
+}
+
+.list-more [hidden] {
+    display: none;
+}
+
 .track {
     display: flex;
     align-items: center;

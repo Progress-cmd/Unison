@@ -3,9 +3,10 @@
 namespace App\Library\Controller;
 
 use App\Account\Entity\User;
-use App\Library\Repository\TrackRepository;
 use App\Library\Entity\FavoriteTrack;
 use App\Library\Repository\FavoriteTrackRepository;
+use App\Library\Repository\TrackRepository;
+use App\Shared\Pagination\ListPage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,10 +18,13 @@ use Symfony\UX\Turbo\TurboBundle;
 final class FavoriteController extends AbstractController
 {
     #[Route('/library/favorites', name: 'app_favorites')]
-    public function index(#[CurrentUser] User $user, TrackRepository $trackRepository, FavoriteTrackRepository $favoriteTrackRepository): Response
+    public function index(Request $request, #[CurrentUser] User $user, TrackRepository $trackRepository, FavoriteTrackRepository $favoriteTrackRepository): Response
     {
-        return $this->render('library/favorites.html.twig', [
-            'tracks' => $trackRepository->findFavorites($user),
+        $page = $trackRepository->paginateFavorites($user, ListPage::window($request));
+
+        // The next 50, while scrolling: the rows alone.
+        return $this->render(ListPage::isNextRows($request) ? 'library/_track_rows.html.twig' : 'library/favorites.html.twig', [
+            'page' => $page,
             'favoriteIds' => $favoriteTrackRepository->findTrackIds($user),
         ]);
     }

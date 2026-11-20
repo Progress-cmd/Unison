@@ -1,0 +1,10 @@
+{# The rows of one page of tracks: inside the list on the first load, alone for the next pages. #}
+{% for track in page %}
+    {% include 'library/_track.html.twig' %}
+{% else %}
+    {% if not page.hasPreviousPage %}
+        <li>Aucun morceau pour l'instant.</li>
+    {% endif %}
+{% endfor %}
+
+{% include 'shared/_more_rows.html.twig' %}

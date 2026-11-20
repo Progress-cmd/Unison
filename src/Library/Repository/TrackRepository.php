@@ -9,6 +9,7 @@ use App\Library\Entity\FavoriteTrack;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\OffsetPaginator;
 use Doctrine\ORM\Tools\Pagination\Window;
+use Doctrine\ORM\Tools\Pagination\WindowPage;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -21,19 +22,38 @@ class TrackRepository extends ServiceEntityRepository
         parent::__construct($registry, Track::class);
     }
 
-    public function findLatest(): array
+    /**
+     * One page of the whole library, newest first (library page, loaded while scrolling).
+     *
+     * @return WindowPage<Track>
+     */
+    public function paginateLatest(Window $window): WindowPage
     {
-        return $this->createQueryBuilder('t')
+        $query = $this->createQueryBuilder('t')
             ->orderBy('t.createdAt', 'DESC')
             ->addOrderBy('t.id', 'DESC')
             ->leftJoin('t.artists', 'a')
             ->addSelect('a')
             ->getQuery()
-            ->getResult()
         ;
+
+        return (new OffsetPaginator())->paginate($query, $window);
     }
 
-    public function findFavorites(User $user, ?int $limit = null): array
+    /**
+     * The last favourites of the user (home page).
+     */
+    public function findFavorites(User $user, int $limit): array
+    {
+        return $this->paginateFavorites($user, Window::fromPageNumberAndSize(1, $limit))->getItems();
+    }
+
+    /**
+     * One page of the user's favourites, last added first.
+     *
+     * @return WindowPage<Track>
+     */
+    public function paginateFavorites(User $user, Window $window): WindowPage
     {
         $query = $this->createQueryBuilder('t')
             ->innerJoin(FavoriteTrack::class, 'f', 'WITH', 'f.track = t')
@@ -42,29 +62,32 @@ class TrackRepository extends ServiceEntityRepository
             ->andWhere('f.user = :user')
             ->setParameter('user', $user)
             ->orderBy('f.addedAt', 'DESC')
+            ->addOrderBy('f.id', 'DESC')
             ->getQuery()
         ;
 
-        // Without a limit, nothing to cut: a plain result is enough.
-        if (null === $limit) {
-            return $query->getResult();
-        }
-
-        return (new OffsetPaginator())->paginate($query, Window::fromPageNumberAndSize(1, $limit))->getItems();
+        return (new OffsetPaginator())->paginate($query, $window);
     }
 
-    public function findByArtist(Artist $artist): array
+    /**
+     * One page of an artist's tracks, by title.
+     *
+     * @return WindowPage<Track>
+     */
+    public function paginateByArtist(Artist $artist, Window $window): WindowPage
     {
-        return $this->createQueryBuilder('t')
+        $query = $this->createQueryBuilder('t')
             ->innerJoin('t.artists', 'filter')
             ->andWhere('filter = :artist')
             ->setParameter('artist', $artist)
             ->leftJoin('t.artists', 'a')
             ->addSelect('a')
             ->orderBy('t.title', 'ASC')
+            ->addOrderBy('t.id', 'ASC')
             ->getQuery()
-            ->getResult()
         ;
+
+        return (new OffsetPaginator())->paginate($query, $window);
     }
 
     public function findRandom(int $count, ?Track $exclude = null): array
