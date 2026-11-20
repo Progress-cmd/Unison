@@ -10,6 +10,7 @@
     class="track-list"
     data-controller="track-list infinite-scroll"
     data-action="player:change@window->track-list#highlight"
+    data-track-list-queue-url-value="{{ path('app_history') }}"
 >
     {% include 'history/_rows.html.twig' %}
 </ul>

@@ -6,8 +6,10 @@ use App\Account\Entity\User;
 use App\Library\Entity\FavoriteTrack;
 use App\Library\Repository\FavoriteTrackRepository;
 use App\Library\Repository\TrackRepository;
+use App\Playback\Service\ListQueue;
 use App\Shared\Pagination\ListPage;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Window;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,8 +20,15 @@ use Symfony\UX\Turbo\TurboBundle;
 final class FavoriteController extends AbstractController
 {
     #[Route('/library/favorites', name: 'app_favorites')]
-    public function index(Request $request, #[CurrentUser] User $user, TrackRepository $trackRepository, FavoriteTrackRepository $favoriteTrackRepository): Response
+    public function index(Request $request, #[CurrentUser] User $user, TrackRepository $trackRepository, FavoriteTrackRepository $favoriteTrackRepository, ListQueue $listQueue): Response
     {
+        // Playing a track: the whole list as a queue (JSON for the player).
+        $queue = $listQueue->response($request, fn (Window $window) => $trackRepository->paginateFavorites($user, $window)->getItems());
+
+        if ($queue) {
+            return $queue;
+        }
+
         $page = $trackRepository->paginateFavorites($user, ListPage::window($request));
 
         // The next 50, while scrolling: the rows alone.

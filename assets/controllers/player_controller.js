@@ -257,6 +257,35 @@ export default class extends Controller
         this.loadCurrent();
     }
 
+    // A long list is only partly on the page: once fetched (track-list:queue), the whole
+    // list, around the track clicked, replaces the queue made of the rows shown.
+    // The track playing goes on, untouched.
+    extendQueue(event)
+    {
+        const { tracks, index } = event.detail;
+        const current = this.queue[this.index];
+
+        // Another track was started meanwhile: this list is no longer the one playing.
+        if (!current || tracks[index]?.id !== current.id) {
+            return;
+        }
+
+        tracks[index] = current;
+        this.sourceQueue = tracks;
+
+        // Not shuffled: the same list. Shuffled: the current track first, the rest mixed.
+        this.queue = tracks;
+        this.index = index;
+        this.arrangeQueue();
+
+        this.renderUpcoming();
+
+        this.cache.keep(this.aheadUrls());
+        this.lastPrepare = Date.now() - 10000;
+
+        this.saveState();
+    }
+
     // --- Queue, filled from a track's options (track-options:play-next / add-to-queue) ---
 
     playNext(event)

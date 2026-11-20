@@ -4,6 +4,7 @@
     class="track-list"
     data-controller="track-list infinite-scroll"
     data-action="player:change@window->track-list#highlight"
+    {% if page is defined %}data-track-list-queue-url-value="{{ path(app.current_route, app.current_route_parameters) }}"{% endif %}
     {% if favoritesList ?? false %}data-favorites-list{% endif %}
 >
     {% if page is defined %}

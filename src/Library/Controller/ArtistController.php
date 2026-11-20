@@ -7,7 +7,9 @@ use App\Library\Entity\Artist;
 use App\Library\Repository\ArtistRepository;
 use App\Library\Repository\FavoriteTrackRepository;
 use App\Library\Repository\TrackRepository;
+use App\Playback\Service\ListQueue;
 use App\Shared\Pagination\ListPage;
+use Doctrine\ORM\Tools\Pagination\Window;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,8 +27,15 @@ final class ArtistController extends AbstractController
     }
 
     #[Route('/artists/{id}', name: 'app_artists_show', requirements: ['id' => '[0-9]+'])]
-    public function show(Request $request, Artist $artist, #[CurrentUser] User $user, FavoriteTrackRepository $favoriteTrackRepository, TrackRepository $trackRepository): Response
+    public function show(Request $request, Artist $artist, #[CurrentUser] User $user, FavoriteTrackRepository $favoriteTrackRepository, TrackRepository $trackRepository, ListQueue $listQueue): Response
     {
+        // Playing a track: the whole list as a queue (JSON for the player).
+        $queue = $listQueue->response($request, fn (Window $window) => $trackRepository->paginateByArtist($artist, $window)->getItems());
+
+        if ($queue) {
+            return $queue;
+        }
+
         $page = $trackRepository->paginateByArtist($artist, ListPage::window($request));
 
         // The next 50, while scrolling: the rows alone.
