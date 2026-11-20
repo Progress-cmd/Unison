@@ -13,7 +13,10 @@ export default class extends Controller
     {
         const tracks = this.trackTargets.map(row => JSON.parse(row.dataset.track));
 
-        this.dispatch('play', { detail: { tracks: tracks, index: event.params.index } });
+        // The position of the row in the list: rows come and go (favourite removed, more loaded).
+        const index = this.trackTargets.indexOf(event.currentTarget.closest('[data-track-list-target="track"]'));
+
+        this.dispatch('play', { detail: { tracks: tracks, index: index } });
     }
 
     highlight(event)

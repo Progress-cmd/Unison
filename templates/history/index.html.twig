@@ -21,7 +21,7 @@
             <li class="history-day">{{ day == today ? "Aujourd'hui" : (day == yesterday ? 'Hier' : listen.listenedAt|date('d/m/Y')) }}</li>
         {% endif %}
         {% set previousDay = day %}
-        {% include 'library/_track.html.twig' with {track: listen.track, index: loop.index0} %}
+        {% include 'library/_track.html.twig' with {track: listen.track} %}
     {% else %}
         <li>Aucune écoute pour l'instant.</li>
     {% endfor %}

@@ -13,7 +13,7 @@
 } %}
 
 <li
-    class="track{{ inPlaylist is defined ? ' track--in-playlist' }}"
+    class="track track-{{ track.id }}{{ inPlaylist is defined ? ' track--in-playlist' }}"
     data-track-list-target="track"
     data-url="{{ item.url }}"
     data-track="{{ item|json_encode }}"
@@ -24,7 +24,6 @@
         class="icon-btn"
         aria-label="Lire {{ track.title }}"
         data-action="track-list#play"
-        data-track-list-index-param="{{ index }}"
     >
         {{ ux_icon('material-symbols:play-arrow') }}
     </button>
@@ -45,19 +44,7 @@
 
     <span class="track-duration">{{ track.duration|duration }}</span>
 
-    <form action="{{ path('app_favorite_toggle') }}" method="post">
-        <input type="hidden" name="_csrf_token" value="{{ csrf_token('favorite_toggle') }}">
-        <input type="hidden" name="track" value="{{ track.id }}">
-        {% if track.id in favoriteIds %}
-            <button class="icon-btn" aria-label="Retirer des favoris" type="submit" aria-pressed="true">
-                {{ ux_icon('material-symbols:favorite') }}
-            </button>
-        {% else %}
-            <button class="icon-btn" aria-label="Ajouter aux favoris" type="submit" aria-pressed="false">
-                {{ ux_icon('material-symbols:favorite-outline') }}
-            </button>
-        {% endif %}
-    </form>
+    {% include 'library/_favorite_button.html.twig' with {isFavorite: track.id in favoriteIds} %}
 
     {# Écouter juste après, ajouter à la file ou à une playlist, voir l'album ou l'artiste. #}
     <button

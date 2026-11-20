@@ -18,7 +18,7 @@
     </div>
     <ul class="track-list" data-controller="track-list" data-action="player:change@window->track-list#highlight">
         {% for listen in recentListens %}
-            {% include 'library/_track.html.twig' with {track: listen.track, index: loop.index0} %}
+            {% include 'library/_track.html.twig' with {track: listen.track} %}
         {% else %}
             <li>Aucune écoute pour l'instant.</li>
         {% endfor %}

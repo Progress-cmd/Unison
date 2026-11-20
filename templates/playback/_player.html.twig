@@ -11,6 +11,7 @@
         click@window->player#wakeSound
         pagehide@window->player#saveState
         turbo:load@document->player#refreshFavorite
+        turbo:submit-end@document->player#refreshFavorite
         turbo:visit@document->player#collapseOnVisit
         keydown@window->player#shortcut
         touchstart->player#swipeStart:passive

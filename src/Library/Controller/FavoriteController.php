@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\UX\Turbo\TurboBundle;
 
 final class FavoriteController extends AbstractController
 {
@@ -50,6 +51,17 @@ final class FavoriteController extends AbstractController
         }
 
         $em->flush();
+
+        // From the page (Turbo): only the hearts of this track change, the page stays where it is.
+        // Reloading it would lose the rows loaded while scrolling.
+        if (TurboBundle::STREAM_FORMAT === $request->getPreferredFormat()) {
+            $request->setRequestFormat(TurboBundle::STREAM_FORMAT);
+
+            return $this->render('library/favorite_toggle.stream.html.twig', [
+                'track' => $track,
+                'isFavorite' => $em->contains($favoriteTrack),
+            ]);
+        }
 
         return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_home'));
     }

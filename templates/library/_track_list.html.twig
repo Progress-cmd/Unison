@@ -2,9 +2,10 @@
     class="track-list"
     data-controller="track-list"
     data-action="player:change@window->track-list#highlight"
+    {% if favoritesList ?? false %}data-favorites-list{% endif %}
 >
     {% for track in tracks %}
-        {% include 'library/_track.html.twig' with {index: loop.index0} %}
+        {% include 'library/_track.html.twig' %}
     {% else %}
         <li>Aucun morceau pour l'instant.</li>
     {% endfor %}

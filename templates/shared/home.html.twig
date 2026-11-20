@@ -72,7 +72,7 @@
                     <h2>Tes favoris</h2>
                     <a href="{{ path('app_favorites') }}">Voir tout</a>
                 </div>
-                {% include "library/_track_list.html.twig" %}
+                {% include "library/_track_list.html.twig" with {favoritesList: true} %}
             </section>
         </aside>
     </div>

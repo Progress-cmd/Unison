@@ -1,0 +1,15 @@
+{# The heart of a track row. Its class lets the toggle's Turbo Stream replace every heart
+   of this track on the page at once (library/favorite_toggle.stream.html.twig). #}
+<form class="track-favorite-{{ track.id }}" action="{{ path('app_favorite_toggle') }}" method="post">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('favorite_toggle') }}">
+    <input type="hidden" name="track" value="{{ track.id }}">
+    {% if isFavorite %}
+        <button class="icon-btn" aria-label="Retirer des favoris" type="submit" aria-pressed="true">
+            {{ ux_icon('material-symbols:favorite') }}
+        </button>
+    {% else %}
+        <button class="icon-btn" aria-label="Ajouter aux favoris" type="submit" aria-pressed="false">
+            {{ ux_icon('material-symbols:favorite-outline') }}
+        </button>
+    {% endif %}
+</form>
