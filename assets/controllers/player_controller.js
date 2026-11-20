@@ -26,6 +26,7 @@ export default class extends Controller
         'tipBrowser',
         'queueToggle',
         'toast',
+        'options',
     ];
 
     static values = {
@@ -141,6 +142,13 @@ export default class extends Controller
     collapse()
     {
         this.setExpanded(false);
+    }
+
+    // Following a link from the detailed player (an artist in the options sheet…): the new
+    // page must not stay hidden under it. No animation, Turbo is already changing the page.
+    collapseOnVisit()
+    {
+        this.setExpanded(false, false);
     }
 
     // Phone, full screen: the queue takes the place of the cover, and back.
@@ -301,6 +309,30 @@ export default class extends Controller
         this.renderUpcoming();
 
         // The next track may have changed: free the old one, download the new one in about 10 s.
+        this.cache.keep(this.aheadUrls());
+        this.lastPrepare = Date.now() - 10000;
+
+        this.saveState();
+    }
+
+    // The ✕ of a row of "À suivre". Only upcoming tracks have one: the index is after the current one.
+    removeFromQueue(event)
+    {
+        const removed = this.queue[event.params.index];
+
+        if (!removed || event.params.index <= this.index) {
+            return;
+        }
+
+        const current = this.queue[this.index];
+        const without = list => list.filter(track => track !== removed);
+
+        this.sourceQueue = without(this.sourceQueue);
+        this.queue = this.shuffle ? without(this.queue) : this.sourceQueue;
+        this.index = this.queue.indexOf(current);
+
+        this.renderUpcoming();
+
         this.cache.keep(this.aheadUrls());
         this.lastPrepare = Date.now() - 10000;
 
@@ -627,7 +659,7 @@ export default class extends Controller
         return `${minutes}:${String(rest).padStart(2, '0')}`;
     }
 
-    setExpanded(expanded)
+    setExpanded(expanded, animate = true)
     {
         // Escape calls collapse() even when the player is already small: nothing to animate.
         if (expanded === this.element.classList.contains('is-expanded')) {
@@ -648,7 +680,7 @@ export default class extends Controller
 
         // The browser pictures the player before and after apply(), then animates
         // between the two (see "view-transition-name: player" in player.css).
-        if (document.startViewTransition && !reduceMotion) {
+        if (animate && document.startViewTransition && !reduceMotion) {
             document.startViewTransition(apply);
         } else {
             apply();
@@ -716,7 +748,8 @@ export default class extends Controller
 
         row.querySelector('.track-title').textContent = track.title;
         row.querySelector('.track-artists').textContent = track.artists;
-        row.querySelector('button').dataset.playerIndexParam = index;
+        row.querySelectorAll('button').forEach(button => { button.dataset.playerIndexParam = index; });
+        row.querySelector('.player-queue-remove').setAttribute('aria-label', `Retirer « ${track.title} » de la file d'attente`);
 
         return row;
     }
@@ -835,6 +868,8 @@ export default class extends Controller
         this.favoriteTrackTarget.value = track.id;
         this.addTarget.dataset.playlistPickerUrlParam = track.playlistsUrl;
         this.addTarget.dataset.playlistPickerTitleParam = track.title;
+        // The ⋮ of the detailed player opens the options of this track.
+        this.optionsTarget.dataset.track = JSON.stringify(track);
 
         const response = await fetch(`${this.favoriteUrlValue}?track=${track.id}`).catch(() => null);
 

@@ -11,6 +11,7 @@
         click@window->player#wakeSound
         pagehide@window->player#saveState
         turbo:load@document->player#refreshFavorite
+        turbo:visit@document->player#collapseOnVisit
         keydown@window->player#shortcut
         touchstart->player#swipeStart:passive
         touchmove->player#swipeMove:passive
@@ -33,6 +34,19 @@
         data-action="player#collapse"
     >
         {{ ux_icon('material-symbols:keyboard-arrow-down') }}
+    </button>
+
+    {# Options of the track playing (playlist, album, artists): only in the detailed player. #}
+    <button
+        type="button"
+        class="icon-btn player-options"
+        aria-label="Options du titre"
+        aria-haspopup="dialog"
+        data-player-target="options"
+        data-action="track-options#open"
+        data-track-options-playing-param="true"
+    >
+        {{ ux_icon('material-symbols:more-vert') }}
     </button>
 
     <img class="track-cover desktop-only" data-player-target="cover" alt="" data-action="click->player#toggleExpanded">
@@ -176,6 +190,9 @@
                 <button type="button" class="player-queue-row" data-action="player#jumpTo">
                     <span class="track-title"></span>
                     <span class="track-artists"></span>
+                </button>
+                <button type="button" class="icon-btn player-queue-remove" data-action="player#removeFromQueue">
+                    {{ ux_icon('material-symbols:close') }}
                 </button>
             </li>
         </template>

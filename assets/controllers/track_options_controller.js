@@ -9,7 +9,14 @@ export default class extends Controller
 
     open(event)
     {
-        this.track = JSON.parse(event.currentTarget.closest('[data-track]').dataset.track);
+        // No track yet (empty player): nothing to show.
+        const source = event.currentTarget.closest('[data-track]');
+
+        if (!source) {
+            return;
+        }
+
+        this.track = JSON.parse(source.dataset.track);
 
         this.coverTarget.src = this.track.cover ?? '';
         this.coverTarget.hidden = !this.track.cover;
