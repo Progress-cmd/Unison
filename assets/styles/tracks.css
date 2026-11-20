@@ -18,6 +18,14 @@
     transition: background-color 0.2s ease; /* soft highlight of the current track */
 }
 
+/* Phone, in a playlist: the row also has remove and move buttons. Without the duration,
+   the title keeps enough room to be read. */
+@media (max-width: 639px) {
+    .track--in-playlist .track-duration {
+        display: none;
+    }
+}
+
 .track-cover {
     width: 48px;
     height: 48px;
@@ -145,4 +153,131 @@
 
 .track[aria-current="true"] .track-title {
     font-weight: 500;
+}
+/* --- "Options du titre" sheet (templates/shared/_track_options.html.twig) --- */
+
+/* Phone: a sheet rising from the bottom, full width, like "Ajouter à une playlist".
+   Large screen (see below): the usual centred dialog. */
+.track-options {
+    margin: auto 0 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 90dvh;
+    padding: 20px 16px calc(16px + env(safe-area-inset-bottom));
+    border-width: 1px 0 0;
+    border-radius: 16px 16px 0 0;
+    transform: translateY(100%);
+}
+
+.track-options[open] {
+    transform: none;
+}
+
+.track-options:focus {
+    outline: none;
+}
+
+@starting-style {
+    .track-options[open] {
+        transform: translateY(100%);
+    }
+}
+
+/* The track: cover, title and artists. */
+.track-options-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 8px 16px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.track-options-head .track-cover[hidden] {
+    display: none;
+}
+
+.track-options .track-options-head h2 {
+    margin: 0;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.track-options-list {
+    margin: 0;
+    padding: 8px 0;
+    list-style: none;
+}
+
+/* The album and artist links, apart from the actions. */
+.track-options-links {
+    border-top: 1px solid var(--color-border);
+}
+
+.track-options-list [hidden] {
+    display: none;
+}
+
+/* One action per line, the whole line clickable. */
+.track-options-list button,
+.track-options-list a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 12px 8px;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    color: var(--color-text);
+    font: inherit;
+    font-size: 15px;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.track-options-list button:hover,
+.track-options-list a:hover {
+    background: var(--color-accent-soft);
+}
+
+.track-options-list svg[hidden] {
+    display: none;
+}
+
+.track-options-list svg {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    color: var(--color-text-muted);
+}
+
+.track-options-list span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.track-options form[method="dialog"] {
+    padding-top: 8px;
+}
+
+@media (min-width: 640px) {
+    .track-options {
+        margin: auto;
+        width: min(400px, calc(100vw - 32px));
+        max-height: 85dvh;
+        padding: 20px 16px 16px;
+        border-width: 1px;
+        border-radius: 16px;
+        transform: translateY(8px) scale(0.98);
+    }
+
+    @starting-style {
+        .track-options[open] {
+            transform: translateY(8px) scale(0.98);
+        }
+    }
 }

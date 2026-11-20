@@ -202,6 +202,23 @@
     display: none;
 }
 
+/* --- ⋮ (options of the track playing): only in the detailed card --- */
+
+.player-options {
+    display: none;
+}
+
+.player.is-expanded .player-options {
+    display: flex;
+    grid-area: options;
+    justify-self: end;
+}
+
+.player.is-expanded .player-options svg {
+    width: 26px;
+    height: 26px;
+}
+
 /* --- "+" (add to a playlist): only in the detailed card --- */
 
 .player-add {
@@ -219,7 +236,7 @@
     display: grid;
     grid-template-columns: auto 1fr auto;
     grid-template-areas:
-        "close . ."
+        "close . options"
         "cover cover cover"
         "add . favorite"
         "elapsed . duration"
@@ -399,9 +416,33 @@
     padding: 0;
 }
 
+/* Each upcoming track: the row (plays it) and its ✕ (removes it from the queue). */
+.player-queue li {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.player-queue-remove {
+    flex: none;
+    padding: 6px;
+    color: rgb(255 255 255 / 65%);
+}
+
+.player-queue-remove:hover {
+    color: white;
+}
+
+.player-queue-remove svg {
+    width: 18px;
+    height: 18px;
+}
+
 .player-queue-row {
     display: flex;
     flex-direction: column;
+    flex: 1;
+    min-width: 0;
     width: 100%;
     padding: 6px 8px;
     background: none;
@@ -439,7 +480,7 @@
     .player.is-expanded {
         grid-template-rows: auto minmax(0, 1fr) auto auto auto auto auto auto;
         grid-template-areas:
-            "close . ."
+            "close . options"
             "cover cover cover"
             "add . favorite"
             "elapsed . duration"
@@ -681,5 +722,35 @@
 
     .player-play:hover {
         transform: none;
+    }
+}
+
+/* --- Toast: confirms the queue actions ("Ajouté à la file d'attente") --- */
+
+/* Above the player, centred on the page. */
+.player-toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(var(--nav-height) + var(--player-height) + 16px);
+    z-index: 6;
+    translate: -50% 0;
+    width: max-content;
+    max-width: calc(100vw - 32px);
+    margin: 0;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: var(--color-text);
+    color: var(--color-bg);
+    font-size: 14px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgb(0 0 0 / 20%);
+}
+
+@media (min-width: 1024px) {
+    /* Centred on the content, beside the sidebar, above the floating bar. */
+    .player-toast {
+        left: calc(50% + var(--sidebar-width) / 2);
+        bottom: calc(var(--player-height) + 32px);
+        max-width: calc(100vw - var(--sidebar-width) - 32px);
     }
 }

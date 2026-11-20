@@ -1,0 +1,54 @@
+{# "Options du titre": one sheet for the whole page, filled by track_options_controller.js. #}
+<dialog
+    class="track-options"
+    aria-labelledby="track-options-title"
+    {# Focusable, to take the focus on opening instead of its first action (see open()). #}
+    tabindex="-1"
+    data-track-options-target="dialog"
+    data-action="click->track-options#closeOnBackdrop"
+>
+    <div class="track-options-head">
+        <img class="track-cover" alt="" data-track-options-target="cover">
+        <div class="track-info">
+            <h2 class="track-title" id="track-options-title" data-track-options-target="title"></h2>
+            <span class="track-artists" data-track-options-target="artists"></span>
+        </div>
+    </div>
+
+    <ul class="track-options-list">
+        <li data-track-options-target="queueAction">
+            <button type="button" data-action="track-options#playNext">
+                {{ ux_icon('material-symbols:queue-play-next') }}
+                <span>Écouter juste après</span>
+            </button>
+        </li>
+        <li data-track-options-target="queueAction">
+            <button type="button" data-action="track-options#addToQueue">
+                {{ ux_icon('material-symbols:queue-music') }}
+                <span>Ajouter à la file d'attente</span>
+            </button>
+        </li>
+        <li>
+            <button type="button" data-track-options-target="playlist" data-action="track-options#close playlist-picker#open">
+                {{ ux_icon('material-symbols:playlist-add') }}
+                <span>Ajouter à une playlist</span>
+            </button>
+        </li>
+    </ul>
+
+    {# Album and artists, filled for each track. #}
+    <ul class="track-options-list track-options-links" data-track-options-target="links"></ul>
+    <template data-track-options-target="linkTemplate">
+        <li>
+            <a data-action="track-options#close">
+                {{ ux_icon('material-symbols:album', {hidden: true, 'data-icon': 'album'}) }}
+                {{ ux_icon('material-symbols:person', {hidden: true, 'data-icon': 'artist'}) }}
+                <span></span>
+            </a>
+        </li>
+    </template>
+
+    <form method="dialog">
+        <button type="submit">Fermer</button>
+    </form>
+</dialog>

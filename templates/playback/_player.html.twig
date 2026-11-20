@@ -5,10 +5,13 @@
     data-action="
         track-list:play@window->player#play
         discover:play@window->player#play
+        track-options:play-next@window->player#playNext
+        track-options:add-to-queue@window->player#addToQueue
         keydown.esc@window->player#collapse
         click@window->player#wakeSound
         pagehide@window->player#saveState
         turbo:load@document->player#refreshFavorite
+        turbo:visit@document->player#collapseOnVisit
         keydown@window->player#shortcut
         touchstart->player#swipeStart:passive
         touchmove->player#swipeMove:passive
@@ -31,6 +34,19 @@
         data-action="player#collapse"
     >
         {{ ux_icon('material-symbols:keyboard-arrow-down') }}
+    </button>
+
+    {# Options of the track playing (playlist, album, artists): only in the detailed player. #}
+    <button
+        type="button"
+        class="icon-btn player-options"
+        aria-label="Options du titre"
+        aria-haspopup="dialog"
+        data-player-target="options"
+        data-action="track-options#open"
+        data-track-options-playing-param="true"
+    >
+        {{ ux_icon('material-symbols:more-vert') }}
     </button>
 
     <img class="track-cover desktop-only" data-player-target="cover" alt="" data-action="click->player#toggleExpanded">
@@ -175,9 +191,15 @@
                     <span class="track-title"></span>
                     <span class="track-artists"></span>
                 </button>
+                <button type="button" class="icon-btn player-queue-remove" data-action="player#removeFromQueue">
+                    {{ ux_icon('material-symbols:close') }}
+                </button>
             </li>
         </template>
     </section>
+
+    {# "Ajouté à la file d'attente"…: confirms actions that change nothing visible. #}
+    <p class="player-toast" role="status" hidden data-player-target="toast"></p>
 
     <audio
         data-player-target="audio"
