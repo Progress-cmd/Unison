@@ -1,3 +1,5 @@
+// First, so it also catches the errors of everything loaded after it.
+import './error_reporter.js';
 import './stimulus_bootstrap.js';
 /*
  * Welcome to your app's main JavaScript file!

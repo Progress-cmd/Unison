@@ -1,0 +1,13 @@
+# Ce que l'image de production ne doit pas contenir (Dockerfile, cible « production »).
+.git
+.env
+.env.*
+!.env.exemple
+*.local*
+vendor/
+var/
+musics_storage/
+public/covers/
+public/assets/
+assets/vendor/
+compose*.yaml

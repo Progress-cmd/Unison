@@ -10,6 +10,10 @@
 
         {# After a form redirects to the page it came from, keep the scroll position. #}
         <meta name="turbo-refresh-scroll" content="preserve">
+        {% if app.user %}
+            {# Where assets/error_reporter.js sends the JavaScript errors (logged-in visitors only). #}
+            <meta name="error-report-url" content="{{ path('app_browser_error') }}">
+        {% endif %}
         {% block meta %}{% endblock %}
 
         {% block javascripts %}

@@ -353,6 +353,10 @@
     --source-color: var(--color-error);
 }
 
+.error-item--browser {
+    --source-color: var(--color-link);
+}
+
 .error-date {
     font-size: 12px;
     color: var(--color-text-muted);
@@ -382,6 +386,8 @@ a.error-context:hover {
     font-size: 13px;
     line-height: 1.45;
     overflow-wrap: anywhere;
+    /* Keeps the line breaks of a stack trace (browser errors). */
+    white-space: pre-wrap;
 }
 
 /* Buttons at the bottom right of the card ("Relancer" will sit before "Réglé"). */

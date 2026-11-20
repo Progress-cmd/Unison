@@ -59,6 +59,11 @@ class YtDlpClient
     public function __construct(
         #[Autowire('%env(resolve:MUSIC_DIR)%')]
         private readonly string $musicDir,
+        // YouTube cookies (Netscape format, from a secondary account) for age-restricted videos.
+        // Optional: without the file, yt-dlp works as before. yt-dlp rewrites the file, so it
+        // must be writable by www-data.
+        #[Autowire('%env(default::YTDLP_COOKIES)%')]
+        private readonly ?string $cookiesFile = null,
     ) {}
 
     public function fetchMetadata(string $url): array
@@ -103,6 +108,10 @@ class YtDlpClient
     private function run(array $arguments, int $timeout = 600): string
     {
         $commonArguments = ['yt-dlp', '--js-runtimes', 'quickjs'];
+
+        if ($this->cookiesFile && is_file($this->cookiesFile)) {
+            array_push($commonArguments, '--cookies', $this->cookiesFile);
+        }
 
         $process = new Process(array_merge($commonArguments, $arguments));
 

@@ -1,0 +1,115 @@
+# Stack « unison » du serveur 002x0 : à copier dans /srv/stacks/unison/compose.yaml.
+# Le code de l'appli est dans /srv/stacks/unison/app (ce dépôt, sur un tag), voir deploy/README.md.
+name: unison
+
+services:
+  app:
+    build:
+      context: ./app
+      target: production
+    image: unison-app:v2                  # image locale, reconstruite sur place (pas de digest)
+    container_name: unison-app
+    restart: unless-stopped
+    env_file: /srv/secrets/unison.env     # base, APP_SECRET, clé Resend
+    environment: &environment
+      DEFAULT_URI: https://unison.pi5.ovh
+      ADMIN_URL: https://unison-admin.pi5.ovh/admin
+      MUSIC_DIR: /data/music
+      YTDLP_COOKIES: /data/youtube/cookies.txt
+      MESSENGER_TRANSPORT_DSN: doctrine://default?auto_setup=0
+      # Seules ces adresses sont acceptées (les liens des e-mails ne dépendent jamais de la requête).
+      SYMFONY_TRUSTED_HOSTS: '^unison(-admin)?\.pi5\.ovh$$'
+      # Traefik, sur un réseau Docker privé : Symfony lit la vraie IP du visiteur dans
+      # X-Forwarded-For (limite de « Mot de passe oublié ? », journaux).
+      SYMFONY_TRUSTED_PROXIES: private_ranges
+    volumes: &volumes
+      - /srv/data/unison/music:/data/music
+      - /srv/data/unison/covers:/var/www/html/public/covers
+      - /srv/data/unison/youtube:/data/youtube
+    # Résolveurs explicites (repris de la v1) : sans eux, un résolveur de l'hôte qui ne répond
+    # pas ajoute son délai à chaque requête sortante (yt-dlp, YouTube Music).
+    dns: [1.1.1.1, 9.9.9.9]
+    networks: [edge, internal]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512m
+    pids_limit: 256
+    depends_on:
+      db:
+        condition: service_healthy
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: edge
+      traefik.http.services.unison.loadbalancer.server.port: "80"
+      # Public : l'application, sans l'administration
+      traefik.http.routers.unison.rule: Host(`unison.pi5.ovh`) && !PathPrefix(`/admin`)
+      traefik.http.routers.unison.entrypoints: public
+      traefik.http.routers.unison.tls: "true"
+      traefik.http.routers.unison.service: unison
+      traefik.http.routers.unison.middlewares: unison-rl,unison-sec
+      # Privé (Netbird) : tout, y compris l'administration
+      traefik.http.routers.unison-admin.rule: Host(`unison-admin.pi5.ovh`)
+      traefik.http.routers.unison-admin.entrypoints: private
+      traefik.http.routers.unison-admin.tls: "true"
+      traefik.http.routers.unison-admin.service: unison
+      # Middlewares
+      traefik.http.middlewares.unison-rl.ratelimit.average: "30"
+      traefik.http.middlewares.unison-rl.ratelimit.burst: "100"
+      traefik.http.middlewares.unison-sec.headers.stsSeconds: "2592000"
+
+  # Les imports : yt-dlp, ffmpeg, pochettes. Même image, autre commande ; il redémarre toutes
+  # les heures (--time-limit) pour ne pas grossir en mémoire.
+  worker:
+    build:
+      context: ./app
+      target: production
+    image: unison-app:v2
+    container_name: unison-worker
+    restart: unless-stopped
+    command: ["php", "bin/console", "messenger:consume", "async", "--time-limit=3600", "--memory-limit=256M"]
+    env_file: /srv/secrets/unison.env
+    environment: *environment
+    volumes: *volumes
+    dns: [1.1.1.1, 9.9.9.9]
+    # « outbound » pour joindre YouTube : « internal » n'a pas accès à Internet, et le worker
+    # n'a rien à faire sur « edge » (Traefik ne le sert pas).
+    networks: [internal, outbound]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512m
+    pids_limit: 128
+    healthcheck:
+      # Répond tant que la file d'attente (dans la base) est lisible.
+      test: ["CMD", "php", "bin/console", "messenger:stats", "async"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      app:
+        condition: service_healthy        # l'app a appliqué les migrations
+
+  db:
+    image: mariadb:12.2.2@sha256:6a4c4bbf0447c2247801309513fcc0dd17c3f35390368139ce419387fdd1144d  # figé le 2 nov. 2026
+    container_name: unison-db
+    restart: unless-stopped
+    env_file: /srv/secrets/unison.env     # MARIADB_ROOT_PASSWORD, MARIADB_PASSWORD
+    environment:
+      MARIADB_DATABASE: unison
+      MARIADB_USER: unison
+    volumes:
+      - /srv/data/unison/db:/var/lib/mysql
+    networks: [internal]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    mem_limit: 384m
+    pids_limit: 256
+
+networks:
+  edge:
+    external: true
+  internal:
+    internal: true
+  outbound: {}
