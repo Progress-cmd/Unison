@@ -206,4 +206,17 @@ class TrackRepository extends ServiceEntityRepository
             ->getSingleScalarResult()
         ;
     }
+
+    /**
+     * Tracks added per UTC hour since that date, for LocalCalendar (admin dashboard).
+     *
+     * @return array<string, int> 'Y-m-d H:00:00' => count
+     */
+    public function countAddedPerHour(\DateTimeImmutable $since): array
+    {
+        return array_map('intval', $this->getEntityManager()->getConnection()->fetchAllKeyValue(
+            "SELECT DATE_FORMAT(created_at, '%Y-%m-%d %H:00:00') AS hour, COUNT(*) FROM track WHERE created_at >= :since GROUP BY hour",
+            ['since' => $since->format('Y-m-d H:i:s')],
+        ));
+    }
 }

@@ -1,0 +1,120 @@
+<?php
+
+namespace App\Admin\Stats;
+
+// Turns counts per hour, stored in UTC like every date of the application, into the series the
+// dashboard draws, in French local time (as the dates Twig shows, config/packages/twig.yaml):
+// a listen at 0:30 in Paris belongs to that day, not to the day before.
+// Every period of the series is present, at 0 when nothing happened: a missing day would
+// bring two distant dates together.
+final class LocalCalendar
+{
+    public const TIMEZONE = 'Europe/Paris';
+
+    private const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+    private const SHORT_MONTHS = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+
+    private \DateTimeZone $zone;
+
+    public function __construct()
+    {
+        $this->zone = new \DateTimeZone(self::TIMEZONE);
+    }
+
+    // Start of the local day $days - 1 days ago, as a UTC date for the query.
+    public function daysAgo(int $days): \DateTimeImmutable
+    {
+        return (new \DateTimeImmutable('today', $this->zone))->modify(sprintf('-%d days', $days - 1))->setTimezone(new \DateTimeZone('UTC'));
+    }
+
+    // Start of the local month $months - 1 months ago, as a UTC date for the query.
+    public function monthsAgo(int $months): \DateTimeImmutable
+    {
+        return (new \DateTimeImmutable('first day of this month midnight', $this->zone))->modify(sprintf('-%d months', $months - 1))->setTimezone(new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * @param array<string, int> $hourly UTC hour ('Y-m-d H:00:00') => count
+     *
+     * @return list<array{label: string, title: string, value: int}>
+     */
+    public function lastDays(array $hourly, int $days): array
+    {
+        $totals = $this->fold($hourly, 'Y-m-d');
+        $day = new \DateTimeImmutable('today', $this->zone);
+        $series = [];
+
+        for ($i = $days - 1; $i >= 0; --$i) {
+            $date = $day->modify(sprintf('-%d days', $i));
+            $series[] = [
+                'label' => $date->format('d/m'),
+                'title' => sprintf('%d %s', $date->format('j'), self::MONTHS[$date->format('n') - 1]),
+                'value' => $totals[$date->format('Y-m-d')] ?? 0,
+            ];
+        }
+
+        return $series;
+    }
+
+    /**
+     * @param array<string, int> $hourly UTC hour ('Y-m-d H:00:00') => count
+     *
+     * @return list<array{label: string, title: string, value: int}>
+     */
+    public function hoursOfDay(array $hourly): array
+    {
+        $totals = $this->fold($hourly, 'G');
+        $series = [];
+
+        for ($hour = 0; $hour < 24; ++$hour) {
+            $series[] = [
+                'label' => $hour.' h',
+                'title' => sprintf('De %d h à %d h', $hour, ($hour + 1) % 24),
+                'value' => $totals[(string) $hour] ?? 0,
+            ];
+        }
+
+        return $series;
+    }
+
+    /**
+     * @param array<string, int> $hourly UTC hour ('Y-m-d H:00:00') => count
+     *
+     * @return list<array{label: string, title: string, value: int}>
+     */
+    public function lastMonths(array $hourly, int $months): array
+    {
+        $totals = $this->fold($hourly, 'Y-m');
+        $month = new \DateTimeImmutable('first day of this month midnight', $this->zone);
+        $series = [];
+
+        for ($i = $months - 1; $i >= 0; --$i) {
+            $date = $month->modify(sprintf('-%d months', $i));
+            $series[] = [
+                'label' => self::SHORT_MONTHS[$date->format('n') - 1],
+                'title' => self::MONTHS[$date->format('n') - 1].' '.$date->format('Y'),
+                'value' => $totals[$date->format('Y-m')] ?? 0,
+            ];
+        }
+
+        return $series;
+    }
+
+    /**
+     * @param array<string, int> $hourly
+     *
+     * @return array<string, int> local period (formatted with $format) => count
+     */
+    private function fold(array $hourly, string $format): array
+    {
+        $totals = [];
+        $utc = new \DateTimeZone('UTC');
+
+        foreach ($hourly as $hour => $count) {
+            $key = (new \DateTimeImmutable($hour, $utc))->setTimezone($this->zone)->format($format);
+            $totals[$key] = ($totals[$key] ?? 0) + (int) $count;
+        }
+
+        return $totals;
+    }
+}
