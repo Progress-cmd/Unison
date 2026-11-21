@@ -1,84 +1,93 @@
 /* Small surprises: the little character and the butterflies. Decoration only, never in the way,
    and still when the system asks for less motion. */
 
-/* --- The little character (templates/shared/_buddy.html.twig) --- */
+/* --- The little character peeking out of the sidebar (templates/base.html.twig) --- */
 
-.buddy {
-    display: inline-block;
-    width: 34px;
-    height: 37px;
-    margin-left: 6px;
-    vertical-align: -4px;
-    --buddy-skin: light-dark(#f3cdbb, #e2b29e);
+/* Behind the sidebar (z-index 5) until he leans out; computer only. */
+.peekaboo {
+    display: none;
 }
 
-.buddy svg {
+@media (min-width: 1024px) {
+    .peekaboo {
+        --skin: light-dark(#f3cdbb, #e2b29e);
+        position: fixed;
+        top: 50%;
+        left: var(--sidebar-width);
+        z-index: 4;
+        display: block;
+        width: 48px;
+        height: 48px;
+        transform: translateX(-100%);
+        /* Only out there can he be hovered (to send him back). */
+        pointer-events: none;
+    }
+
+    .peekaboo.is-out {
+        pointer-events: auto;
+    }
+}
+
+.peekaboo svg {
     display: block;
     width: 100%;
     height: 100%;
     overflow: visible;
 }
 
-.buddy-body,
-.buddy-cup {
-    fill: var(--color-accent);
+.peekaboo-skin {
+    fill: var(--skin);
 }
 
-.buddy-skin {
-    fill: var(--buddy-skin);
-}
-
-.buddy-skin-line {
-    fill: none;
-    stroke: var(--buddy-skin);
-    stroke-width: 3.4;
-    stroke-linecap: round;
-}
-
-.buddy-eye {
+.peekaboo-eyes {
     fill: var(--color-text);
+    transform-box: fill-box;
+    transform-origin: center;
 }
 
-.buddy-smile,
-.buddy-headband {
+.peekaboo-line,
+.peekaboo-band {
     fill: none;
     stroke: var(--color-text);
-    stroke-width: 1.6;
     stroke-linecap: round;
 }
 
-.buddy-headband {
+.peekaboo-line {
+    stroke-width: 1.6;
+}
+
+.peekaboo-band {
     stroke-width: 2.4;
 }
 
-/* The arm turns around the shoulder. */
-.buddy-arm {
+.peekaboo-cup {
+    fill: var(--color-accent);
+}
+
+/* Leaning out from the bottom left, as if around a corner; a little tilt of curiosity, a blink. */
+.peekaboo-head {
     transform-box: view-box;
-    transform-origin: 29px 36px;
+    transform-origin: 14px 40px;
+    transform: rotate(14deg);
 }
 
-.buddy.is-waving .buddy-arm {
-    animation: buddy-wave 0.5s ease-in-out 3;
+.peekaboo.is-out .peekaboo-head {
+    animation: peekaboo-tilt 2.4s ease-in-out 0.5s;
 }
 
-@keyframes buddy-wave {
-    0%, 100% { transform: rotate(0deg); }
-    30% { transform: rotate(-28deg); }
-    70% { transform: rotate(14deg); }
+.peekaboo.is-out .peekaboo-eyes {
+    animation: peekaboo-blink 0.24s ease-in-out 1.3s 2 alternate;
 }
 
-/* On the home page, only on a phone (the sidebar has its own); about the size of a capital. */
-.buddy--greeting {
-    width: 0.72em;
-    height: 0.8em;
-    margin-left: 0.2em;
-    vertical-align: -0.05em;
+@keyframes peekaboo-tilt {
+    0%, 100% { transform: rotate(14deg); }
+    35% { transform: rotate(4deg); }
+    65% { transform: rotate(18deg); }
 }
 
-@media (min-width: 1024px) {
-    .buddy--greeting {
-        display: none;
-    }
+@keyframes peekaboo-blink {
+    from { transform: scaleY(1); }
+    to { transform: scaleY(0.1); }
 }
 
 /* --- Butterflies (templates/base.html.twig, butterflies_controller.js) --- */
@@ -144,11 +153,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .buddy.is-waving .buddy-arm,
     .butterfly-wings {
         animation: none;
     }
 
+    .peekaboo,
     .butterflies {
         display: none;
     }

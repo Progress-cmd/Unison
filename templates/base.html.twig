@@ -42,6 +42,29 @@
             {% include 'playlist/_picker_dialog.html.twig' %}
             {% include 'shared/_track_options.html.twig' %}
             {% include 'shared/_announcement.html.twig' %}
+            {# Now and then, the little character peeks out from behind the sidebar (computer only,
+               peekaboo_controller.js); kept from page to page like the butterflies below. #}
+            <div id="peekaboo" class="peekaboo" aria-hidden="true" data-turbo-permanent data-controller="peekaboo" data-action="mouseenter->peekaboo#hide">
+                <svg viewBox="0 0 48 48" focusable="false">
+                    <g class="peekaboo-head">
+                        <circle class="peekaboo-skin" cx="24" cy="23" r="12"/>
+                        <g class="peekaboo-eyes">
+                            <circle cx="24" cy="21.5" r="1.5"/>
+                            <circle cx="30.5" cy="21.5" r="1.5"/>
+                        </g>
+                        <path class="peekaboo-line" d="M24.5 27 Q28 29.5 31.5 26.5"/>
+                        <path class="peekaboo-band" d="M12.5 22 A11.8 11.8 0 0 1 35.5 22"/>
+                        <rect class="peekaboo-cup" x="33" y="18" width="5" height="9.5" rx="2.5"/>
+                    </g>
+                    {# The hand holding the edge of the sidebar. #}
+                    <g class="peekaboo-hand">
+                        <circle class="peekaboo-skin" cx="22.5" cy="36" r="2.2"/>
+                        <circle class="peekaboo-skin" cx="22.5" cy="39.6" r="2.2"/>
+                        <circle class="peekaboo-skin" cx="22.5" cy="43.2" r="2.2"/>
+                    </g>
+                </svg>
+            </div>
+
             {# Now and then, a butterfly (butterflies_controller.js). Kept from page to page, like
                the player, so the time between two goes on while browsing. #}
             <div id="butterflies" class="butterflies" aria-hidden="true" data-turbo-permanent data-controller="butterflies">

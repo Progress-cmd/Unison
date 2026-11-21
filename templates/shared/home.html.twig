@@ -5,8 +5,7 @@
 {% block body %}
 {% set hour = 'now'|date('G') %}
 <div class="home">
-    {# On a phone, the little character of the sidebar says hello here. #}
-    <h1 class="home-greeting">{{ hour < 18 ? 'Bonjour' : 'Bonsoir'}}, <em>{{ app.user.username }}</em>{% include 'shared/_buddy.html.twig' with {class: 'buddy--greeting'} %}</h1>
+    <h1 class="home-greeting">{{ hour < 18 ? 'Bonjour' : 'Bonsoir'}}, <em>{{ app.user.username }}</em></h1>
     <p class="home-subtitle">Que veux-tu écouter aujourd'hui ?</p>
 
     <div class="home-columns">
