@@ -6,6 +6,7 @@ use App\Library\Entity\Album;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\OffsetPaginator;
 use Doctrine\ORM\Tools\Pagination\Window;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -68,5 +69,27 @@ class AlbumRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleColumnResult()
         ;
+    }
+
+    /**
+     * The albums whose cover is still a link to YouTube rather than a file on the server
+     * (app:covers:localize).
+     *
+     * @return list<Album>
+     */
+    public function findWithRemoteCover(): array
+    {
+        return $this->remoteCover()->getQuery()->getResult();
+    }
+
+    // How many of them (admin dashboard).
+    public function countRemoteCovers(): int
+    {
+        return (int) $this->remoteCover()->select('COUNT(x.id)')->getQuery()->getSingleScalarResult();
+    }
+
+    private function remoteCover(): QueryBuilder
+    {
+        return $this->createQueryBuilder('x')->andWhere('x.cover LIKE :remote')->setParameter('remote', 'http%');
     }
 }

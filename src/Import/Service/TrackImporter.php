@@ -68,11 +68,9 @@ class TrackImporter
 
         $fileName = $this->ytDlpClient->downloadAudio($metadata['webpage_url']);
         $waveform = $this->waveformGenerator->generate($this->musicDir . '/' . $fileName);
-        $cover = $metadata['thumbnail'] ?? null;
-
-        if (null !== $cover) {
-            $cover = $this->coverDownloader->download($cover, $metadata['id']) ?? $cover;
-        }
+        // Kept on the server; YouTube's link only as a last resort (app:covers:localize brings
+        // it back later).
+        $cover = $this->coverDownloader->localize($metadata['thumbnail'] ?? null, $metadata['id']) ?? $metadata['thumbnail'] ?? null;
 
         $track = new Track();
         $track->setTitle(mb_substr($cleaned->title, 0, 255));

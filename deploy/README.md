@@ -17,6 +17,7 @@
 - Commandes Symfony : `sudo docker exec -u www-data unison-app php bin/console <commande>`.
 - Cookies YouTube (vidéos avec vérification d'âge) : `/srv/data/unison/youtube/cookies.txt`, format Netscape, compte secondaire, propriétaire `www-data` (le conteneur corrige le propriétaire du dossier au démarrage), droits 600.
 - Les erreurs des imports, des recherches et du serveur sont sur la page **Erreurs** de l'administration.
+- Pochettes encore lues chez YouTube (le tableau de bord en donne le nombre) : `sudo docker exec -u www-data unison-app php bin/console app:covers:localize`. Relançable.
 
 ## Mettre à jour
 

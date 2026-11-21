@@ -10,6 +10,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\OffsetPaginator;
 use Doctrine\ORM\Tools\Pagination\Window;
 use Doctrine\ORM\Tools\Pagination\WindowPage;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -218,5 +219,27 @@ class TrackRepository extends ServiceEntityRepository
             "SELECT DATE_FORMAT(created_at, '%Y-%m-%d %H:00:00') AS hour, COUNT(*) FROM track WHERE created_at >= :since GROUP BY hour",
             ['since' => $since->format('Y-m-d H:i:s')],
         ));
+    }
+
+    /**
+     * The tracks whose cover is still a link to YouTube rather than a file on the server
+     * (app:covers:localize).
+     *
+     * @return list<Track>
+     */
+    public function findWithRemoteCover(): array
+    {
+        return $this->remoteCover()->getQuery()->getResult();
+    }
+
+    // How many of them (admin dashboard).
+    public function countRemoteCovers(): int
+    {
+        return (int) $this->remoteCover()->select('COUNT(x.id)')->getQuery()->getSingleScalarResult();
+    }
+
+    private function remoteCover(): QueryBuilder
+    {
+        return $this->createQueryBuilder('x')->andWhere('x.cover LIKE :remote')->setParameter('remote', 'http%');
     }
 }

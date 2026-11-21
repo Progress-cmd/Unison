@@ -208,6 +208,10 @@
             <div class="stat">
                 <dt>Pochettes</dt>
                 <dd>{{ covers.value }}<small>{{ covers.unit }}</small></dd>
+                {# Still read from YouTube: app:covers:localize brings them onto the server. #}
+                {% if nbRemoteCovers %}
+                    <p class="stat-note"><span class="stat-note-warning">{{ nbRemoteCovers }} encore chez YouTube</span> · app:covers:localize</p>
+                {% endif %}
             </div>
             <div class="stat stat--wide">
                 <dt>Libre sur le disque</dt>
