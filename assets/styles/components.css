@@ -387,3 +387,47 @@ dialog form[method="dialog"] button:hover {
     width: 18px;
     height: 18px;
 }
+
+/* --- Announcement window (templates/shared/_announcement.html.twig) --- */
+
+/* Its type, small, above the title: what kind of news this is. */
+.announcement-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-accent);
+}
+
+.announcement-eyebrow svg {
+    width: 20px;
+    height: 20px;
+}
+
+dialog.announcement:focus {
+    outline: none;
+}
+
+dialog.announcement h2 {
+    margin-bottom: 12px;
+    overflow-wrap: anywhere;
+}
+
+/* Written in the administration as plain text: its line breaks are kept. */
+.announcement-content {
+    margin: 0 0 20px;
+    font-size: 15px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+}
+
+.announcement form {
+    margin: 0;
+}
+
+.announcement .btn {
+    width: 100%;
+}
