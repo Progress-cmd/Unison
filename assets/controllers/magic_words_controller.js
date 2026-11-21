@@ -8,6 +8,8 @@ const WORDS = {
     butterflies: 'unison:butterflies',
     papillon: 'unison:butterflies',
     papillons: 'unison:butterflies',
+    neige: 'unison:snow',
+    snow: 'unison:snow',
 };
 
 export default class extends Controller

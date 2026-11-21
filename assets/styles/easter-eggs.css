@@ -182,13 +182,42 @@
     to { transform: rotateY(var(--flap-to)); }
 }
 
+/* --- Falling from the top: snow (rain_controller.js) --- */
+
+/* Behind the navigation and the player, unless a secret word called it: then above all. */
+.rain {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.rain.is-above {
+    z-index: 30;
+}
+
+.drop {
+    position: absolute;
+    top: 0;
+    will-change: transform, opacity;
+}
+
+/* Soft round flakes: bluish grey on the light theme (white wouldn't show), white on the dark one. */
+.drop--snow {
+    border-radius: 50%;
+    background: light-dark(#c3d0e0, #ffffff);
+    box-shadow: 0 0 4px light-dark(rgb(120 140 170 / 40%), rgb(255 255 255 / 70%));
+}
+
 @media (prefers-reduced-motion: reduce) {
     .butterfly-wing {
         animation: none;
     }
 
     .peekaboo,
-    .butterflies {
+    .butterflies,
+    .rain {
         display: none;
     }
 }
