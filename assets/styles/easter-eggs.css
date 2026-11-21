@@ -1,5 +1,5 @@
-/* Small surprises: the little character. Decoration only, never in the way, and still when the
-   system asks for less motion. */
+/* Small surprises: the little character and the butterflies. Decoration only, never in the way,
+   and still when the system asks for less motion. */
 
 /* --- The little character (templates/shared/_buddy.html.twig) --- */
 
@@ -81,8 +81,75 @@
     }
 }
 
+/* --- Butterflies (templates/base.html.twig, butterflies_controller.js) --- */
+
+/* Behind the navigation and the player (z-index 5 and more), never catching a click. */
+.butterflies {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.butterfly {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 26px;
+    height: 22px;
+    margin: -11px 0 0 -13px;
+    opacity: 0.9;
+    will-change: transform;
+}
+
+.butterfly svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Facing the way it flies. */
+.butterfly.is-flying-left svg {
+    transform: scaleX(-1);
+}
+
+.butterfly-wings {
+    transform-box: view-box;
+    transform-origin: 12px 10px;
+    animation: butterfly-flap 0.22s ease-in-out infinite alternate;
+}
+
+.butterfly-body {
+    stroke: light-dark(#3b2a22, #f1e6dc);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+}
+
+.butterfly--1 .butterfly-wings {
+    fill: var(--color-accent);
+}
+
+.butterfly--2 .butterfly-wings {
+    fill: light-dark(#d9962b, #e3b25a);
+}
+
+.butterfly--3 .butterfly-wings {
+    fill: light-dark(#5a86b8, #86acd8);
+}
+
+@keyframes butterfly-flap {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0.25); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .buddy.is-waving .buddy-arm {
+    .buddy.is-waving .buddy-arm,
+    .butterfly-wings {
         animation: none;
+    }
+
+    .butterflies {
+        display: none;
     }
 }
