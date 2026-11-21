@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controller;
 
+use App\Admin\Maintenance\CookiesFile;
 use App\Admin\Maintenance\MediaCheck;
 use App\Import\Message\RepairTrack;
 use App\Import\Service\YtDlpClient;
@@ -12,14 +13,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
-// The health of the files (audio, covers) and yt-dlp's version.
+// The health of the files (audio, covers), yt-dlp's version and the YouTube cookies.
 final class MaintenanceController extends AbstractController
 {
     // Past this age, yt-dlp may no longer keep up with YouTube's changes.
     private const YTDLP_OLD_DAYS = 45;
 
     #[Route('/admin/maintenance', name: 'app_admin_maintenance')]
-    public function index(MediaCheck $mediaCheck, YtDlpClient $ytDlpClient): Response
+    public function index(MediaCheck $mediaCheck, CookiesFile $cookiesFile, YtDlpClient $ytDlpClient): Response
     {
         $report = $mediaCheck->report();
         $version = $ytDlpClient->version();
@@ -29,6 +30,7 @@ final class MaintenanceController extends AbstractController
         return $this->render('admin/maintenance.html.twig', [
             'report' => $report,
             'nbToRepair' => count($mediaCheck->tracksToRepair($report)),
+            'cookies' => $cookiesFile->status(),
             'ytDlpVersion' => $version,
             'ytDlpAge' => $age,
             'ytDlpOld' => null !== $age && $age > self::YTDLP_OLD_DAYS,
@@ -80,6 +82,40 @@ final class MaintenanceController extends AbstractController
             : number_format($deleted['bytes'] / 1024, 0, ',', ' ').' Ko';
 
         $this->addFlash('success', sprintf('%d fichier%s supprimé%s, %s libérés.', $deleted['files'], $deleted['files'] > 1 ? 's' : '', $deleted['files'] > 1 ? 's' : '', $size));
+
+        return $this->redirectToRoute('app_admin_maintenance');
+    }
+
+    #[Route('/admin/maintenance/cookies', name: 'app_admin_maintenance_cookies', methods: ['POST'])]
+    public function uploadCookies(Request $request, CookiesFile $cookiesFile): Response
+    {
+        $this->checkToken($request, 'maintenance_cookies');
+
+        $file = $request->files->get('cookies');
+
+        if (null === $file || !$file->isValid()) {
+            $this->addFlash('error', 'Choisis le fichier cookies.txt à envoyer.');
+        } elseif ($file->getSize() > 1048576) {
+            $this->addFlash('error', 'Fichier trop gros pour un fichier de cookies (1 Mo au plus).');
+        } else {
+            try {
+                $count = $cookiesFile->replace($file);
+                $this->addFlash('success', sprintf('Cookies remplacés (%d). yt-dlp s\'en sert dès le prochain import.', $count));
+            } catch (\InvalidArgumentException $e) {
+                $this->addFlash('error', $e->getMessage());
+            }
+        }
+
+        return $this->redirectToRoute('app_admin_maintenance');
+    }
+
+    #[Route('/admin/maintenance/cookies/delete', name: 'app_admin_maintenance_cookies_delete', methods: ['POST'])]
+    public function deleteCookies(Request $request, CookiesFile $cookiesFile): Response
+    {
+        $this->checkToken($request, 'maintenance_cookies_delete');
+
+        $cookiesFile->remove();
+        $this->addFlash('success', 'Cookies retirés : yt-dlp travaille sans compte.');
 
         return $this->redirectToRoute('app_admin_maintenance');
     }

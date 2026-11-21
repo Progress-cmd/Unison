@@ -7,7 +7,7 @@
 {% block body %}
 <header class="admin-header">
     <h1>Administration</h1>
-    <p class="admin-subtitle">Les fichiers sur le disque et yt-dlp.</p>
+    <p class="admin-subtitle">Les fichiers sur le disque, yt-dlp et les cookies YouTube.</p>
 </header>
 {% include 'admin/_tabs.html.twig' with {active: 'maintenance'} %}
 
@@ -91,6 +91,36 @@
                 </p>
             {% else %}
                 <p class="maintenance-value">yt-dlp ne répond pas sur ce serveur.</p>
+            {% endif %}
+        </section>
+
+        <section class="admin-card maintenance-card">
+            <h3 class="maintenance-title">
+                {{ ux_icon(cookies.present ? 'material-symbols:cookie-outline' : 'material-symbols:info-outline', {class: cookies.present ? 'maintenance-icon--ok' : 'maintenance-icon--muted'}) }}
+                Cookies YouTube
+            </h3>
+            {% if not cookies.configured %}
+                <p class="maintenance-value">Non configurés sur ce serveur (YTDLP_COOKIES).</p>
+            {% else %}
+                <p class="maintenance-value">
+                    {% if cookies.present %}
+                        {{ cookies.cookies }} cookie{{ cookies.cookies > 1 ? 's' }}, envoyés le {{ cookies.modifiedAt|date('d/m/Y à H:i') }}
+                    {% else %}
+                        Aucun : yt-dlp travaille sans compte.
+                    {% endif %}
+                </p>
+                <p class="help-text">Pour les vidéos qui demandent de se connecter (vérification d'âge). Un fichier cookies.txt au format Netscape, exporté du navigateur d'un compte YouTube secondaire.</p>
+                <form class="maintenance-upload" method="post" action="{{ path('app_admin_maintenance_cookies') }}" enctype="multipart/form-data">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('maintenance_cookies') }}">
+                    <input type="file" name="cookies" accept=".txt,text/plain" required aria-label="Fichier cookies.txt">
+                    <button type="submit" class="btn btn-secondary">{{ cookies.present ? 'Remplacer' : 'Envoyer' }}</button>
+                </form>
+                {% if cookies.present %}
+                    <form method="post" action="{{ path('app_admin_maintenance_cookies_delete') }}" data-turbo-confirm="Retirer les cookies ? Les vidéos avec vérification d'âge ne s'importeront plus.">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('maintenance_cookies_delete') }}">
+                        <button type="submit" class="maintenance-link">Retirer les cookies</button>
+                    </form>
+                {% endif %}
             {% endif %}
         </section>
     </div>

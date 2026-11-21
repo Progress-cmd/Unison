@@ -1175,6 +1175,10 @@ a.error-context:hover {
     color: var(--color-warning);
 }
 
+.maintenance-icon--muted {
+    color: var(--color-text-muted);
+}
+
 /* Two figures side by side. */
 .maintenance-figures {
     display: grid;
@@ -1215,6 +1219,35 @@ a.error-context:hover {
 
 .maintenance-card code {
     font-size: 12px;
+}
+
+.maintenance-upload {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.maintenance-upload input[type="file"] {
+    flex: 1 1 200px;
+    min-width: 0;
+    font: inherit;
+    font-size: 13px;
+}
+
+.maintenance-link {
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    font: inherit;
+    font-size: 13px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.maintenance-link:hover {
+    color: var(--color-error);
 }
 
 .btn:disabled {
