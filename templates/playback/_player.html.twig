@@ -1,7 +1,7 @@
 <div
     id="player"
     class="player"
-    data-controller="player"
+    data-controller="player audio-settings"
     data-action="
         track-list:play@window->player#play
         track-list:queue@window->player#extendQueue
@@ -167,9 +167,21 @@
             step="0.01"
             value="1"
             aria-label="Volume"
+            data-player-target="volume"
             data-action="input->player#setVolume"
         >
     </div>
+
+    {# Volume in percent and audio output: in the bar on a computer, in the detailed player. #}
+    <button
+        type="button"
+        class="icon-btn player-settings"
+        aria-label="Paramètres audio"
+        aria-haspopup="dialog"
+        data-action="audio-settings#open"
+    >
+        {{ ux_icon('material-symbols:tune') }}
+    </button>
 
     {# Phone, full screen: shows the queue in place of the cover, so nothing needs scrolling. #}
     <button
@@ -203,9 +215,56 @@
     {# "Ajouté à la file d'attente"…: confirms actions that change nothing visible. #}
     <p class="player-toast" role="status" hidden data-player-target="toast"></p>
 
+    {# Filled and run by audio_settings_controller.js. #}
+    <dialog class="audio-settings" aria-labelledby="audio-settings-title" data-audio-settings-target="dialog">
+        <h2 id="audio-settings-title">Paramètres audio</h2>
+
+        <section class="audio-setting">
+            <div data-audio-settings-target="volumeField">
+                <label class="audio-setting-label" for="audio-settings-volume">
+                    Volume
+                    <output data-audio-settings-target="volumeValue">100 %</output>
+                </label>
+                <input
+                    id="audio-settings-volume"
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value="1"
+                    data-audio-settings-target="volume"
+                    data-action="input->audio-settings#setVolume"
+                >
+            </div>
+            <p class="audio-setting-note" data-audio-settings-target="volumeNote" hidden>Sur cet appareil, le volume se règle avec ses boutons.</p>
+        </section>
+
+        <section class="audio-setting">
+            <p class="audio-setting-label">Sortie audio</p>
+            <p class="audio-output-name">
+                {{ ux_icon('material-symbols:speaker-outline') }}
+                <span data-audio-settings-target="outputName">Sortie par défaut du système</span>
+            </p>
+            <select class="audio-output-list" aria-label="Sortie audio" data-audio-settings-target="list" data-action="change->audio-settings#choose" hidden></select>
+            <div class="audio-output-actions">
+                <button type="button" class="btn btn-secondary" data-audio-settings-target="pick" data-action="audio-settings#pick" hidden>Choisir la sortie audio…</button>
+                <button type="button" class="btn btn-secondary" data-audio-settings-target="reveal" data-action="audio-settings#reveal" hidden>Afficher les sorties</button>
+                <button type="button" class="audio-output-reset" data-audio-settings-target="reset" data-action="audio-settings#resetOutput" hidden>Revenir à la sortie par défaut</button>
+            </div>
+            <p class="audio-setting-note" data-audio-settings-target="outputNote"></p>
+        </section>
+
+        <form method="dialog">
+            <button type="submit">Fermer</button>
+        </form>
+    </dialog>
+
     <audio
         data-player-target="audio"
+        data-audio-settings-target="audio"
         data-action="
+            volumechange->player#volumeChanged
+            volumechange->audio-settings#volumeChanged
             play->player#showPlaying
             pause->player#showPaused
             loadedmetadata->player#updateDuration
