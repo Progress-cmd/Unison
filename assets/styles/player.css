@@ -1,5 +1,13 @@
 /* --- Bar --- */
 
+/* Scrollbars (queue, card on a very short window): thin and dark, at home on the black player
+   rather than the light ones of the page. */
+.player,
+.player * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 255 255 / 25%) transparent;
+}
+
 .player {
     position: fixed;
     bottom: var(--nav-height);
@@ -684,12 +692,32 @@
         box-shadow: 0 10px 30px rgb(0 0 0 / 25%);
     }
 
+    /* The whole height of the window, and only « À suivre » scrolls: one scrollbar, in the
+       list, instead of the card's and the list's one inside the other. */
     .player.is-expanded {
         /* Same right and bottom gap as the floating bar: the card grows from its corner. */
         inset: auto 16px 16px auto;
         width: 340px;
+        height: calc(100dvh - 32px);
+        max-height: none;
         border-radius: 20px;
+        /* At least a few upcoming tracks: on a very short window, the card scrolls instead. */
+        grid-template-rows: repeat(7, auto) minmax(120px, 1fr);
+        align-content: stretch;
+    }
+
+    .player.is-expanded .player-upcoming {
+        align-self: stretch;
+        max-height: none;
+        min-height: 0;
+    }
+
+    /* Nothing coming next: the card shrinks to its content, centred at the bottom right. */
+    .player.is-expanded:has(.player-queue:empty) {
+        height: auto;
         max-height: calc(100dvh - 32px);
+        grid-template-rows: none;
+        align-content: safe center;
     }
 
     .player-track {
