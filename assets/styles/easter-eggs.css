@@ -182,7 +182,7 @@
     to { transform: rotateY(var(--flap-to)); }
 }
 
-/* --- Falling from the top: snow (rain_controller.js) --- */
+/* --- Falling from the top: snow and hearts (rain_controller.js) --- */
 
 /* Behind the navigation and the player, unless a secret word called it: then above all. */
 .rain {
@@ -208,6 +208,23 @@
     border-radius: 50%;
     background: light-dark(#c3d0e0, #ffffff);
     box-shadow: 0 0 4px light-dark(rgb(120 140 170 / 40%), rgb(255 255 255 / 70%));
+}
+
+/* Hearts in the red of the favourites, a pink and a pale pink. */
+.drop--hearts {
+    overflow: visible;
+}
+
+.drop--heart-1 {
+    fill: var(--color-accent);
+}
+
+.drop--heart-2 {
+    fill: light-dark(#e0607e, #ec7f98);
+}
+
+.drop--heart-3 {
+    fill: light-dark(#f09ab0, #f5b3c4);
 }
 
 @media (prefers-reduced-motion: reduce) {

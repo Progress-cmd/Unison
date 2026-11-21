@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 // Things falling from the top of the screen (templates/base.html.twig): snow (secret word, and now
-// and then in December). Called by a secret word, they fall above everything for a few seconds;
+// and then in December) and hearts (secret word). Called by a secret word, they fall above everything for a few seconds;
 // December's snow stays behind the player and the navigation. Never clickable, nothing when the
 // system asks for less motion; with the tab hidden, it waits to be seen.
 const DECEMBER_FIRST = [30, 90];
@@ -11,10 +11,14 @@ const random = (min, max) => min + Math.random() * (max - min);
 
 const KINDS = {
     snow: { count: 46, duration: [9000, 14000], delay: 4500, size: [4, 9], sway: 26, spin: 0 },
+    hearts: { count: 38, duration: [6000, 9500], delay: 3000, size: [12, 24], sway: 34, spin: 22 },
 };
+const HEART_COLOURS = 3;
 
 export default class extends Controller
 {
+    static targets = ['heart'];
+
     connect()
     {
         if (!this.timer && new Date().getMonth() === 11) {
@@ -40,6 +44,11 @@ export default class extends Controller
     snow()
     {
         this.fall('snow');
+    }
+
+    hearts()
+    {
+        this.fall('hearts');
     }
 
     fall(kind, { above = true, count = KINDS[kind].count } = {})
@@ -86,6 +95,13 @@ export default class extends Controller
 
     create(kind)
     {
+        if (kind === 'hearts') {
+            const heart = this.heartTarget.content.firstElementChild.cloneNode(true);
+            heart.classList.add(`drop--heart-${1 + Math.floor(Math.random() * HEART_COLOURS)}`);
+
+            return heart;
+        }
+
         const drop = document.createElement('span');
         drop.className = `drop drop--${kind}`;
 

@@ -10,6 +10,14 @@ const WORDS = {
     papillons: 'unison:butterflies',
     neige: 'unison:snow',
     snow: 'unison:snow',
+    'cœur': 'unison:hearts',
+    'cœurs': 'unison:hearts',
+    coeur: 'unison:hearts',
+    coeurs: 'unison:hearts',
+    amour: 'unison:hearts',
+    love: 'unison:hearts',
+    heart: 'unison:hearts',
+    hearts: 'unison:hearts',
 };
 
 export default class extends Controller

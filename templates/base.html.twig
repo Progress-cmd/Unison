@@ -65,8 +65,12 @@
                 </svg>
             </div>
 
-            {# Snow and the like, falling from the top (rain_controller.js). #}
-            <div id="rain" class="rain" aria-hidden="true" data-turbo-permanent data-controller="rain" data-action="unison:snow@window->rain#snow"></div>
+            {# Snow and hearts, falling from the top (rain_controller.js). #}
+            <div id="rain" class="rain" aria-hidden="true" data-turbo-permanent data-controller="rain" data-action="unison:snow@window->rain#snow unison:hearts@window->rain#hearts">
+                <template data-rain-target="heart">
+                    <svg class="drop drop--hearts" viewBox="0 0 24 22" focusable="false"><path d="M12 21 C12 21 3.5 15.5 1.5 10.5 C0 6.6 2.4 2 6.8 2 C9.2 2 10.9 3.4 12 5.2 C13.1 3.4 14.8 2 17.2 2 C21.6 2 24 6.6 22.5 10.5 C20.5 15.5 12 21 12 21 Z"/></svg>
+                </template>
+            </div>
 
             {# Now and then, a butterfly (butterflies_controller.js). Kept from page to page, like
                the player, so the time between two goes on while browsing. #}
