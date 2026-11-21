@@ -72,6 +72,9 @@
                 </template>
             </div>
 
+            {# Fireflies: a secret word, or at night instead of the butterflies (fireflies_controller.js). #}
+            <div id="fireflies" class="fireflies" aria-hidden="true" data-turbo-permanent data-controller="fireflies" data-action="unison:fireflies@window->fireflies#glow"></div>
+
             {# Now and then, a butterfly (butterflies_controller.js). Kept from page to page, like
                the player, so the time between two goes on while browsing. #}
             <div id="butterflies" class="butterflies" aria-hidden="true" data-turbo-permanent data-controller="butterflies" data-action="unison:milestone@window->butterflies#swarm unison:butterflies@window->butterflies#swarm">

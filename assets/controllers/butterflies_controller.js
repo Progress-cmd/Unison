@@ -48,7 +48,15 @@ export default class extends Controller
             return;
         }
 
-        this.launch({ band: [0.12, 0.6], duration: random(11000, 16000) });
+        // At night, from 1 to 5 a.m., fireflies come instead (fireflies_controller.js).
+        const hour = new Date().getHours();
+
+        if (hour >= 1 && hour < 5) {
+            window.dispatchEvent(new CustomEvent('unison:fireflies', { detail: { night: true } }));
+        } else {
+            this.launch({ band: [0.12, 0.6], duration: random(11000, 16000) });
+        }
+
         this.schedule(NEXT);
     }
 

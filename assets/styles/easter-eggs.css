@@ -227,6 +227,43 @@
     fill: light-dark(#f09ab0, #f5b3c4);
 }
 
+/* --- Fireflies (fireflies_controller.js) --- */
+
+/* Behind the navigation and the player at night, above all when a secret word calls them. */
+.fireflies {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.fireflies.is-above {
+    z-index: 30;
+}
+
+/* A warm point of light with its halo, blinking softly. */
+.firefly {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 5px;
+    margin: -2.5px 0 0 -2.5px;
+    border-radius: 50%;
+    background: light-dark(#d4b106, #f5ff9e);
+    box-shadow:
+        0 0 6px 2px light-dark(rgb(212 177 6 / 55%), rgb(225 255 120 / 70%)),
+        0 0 16px 6px light-dark(rgb(240 200 40 / 25%), rgb(200 255 90 / 30%));
+    animation: firefly-blink var(--blink, 1.8s) ease-in-out var(--blink-delay, 0s) infinite alternate;
+    will-change: transform, opacity;
+}
+
+@keyframes firefly-blink {
+    from { filter: brightness(1); scale: 1; }
+    to { filter: brightness(0.35); scale: 0.6; }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .butterfly-wing {
         animation: none;
@@ -234,7 +271,8 @@
 
     .peekaboo,
     .butterflies,
-    .rain {
+    .rain,
+    .fireflies {
         display: none;
     }
 }

@@ -18,6 +18,10 @@ const WORDS = {
     love: 'unison:hearts',
     heart: 'unison:hearts',
     hearts: 'unison:hearts',
+    luciole: 'unison:fireflies',
+    lucioles: 'unison:fireflies',
+    firefly: 'unison:fireflies',
+    fireflies: 'unison:fireflies',
 };
 
 export default class extends Controller
