@@ -52,7 +52,7 @@ Reconstruction complète : `sudo docker compose build app`, puis base et reste c
    sudo gunzip -c /srv/data/unison/v1-final.sql.gz | grep -c '^INSERT INTO'   # doit afficher un nombre, pas 0
    sudo docker compose down
    sudo mv /srv/data/unison /srv/data/unison-v1
-   sudo mv /srv/stacks/unison/app /srv/stacks/unison/app-v1
+   sudo mv /srv/stacks/unison/app /srv/data/unison-v1/app        # hors de /srv/stacks : son Git ne doit pas le voir
    sudo cp /srv/secrets/unison.env /srv/secrets/unison-v1.env
    ```
 2. **Le code de la v2** : `git clone https://github.com/Progress-cmd/Unison.git /srv/stacks/unison/app`, puis `git -C /srv/stacks/unison/app checkout v2.23.0` (la première version qui contient ce dossier `deploy/`, ou une plus récente).
@@ -64,7 +64,7 @@ Reconstruction complète : `sudo docker compose build app`, puis base et reste c
 8. **Reprendre les données de la v1** : section suivante.
 9. **Commiter** : `git -C /srv/stacks add -A && git -C /srv/stacks commit -m "unison : v2"`. Dans `/srv/stacks/RESTORE.md`, le dépôt de l'appli devient `Progress-cmd/Unison`.
 
-Revenir à la v1 : `sudo docker compose down`, remettre `unison-v1` / `app-v1` / `unison-v1.env` à leur place et l'ancien `compose.yaml` (`git -C /srv/stacks checkout <commit> -- unison/compose.yaml`), puis `sudo docker compose up -d`.
+Revenir à la v1 : `sudo docker compose down`, puis remettre chaque chose à sa place : le code de la v2 mis de côté, `/srv/data/unison-v1/app` en `/srv/stacks/unison/app`, `/srv/data/unison-v1` en `/srv/data/unison`, `unison-v1.env` en `unison.env`, et l'ancien `compose.yaml` (`git -C /srv/stacks checkout <commit> -- unison/compose.yaml`). Enfin `sudo docker compose up -d`.
 
 ## Reprendre les données de la v1
 

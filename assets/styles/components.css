@@ -71,14 +71,16 @@
     display: flex;
     gap: 24px;
     margin-bottom: 24px;
-    border-bottom: 1px solid var(--color-border);
+    /* The grey line drawn inside the bar: the underline of the current tab covers it without
+       sticking out. A negative margin did, and the bar then scrolled by 1 px (arrows shown by
+       Chrome on Windows). */
+    box-shadow: inset 0 -1px 0 var(--color-border);
     overflow-x: auto;
 }
 
 .tabs a {
     flex: none;
     padding: 8px 0;
-    margin-bottom: -1px;
     border-bottom: 2px solid transparent;
     color: var(--color-text-muted);
     text-decoration: none;
@@ -268,6 +270,51 @@ dialog form[method="dialog"] button:hover {
     accent-color: var(--color-accent);
 }
 
+/* --- Segmented choice: radio buttons shown as one segmented button (theme, announcement type) --- */
+
+.segmented {
+    display: flex;
+    padding: 4px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+}
+
+/* The radio stays in the page (keyboard, screen readers) but is not drawn:
+   its label is the visible button. Also cancels the text-field look of .form input. */
+.segmented input[type="radio"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+}
+
+.segmented label {
+    flex: 1;
+    padding: 8px 0;
+    border-radius: 7px;
+    text-align: center;
+    font-size: 15px;
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+.segmented label:hover {
+    background: var(--color-accent-soft);
+}
+
+.segmented input:checked + label {
+    background: var(--color-accent);
+    color: white;
+}
+
+.segmented input:focus-visible + label {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
 /* --- Alerts --- */
 
 .alert {
@@ -339,4 +386,48 @@ dialog form[method="dialog"] button:hover {
 .login-back svg {
     width: 18px;
     height: 18px;
+}
+
+/* --- Announcement window (templates/shared/_announcement.html.twig) --- */
+
+/* Its type, small, above the title: what kind of news this is. */
+.announcement-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-accent);
+}
+
+.announcement-eyebrow svg {
+    width: 20px;
+    height: 20px;
+}
+
+dialog.announcement:focus {
+    outline: none;
+}
+
+dialog.announcement h2 {
+    margin-bottom: 12px;
+    overflow-wrap: anywhere;
+}
+
+/* Written in the administration as plain text: its line breaks are kept. */
+.announcement-content {
+    margin: 0 0 20px;
+    font-size: 15px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+}
+
+.announcement form {
+    margin: 0;
+}
+
+.announcement .btn {
+    width: 100%;
 }

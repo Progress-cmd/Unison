@@ -1,0 +1,29 @@
+{# The announcement this account hasn't seen yet (admin, Annonces tab), opened over the page by
+   announcement_controller.js. data-turbo-temporary: left out of Turbo's page cache, so going
+   back doesn't show it again once read. #}
+{% set announcement = pending_announcement() %}
+{% if announcement %}
+    <dialog
+        id="announcement"
+        class="announcement"
+        aria-labelledby="announcement-title"
+        {# Focusable, to take the focus on opening instead of its button (see connect()). #}
+        tabindex="-1"
+        data-turbo-temporary
+        data-controller="announcement"
+        data-action="cancel->announcement#dismiss"
+    >
+        <p class="announcement-eyebrow">
+            {{ ux_icon(announcement.kind.icon) }}
+            {{ announcement.kind.label }}
+        </p>
+        <h2 id="announcement-title">{{ announcement.title }}</h2>
+        {# Plain text: Twig escapes it, the CSS keeps its line breaks. #}
+        <p class="announcement-content">{{ announcement.content }}</p>
+
+        <form method="post" action="{{ path('app_announcement_seen', {id: announcement.id}) }}" data-announcement-target="form" data-action="submit->announcement#close">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('announcement_seen') }}">
+            <button type="submit" class="btn">J'ai compris</button>
+        </form>
+    </dialog>
+{% endif %}
