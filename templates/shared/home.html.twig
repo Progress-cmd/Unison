@@ -4,9 +4,20 @@
 
 {% block body %}
 {% set hour = 'now'|date('G') %}
+{# The day the account was created, a year or more ago (29 February: the 28th in other years). #}
+{% set created = app.user.createdAt %}
+{% set years = 'now'|date('Y') - created|date('Y') %}
+{% set birthday = created|date('m-d') == '02-29' and 'now'|date('L') == '0' ? '02-28' : created|date('m-d') %}
+{% set anniversary = years > 0 and birthday == 'now'|date('m-d') %}
 <div class="home">
-    <h1 class="home-greeting">{{ hour < 18 ? 'Bonjour' : 'Bonsoir'}}, <em>{{ app.user.username }}</em></h1>
-    <p class="home-subtitle">Que veux-tu écouter aujourd'hui ?</p>
+    {% if anniversary %}
+        {# A cloud of butterflies, once that day (anniversary_controller.js). #}
+        <h1 class="home-greeting" data-controller="anniversary">Joyeux anniversaire, <em>{{ app.user.username }}</em></h1>
+        <p class="home-subtitle">Déjà {{ years }} an{{ years > 1 ? 's' }} sur Unison ! Que veux-tu écouter aujourd'hui ?</p>
+    {% else %}
+        <h1 class="home-greeting">{{ hour < 18 ? 'Bonjour' : 'Bonsoir'}}, <em>{{ app.user.username }}</em></h1>
+        <p class="home-subtitle">Que veux-tu écouter aujourd'hui ?</p>
+    {% endif %}
 
     <div class="home-columns">
         <div class="home-main">
