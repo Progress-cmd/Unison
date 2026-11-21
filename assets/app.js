@@ -24,3 +24,4 @@ import './styles/account.css';
 import './styles/history.css';
 import './styles/charts.css';
 import './styles/admin.css';
+import './styles/easter-eggs.css';
