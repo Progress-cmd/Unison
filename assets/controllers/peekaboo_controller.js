@@ -34,7 +34,7 @@ export default class extends Controller
         this.timer = setTimeout(() => this.peek(), random(min, max) * 1000);
     }
 
-    peek()
+    peek(stay = random(2400, 3600))
     {
         if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
             return;
@@ -56,7 +56,7 @@ export default class extends Controller
         this.out = true;
         this.move(HIDDEN, OUT, 650, 'cubic-bezier(0.2, 0.9, 0.3, 1.2)');
 
-        this.backTimer = setTimeout(() => this.hide(), random(2400, 3600));
+        this.backTimer = setTimeout(() => this.hide(), stay);
     }
 
     // Called (five quick clicks on « Unison »): he comes out now, if he isn't already out.
@@ -65,6 +65,21 @@ export default class extends Controller
         if (!this.out) {
             clearTimeout(this.timer);
             this.peek();
+        }
+    }
+
+    // The same track five times in a row (player_controller.js): he comes out and nods along for
+    // a while. If he's already out, he starts nodding there.
+    groove()
+    {
+        this.element.classList.add('is-grooving');
+
+        if (this.out) {
+            clearTimeout(this.backTimer);
+            this.backTimer = setTimeout(() => this.hide(), 6000);
+        } else {
+            clearTimeout(this.timer);
+            this.peek(6000);
         }
     }
 
@@ -79,7 +94,7 @@ export default class extends Controller
         clearTimeout(this.backTimer);
         this.move(OUT, HIDDEN, event ? 180 : 500, 'ease-in')
             .finished.catch(() => {})
-            .finally(() => this.element.classList.remove('is-out'));
+            .finally(() => this.element.classList.remove('is-out', 'is-grooving'));
 
         this.schedule(NEXT);
     }

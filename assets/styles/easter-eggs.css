@@ -79,6 +79,21 @@
     animation: peekaboo-blink 0.24s ease-in-out 1.3s 2 alternate;
 }
 
+/* Five times the same track: he nods along, eyes closed, as long as he stays. */
+.peekaboo.is-grooving .peekaboo-head {
+    animation: peekaboo-nod 0.5s ease-in-out infinite alternate;
+}
+
+.peekaboo.is-grooving .peekaboo-eyes {
+    animation: none;
+    transform: scaleY(0.15);
+}
+
+@keyframes peekaboo-nod {
+    from { transform: rotate(8deg) translateY(0); }
+    to { transform: rotate(20deg) translateY(1.5px); }
+}
+
 @keyframes peekaboo-tilt {
     0%, 100% { transform: rotate(14deg); }
     35% { transform: rotate(4deg); }

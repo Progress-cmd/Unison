@@ -1093,6 +1093,17 @@ export default class extends Controller
 
     recordListen()
     {
+        // The same track listened to five times in a row: the little character comes and nods
+        // along (peekaboo_controller.js). Once per streak.
+        const id = this.queue[this.index].id;
+
+        this.streak = id === this.streakTrack ? this.streak + 1 : 1;
+        this.streakTrack = id;
+
+        if (this.streak === 5) {
+            window.dispatchEvent(new CustomEvent('unison:groove'));
+        }
+
         fetch(this.listenUrlValue, {
             method: 'POST',
             body: JSON.stringify({'track': this.queue[this.index].id, '_token': this.listenTokenValue}),
