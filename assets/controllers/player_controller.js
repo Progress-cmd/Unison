@@ -659,6 +659,8 @@ export default class extends Controller
         this.failures = 0;
 
         document.documentElement.dataset.currentUrl = track.url;
+        // A new track: the cover stops spinning (see vinyl()).
+        this.element.classList.remove('is-vinyl');
         // From memory when downloaded ahead, else streamed (the first track starts at once).
         this.audioTarget.src = this.sourceOf(track);
         this.coverTarget.src = track.cover;
@@ -1091,11 +1093,56 @@ export default class extends Controller
 
     recordListen()
     {
+        // The same track listened to five times in a row: the little character comes and nods
+        // along (peekaboo_controller.js). Once per streak.
+        const id = this.queue[this.index].id;
+
+        this.streak = id === this.streakTrack ? this.streak + 1 : 1;
+        this.streakTrack = id;
+
+        if (this.streak === 5) {
+            window.dispatchEvent(new CustomEvent('unison:groove'));
+        }
+
         fetch(this.listenUrlValue, {
             method: 'POST',
             body: JSON.stringify({'track': this.queue[this.index].id, '_token': this.listenTokenValue}),
             keepalive: true,
-        }).catch(() => {});
+        })
+            .then(response => response.status === 200 ? response.json() : null)
+            .then(data => data?.milestone && this.celebrate(data.milestone))
+            .catch(() => {});
+    }
+
+    // Secret word « vinyle » (magic_words_controller.js): the cover turns like a record while the
+    // music plays, until the next track. Opens the player on a phone, where the mini-player
+    // shows no cover.
+    vinyl()
+    {
+        if (this.queue.length === 0 || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            return;
+        }
+
+        this.element.classList.add('is-vinyl');
+
+        // The search sends the page away, which folds the player: open it once the results are there.
+        if (!matchMedia('(min-width: 1024px)').matches) {
+            document.addEventListener('turbo:load', () => this.setExpanded(true), { once: true });
+        }
+    }
+
+    // A new hundred hours of listening: a word, and a cloud of butterflies (butterflies_controller.js).
+    // With the tab hidden (music in the background), it waits to be seen.
+    celebrate(hours)
+    {
+        if (document.hidden) {
+            document.addEventListener('visibilitychange', () => this.celebrate(hours), { once: true });
+
+            return;
+        }
+
+        this.notify(`${hours} heures d'écoute !`);
+        window.dispatchEvent(new CustomEvent('unison:milestone', { detail: { hours } }));
     }
 
     restoreVolume()

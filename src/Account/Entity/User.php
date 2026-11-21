@@ -50,6 +50,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $disabledAt = null;
 
+    // The last hundred hours of listening celebrated with a cloud of butterflies (100, 200…).
+    #[ORM\Column(options: ['default' => 0])]
+    private int $listeningMilestone = 0;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -185,6 +189,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function enable(): static
     {
         $this->disabledAt = null;
+
+        return $this;
+    }
+
+    public function getListeningMilestone(): int
+    {
+        return $this->listeningMilestone;
+    }
+
+    public function setListeningMilestone(int $hours): static
+    {
+        $this->listeningMilestone = $hours;
 
         return $this;
     }

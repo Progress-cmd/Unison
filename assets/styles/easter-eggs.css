@@ -1,0 +1,312 @@
+/* Small surprises: the little character and the butterflies. Decoration only, never in the way,
+   and still when the system asks for less motion. */
+
+/* --- The little character peeking out of the sidebar (templates/base.html.twig) --- */
+
+/* Behind the sidebar (z-index 5) until he leans out; computer only. */
+.peekaboo {
+    display: none;
+}
+
+@media (min-width: 1024px) {
+    .peekaboo {
+        --skin: light-dark(#f3cdbb, #e2b29e);
+        position: fixed;
+        top: 50%;
+        left: var(--sidebar-width);
+        z-index: 4;
+        display: block;
+        width: 48px;
+        height: 48px;
+        transform: translateX(-100%);
+        /* Only out there can he be hovered (to send him back). */
+        pointer-events: none;
+    }
+
+    .peekaboo.is-out {
+        pointer-events: auto;
+    }
+}
+
+.peekaboo svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.peekaboo-skin {
+    fill: var(--skin);
+}
+
+.peekaboo-eyes {
+    fill: var(--color-text);
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+.peekaboo-line,
+.peekaboo-band {
+    fill: none;
+    stroke: var(--color-text);
+    stroke-linecap: round;
+}
+
+.peekaboo-line {
+    stroke-width: 1.6;
+}
+
+.peekaboo-band {
+    stroke-width: 2.4;
+}
+
+.peekaboo-cup {
+    fill: var(--color-accent);
+}
+
+/* Leaning out from the bottom left, as if around a corner; a little tilt of curiosity, a blink. */
+.peekaboo-head {
+    transform-box: view-box;
+    transform-origin: 14px 40px;
+    transform: rotate(14deg);
+}
+
+.peekaboo.is-out .peekaboo-head {
+    animation: peekaboo-tilt 2.4s ease-in-out 0.5s;
+}
+
+.peekaboo.is-out .peekaboo-eyes {
+    animation: peekaboo-blink 0.24s ease-in-out 1.3s 2 alternate;
+}
+
+/* Five times the same track: he nods along, eyes closed, as long as he stays. */
+.peekaboo.is-grooving .peekaboo-head {
+    animation: peekaboo-nod 0.5s ease-in-out infinite alternate;
+}
+
+.peekaboo.is-grooving .peekaboo-eyes {
+    animation: none;
+    transform: scaleY(0.15);
+}
+
+@keyframes peekaboo-nod {
+    from { transform: rotate(8deg) translateY(0); }
+    to { transform: rotate(20deg) translateY(1.5px); }
+}
+
+@keyframes peekaboo-tilt {
+    0%, 100% { transform: rotate(14deg); }
+    35% { transform: rotate(4deg); }
+    65% { transform: rotate(18deg); }
+}
+
+@keyframes peekaboo-blink {
+    from { transform: scaleY(1); }
+    to { transform: scaleY(0.1); }
+}
+
+/* --- Butterflies (templates/base.html.twig, butterflies_controller.js) --- */
+
+/* Behind the navigation and the player (z-index 5 and more), never catching a click. */
+.butterflies {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* The cloud of the 100 hours: above everything, for a few seconds. */
+.butterflies.is-swarming {
+    z-index: 30;
+}
+
+/* Seen from above, head up in the drawing; the flight turns it towards where it goes. */
+.butterfly {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 26px;
+    height: 22px;
+    margin: -11px 0 0 -13px;
+    perspective: 60px;
+    will-change: transform;
+}
+
+.butterfly-wing {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    animation: butterfly-flap var(--flap, 0.14s) ease-in-out infinite alternate;
+}
+
+.butterfly-wing svg,
+.butterfly-body {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Each wing beats around the body. */
+.butterfly-wing--left {
+    left: 0;
+    transform-origin: right center;
+    --flap-to: 72deg;
+}
+
+.butterfly-wing--right {
+    right: 0;
+    transform-origin: left center;
+    --flap-to: -72deg;
+}
+
+/* The right wing is the left one seen in a mirror. */
+.butterfly-wing--right svg {
+    transform: scaleX(-1);
+}
+
+/* A short glide: wings still, half open. */
+.butterfly.is-gliding .butterfly-wing {
+    animation-play-state: paused;
+}
+
+.butterfly-body {
+    position: absolute;
+    inset: 0;
+    fill: none;
+    stroke: light-dark(#3b2a22, #f1e6dc);
+    stroke-width: 1.3;
+    stroke-linecap: round;
+}
+
+.butterfly--1 .butterfly-wing {
+    fill: var(--color-accent);
+}
+
+.butterfly--2 .butterfly-wing {
+    fill: light-dark(#d9962b, #e3b25a);
+}
+
+.butterfly--3 .butterfly-wing {
+    fill: light-dark(#5a86b8, #86acd8);
+}
+
+@keyframes butterfly-flap {
+    from { transform: rotateY(0deg); }
+    to { transform: rotateY(var(--flap-to)); }
+}
+
+/* --- Falling from the top: snow and hearts (rain_controller.js) --- */
+
+/* Behind the navigation and the player, unless a secret word called it: then above all. */
+.rain {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.rain.is-above {
+    z-index: 30;
+}
+
+.drop {
+    position: absolute;
+    top: 0;
+    will-change: transform, opacity;
+}
+
+/* Soft round flakes: bluish grey on the light theme (white wouldn't show), white on the dark one. */
+.drop--snow {
+    border-radius: 50%;
+    background: light-dark(#c3d0e0, #ffffff);
+    box-shadow: 0 0 4px light-dark(rgb(120 140 170 / 40%), rgb(255 255 255 / 70%));
+}
+
+/* Hearts in the red of the favourites, a pink and a pale pink. */
+.drop--hearts {
+    overflow: visible;
+}
+
+.drop--heart-1 {
+    fill: var(--color-accent);
+}
+
+.drop--heart-2 {
+    fill: light-dark(#e0607e, #ec7f98);
+}
+
+.drop--heart-3 {
+    fill: light-dark(#f09ab0, #f5b3c4);
+}
+
+/* --- Fireflies (fireflies_controller.js) --- */
+
+/* Behind the navigation and the player at night, above all when a secret word calls them. */
+.fireflies {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.fireflies.is-above {
+    z-index: 30;
+}
+
+/* A warm point of light with its halo, blinking softly. */
+.firefly {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 5px;
+    margin: -2.5px 0 0 -2.5px;
+    border-radius: 50%;
+    background: light-dark(#d4b106, #f5ff9e);
+    box-shadow:
+        0 0 6px 2px light-dark(rgb(212 177 6 / 55%), rgb(225 255 120 / 70%)),
+        0 0 16px 6px light-dark(rgb(240 200 40 / 25%), rgb(200 255 90 / 30%));
+    animation: firefly-blink var(--blink, 1.8s) ease-in-out var(--blink-delay, 0s) infinite alternate;
+    will-change: transform, opacity;
+}
+
+@keyframes firefly-blink {
+    from { filter: brightness(1); scale: 1; }
+    to { filter: brightness(0.35); scale: 0.6; }
+}
+
+/* --- « vinyle »: the cover of the player turns like a record (player_controller.js#vinyl) --- */
+
+/* Round, with the label hole, turning at 33 rpm while the music plays. */
+.player.is-vinyl .track-cover {
+    border-radius: 50%;
+    mask: radial-gradient(circle, transparent 0 5%, #000 5.5%);
+    animation: vinyl-spin 1.8s linear infinite;
+    animation-play-state: paused;
+}
+
+.player.is-vinyl.is-playing .track-cover {
+    animation-play-state: running;
+}
+
+@keyframes vinyl-spin {
+    to { rotate: 1turn; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .butterfly-wing,
+    .player.is-vinyl .track-cover {
+        animation: none;
+    }
+
+    .peekaboo,
+    .butterflies,
+    .rain,
+    .fireflies {
+        display: none;
+    }
+}

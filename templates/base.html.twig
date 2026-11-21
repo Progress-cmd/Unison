@@ -42,6 +42,55 @@
             {% include 'playlist/_picker_dialog.html.twig' %}
             {% include 'shared/_track_options.html.twig' %}
             {% include 'shared/_announcement.html.twig' %}
+            {# Now and then, the little character peeks out from behind the sidebar (computer only,
+               peekaboo_controller.js); kept from page to page like the butterflies below. #}
+            <div id="peekaboo" class="peekaboo" aria-hidden="true" data-turbo-permanent data-controller="peekaboo" data-action="mouseenter->peekaboo#hide unison:peek@window->peekaboo#peekNow unison:groove@window->peekaboo#groove">
+                <svg viewBox="0 0 48 48" focusable="false">
+                    <g class="peekaboo-head">
+                        <circle class="peekaboo-skin" cx="24" cy="23" r="12"/>
+                        <g class="peekaboo-eyes">
+                            <circle cx="24" cy="21.5" r="1.5"/>
+                            <circle cx="30.5" cy="21.5" r="1.5"/>
+                        </g>
+                        <path class="peekaboo-line" d="M24.5 27 Q28 29.5 31.5 26.5"/>
+                        <path class="peekaboo-band" d="M12.5 22 A11.8 11.8 0 0 1 35.5 22"/>
+                        <rect class="peekaboo-cup" x="33" y="18" width="5" height="9.5" rx="2.5"/>
+                    </g>
+                    {# The hand holding the edge of the sidebar. #}
+                    <g class="peekaboo-hand">
+                        <circle class="peekaboo-skin" cx="22.5" cy="36" r="2.2"/>
+                        <circle class="peekaboo-skin" cx="22.5" cy="39.6" r="2.2"/>
+                        <circle class="peekaboo-skin" cx="22.5" cy="43.2" r="2.2"/>
+                    </g>
+                </svg>
+            </div>
+
+            {# Snow and hearts, falling from the top (rain_controller.js). #}
+            <div id="rain" class="rain" aria-hidden="true" data-turbo-permanent data-controller="rain" data-action="unison:snow@window->rain#snow unison:hearts@window->rain#hearts">
+                <template data-rain-target="heart">
+                    <svg class="drop drop--hearts" viewBox="0 0 24 22" focusable="false"><path d="M12 21 C12 21 3.5 15.5 1.5 10.5 C0 6.6 2.4 2 6.8 2 C9.2 2 10.9 3.4 12 5.2 C13.1 3.4 14.8 2 17.2 2 C21.6 2 24 6.6 22.5 10.5 C20.5 15.5 12 21 12 21 Z"/></svg>
+                </template>
+            </div>
+
+            {# Fireflies: a secret word, or at night instead of the butterflies (fireflies_controller.js). #}
+            <div id="fireflies" class="fireflies" aria-hidden="true" data-turbo-permanent data-controller="fireflies" data-action="unison:fireflies@window->fireflies#glow"></div>
+
+            {# Now and then, a butterfly (butterflies_controller.js). Kept from page to page, like
+               the player, so the time between two goes on while browsing. #}
+            <div id="butterflies" class="butterflies" aria-hidden="true" data-turbo-permanent data-controller="butterflies" data-action="unison:milestone@window->butterflies#swarm unison:butterflies@window->butterflies#swarm">
+                <template data-butterflies-target="template">
+                    {# Seen from above, head forward: two wings that beat in relief on either side of the body. #}
+                    <span class="butterfly">
+                        <span class="butterfly-wing butterfly-wing--left">
+                            <svg viewBox="0 0 12 20" focusable="false"><path d="M12 9 C7 0 0 1 1 6 C2 10 7 11 12 10 Z"/><path d="M12 10.5 C8 12 2 15 4 18 C6 20 10 15 12 11.5 Z"/></svg>
+                        </span>
+                        <span class="butterfly-wing butterfly-wing--right">
+                            <svg viewBox="0 0 12 20" focusable="false"><path d="M12 9 C7 0 0 1 1 6 C2 10 7 11 12 10 Z"/><path d="M12 10.5 C8 12 2 15 4 18 C6 20 10 15 12 11.5 Z"/></svg>
+                        </span>
+                        <svg class="butterfly-body" viewBox="0 0 24 20" focusable="false"><path d="M12 5 L12 16"/><path d="M12 5.5 Q11 2.5 9.5 1.2 M12 5.5 Q13 2.5 14.5 1.2"/></svg>
+                    </span>
+                </template>
+            </div>
         {% endif %}
     </body>
 </html>

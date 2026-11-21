@@ -1,5 +1,6 @@
 <nav class="navbar">
-    <div class="nav-brand desktop-only">Unison</div>
+    {# Five quick clicks: the little character peeks out at once (secret_clicks_controller.js). #}
+    <div class="nav-brand desktop-only" data-controller="secret-clicks" data-secret-clicks-event-value="unison:peek" data-action="click->secret-clicks#count">Unison</div>
     <a class="nav-item" aria-current="{{ section == 'home' ? 'page' : 'false' }}" href="{{ path('app_home') }}">
         {{ ux_icon('material-symbols:home' ~ (section == 'home' ? '' : '-outline' )) }}
         <span class="nav-label">Accueil</span>
