@@ -76,6 +76,16 @@ class YtDlpClient
         private readonly int $rateLimitPause = 15 * 60,
     ) {}
 
+    // The version installed: its date (2026.10.26). Null if yt-dlp doesn't answer.
+    public function version(): ?string
+    {
+        $process = new Process(['yt-dlp', '--version']);
+        $process->setTimeout(10);
+        $process->run();
+
+        return $process->isSuccessful() ? trim($process->getOutput()) : null;
+    }
+
     public function fetchMetadata(string $url): array
     {
         $output = $this->run([
