@@ -221,6 +221,11 @@
     }
 }
 
+/* Same space under it as under a group: on a phone its last figure sits right above the next heading. */
+.admin-columns {
+    margin-bottom: 24px;
+}
+
 /* Large screen: the imports card on the left, the two remaining figures stacked on the right. */
 @media (min-width: 1024px) {
     .admin-columns {
