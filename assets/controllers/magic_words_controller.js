@@ -22,6 +22,9 @@ const WORDS = {
     lucioles: 'unison:fireflies',
     firefly: 'unison:fireflies',
     fireflies: 'unison:fireflies',
+    vinyle: 'unison:vinyl',
+    vinyles: 'unison:vinyl',
+    vinyl: 'unison:vinyl',
 };
 
 export default class extends Controller

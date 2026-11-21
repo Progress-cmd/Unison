@@ -264,8 +264,27 @@
     to { filter: brightness(0.35); scale: 0.6; }
 }
 
+/* --- « vinyle »: the cover of the player turns like a record (player_controller.js#vinyl) --- */
+
+/* Round, with the label hole, turning at 33 rpm while the music plays. */
+.player.is-vinyl .track-cover {
+    border-radius: 50%;
+    mask: radial-gradient(circle, transparent 0 5%, #000 5.5%);
+    animation: vinyl-spin 1.8s linear infinite;
+    animation-play-state: paused;
+}
+
+.player.is-vinyl.is-playing .track-cover {
+    animation-play-state: running;
+}
+
+@keyframes vinyl-spin {
+    to { rotate: 1turn; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .butterfly-wing {
+    .butterfly-wing,
+    .player.is-vinyl .track-cover {
         animation: none;
     }
 
