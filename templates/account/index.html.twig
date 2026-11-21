@@ -11,18 +11,21 @@
     <p class="account-email">{{ app.user.email }}</p>
 </div>
 
+{# Figures and history have their own page; here, the way to it. #}
 <section class="account-section">
-    <div class="account-section-header">
-        <h2>Écoutes récentes</h2>
-        <a href="{{ path('app_history') }}">Voir tout</a>
-    </div>
-    <ul class="track-list" data-controller="track-list" data-action="player:change@window->track-list#highlight">
-        {% for listen in recentListens %}
-            {% include 'library/_track.html.twig' with {track: listen.track} %}
-        {% else %}
-            <li>Aucune écoute pour l'instant.</li>
-        {% endfor %}
-    </ul>
+    <a class="account-link" href="{{ path('app_history') }}">
+        {{ ux_icon('material-symbols:bar-chart-rounded', {class: 'account-link-icon'}) }}
+        <span class="account-link-text">
+            <strong>Mes écoutes</strong>
+            {% if nbListens > 0 %}
+                {{ nbListens|number_format(0, ',', ' ') }} écoute{{ nbListens > 1 ? 's' }},
+                {{ listenedSeconds // 3600 }} h {{ '%02d'|format(listenedSeconds % 3600 // 60) }} de musique · statistiques et historique
+            {% else %}
+                Statistiques et historique, dès ta première écoute
+            {% endif %}
+        </span>
+        {{ ux_icon('material-symbols:chevron-right', {class: 'account-link-arrow'}) }}
+    </a>
 </section>
 
 <section class="account-section">

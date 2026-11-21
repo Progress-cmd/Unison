@@ -1,0 +1,336 @@
+/* Figures, charts and rankings: the admin dashboard and the « Mes écoutes » page. */
+
+/* --- Figures: one card per number --- */
+
+/* Phone: two per row. Wider: four on one row (three with .stat-grid--three). */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 0;
+}
+
+.stat {
+    padding: 16px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+}
+
+.stat dt {
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.stat dd {
+    margin: 6px 0 0;
+    font-family: var(--serif);
+    font-size: 34px;
+    font-weight: 500;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+/* The "h" of "4h57": smaller, so the hours and minutes read first. */
+.stat dd small {
+    margin: 0 2px;
+    font-size: 0.55em;
+    color: var(--color-text-muted);
+}
+
+.stat-note {
+    margin: 8px 0 0;
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+.stat-note-warning {
+    color: var(--color-warning);
+    font-weight: 600;
+}
+
+/* Phone: the search card takes the whole row under the two side figures. */
+.stat--wide {
+    grid-column: 1 / -1;
+}
+
+/* --- Charts and rankings (templates/shared/_charts.html.twig) --- */
+
+/* A card holding a chart or a ranking. */
+.chart-card {
+    padding: 16px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+}
+
+/* Under a row of figures. */
+.stat-grid + .chart-grid {
+    margin-top: 12px;
+}
+
+.chart-grid {
+    display: grid;
+    /* minmax(0, …): a column never grows to its content (a long track row would push the page
+       wider than the phone). */
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+}
+
+.chart-title {
+    margin: 0;
+    /* Also when it's an h2, which has the serif font. */
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.chart-subtitle {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+/* Room above the plot for the highest value, written over its line. */
+.chart {
+    margin-top: 28px;
+}
+
+/* The drawing area: a hairline on top (the highest value) and the baseline at the bottom. */
+.chart-plot {
+    position: relative;
+    height: 140px;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.chart-max {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    padding-bottom: 2px;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.chart-columns {
+    display: flex;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Each column takes its share of the width and the whole height: it's the hover target,
+   much bigger than the bar. The side padding makes the 2 px gap between bars. */
+.chart-column {
+    display: flex;
+    flex: 1 1 0;
+    align-items: flex-end;
+    justify-content: center;
+    min-width: 0;
+    padding: 0 1px;
+}
+
+/* Thin, rounded at the top, square on the baseline. min-height: a single listen still shows. */
+.chart-bar {
+    width: 100%;
+    max-width: 24px;
+    min-height: 2px;
+    background: var(--color-accent);
+    border-radius: 4px 4px 0 0;
+    transition: background-color 0.15s ease;
+}
+
+.chart-column.is-active .chart-bar {
+    background: var(--color-accent-hover);
+}
+
+/* Value first, then the period: the reader knows which column, they want the number. */
+.chart-tooltip {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 6px 10px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgb(0 0 0 / 12%);
+    font-size: 12px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+/* display: flex above would otherwise win over the hidden attribute. */
+.chart-tooltip[hidden] {
+    display: none;
+}
+
+.chart-tooltip strong {
+    font-size: 14px;
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Labels under the columns, one slot per column; a label may spill over its empty neighbours. */
+.chart-axis {
+    display: flex;
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.chart-axis li {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: visible;
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* Phone: fewer labels, so they don't run into each other. */
+@media (max-width: 639px) {
+    .chart-axis-wide {
+        visibility: hidden;
+    }
+}
+
+/* The numbers of the chart, for whoever can't or won't hover. */
+.chart-table {
+    margin-top: 12px;
+    font-size: 13px;
+}
+
+.chart-table summary {
+    width: fit-content;
+    color: var(--color-text-muted);
+    cursor: pointer;
+}
+
+.chart-table summary:hover {
+    color: var(--color-text);
+}
+
+.chart-table table {
+    width: 100%;
+    margin-top: 8px;
+    border-collapse: collapse;
+}
+
+.chart-table th,
+.chart-table td {
+    padding: 4px 0;
+    border-bottom: 1px solid var(--color-border);
+    font-weight: 400;
+    text-align: left;
+}
+
+.chart-table td {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.chart-empty {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 16px 0 0;
+    font-size: 14px;
+    color: var(--color-text-muted);
+}
+
+.chart-empty svg {
+    flex: none;
+    width: 20px;
+    height: 20px;
+}
+
+/* Rankings: the name and its number on one line, a thin bar under them. */
+.ranking {
+    display: grid;
+    gap: 12px;
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ranking-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 4px 12px;
+}
+
+.ranking-name {
+    overflow: hidden;
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ranking-name a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.ranking-name a:hover {
+    text-decoration: underline;
+}
+
+.ranking-name small {
+    margin-left: 6px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+.ranking-value {
+    font-size: 14px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.ranking-track {
+    grid-column: 1 / -1;
+    height: 6px;
+}
+
+/* Square at its start, rounded at the end it grows to. */
+.ranking-bar {
+    display: block;
+    height: 100%;
+    min-width: 2px;
+    background: var(--color-accent);
+    border-radius: 0 4px 4px 0;
+}
+
+@media (min-width: 640px) {
+    .stat-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .stat-grid--three {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .stat--wide {
+        grid-column: auto;
+    }
+}
+
+@media (min-width: 1024px) {
+    .chart-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .chart-grid--three {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}

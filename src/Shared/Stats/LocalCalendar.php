@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Stats;
+namespace App\Shared\Stats;
 
 // Turns counts per hour, stored in UTC like every date of the application, into the series the
 // dashboard draws, in French local time (as the dates Twig shows, config/packages/twig.yaml):
@@ -13,6 +13,12 @@ final class LocalCalendar
 
     private const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
     private const SHORT_MONTHS = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+    private const DAYS = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+    private const SHORT_DAYS = ['lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.', 'dim.'];
+
+    // The four moments of « Mes écoutes »: with a few dozen listens, 24 columns show only noise,
+    // « mostly in the evening » shows at once. Name, first hour, last hour + 1.
+    private const MOMENTS = [['Nuit', 0, 6], ['Matin', 6, 12], ['Après-midi', 12, 18], ['Soir', 18, 24]];
 
     private \DateTimeZone $zone;
 
@@ -36,9 +42,11 @@ final class LocalCalendar
     /**
      * @param array<string, int> $hourly UTC hour ('Y-m-d H:00:00') => count
      *
+     * @param bool $weekdays labels by day name (lun., mar.…) rather than date: for a week
+     *
      * @return list<array{label: string, title: string, value: int}>
      */
-    public function lastDays(array $hourly, int $days): array
+    public function lastDays(array $hourly, int $days, bool $weekdays = false): array
     {
         $totals = $this->fold($hourly, 'Y-m-d');
         $day = new \DateTimeImmutable('today', $this->zone);
@@ -46,9 +54,10 @@ final class LocalCalendar
 
         for ($i = $days - 1; $i >= 0; --$i) {
             $date = $day->modify(sprintf('-%d days', $i));
+            $weekday = $date->format('N') - 1;
             $series[] = [
-                'label' => $date->format('d/m'),
-                'title' => sprintf('%d %s', $date->format('j'), self::MONTHS[$date->format('n') - 1]),
+                'label' => $weekdays ? self::SHORT_DAYS[$weekday] : $date->format('d/m'),
+                'title' => sprintf('%s%d %s', $weekdays ? self::DAYS[$weekday].' ' : '', $date->format('j'), self::MONTHS[$date->format('n') - 1]),
                 'value' => $totals[$date->format('Y-m-d')] ?? 0,
             ];
         }
@@ -75,6 +84,24 @@ final class LocalCalendar
         }
 
         return $series;
+    }
+
+    /**
+     * The listens of the four moments of the day, in that order (night first).
+     *
+     * @param array<string, int> $hourly UTC hour ('Y-m-d H:00:00') => count
+     *
+     * @return list<array{name: string, detail: string, value: int}>
+     */
+    public function moments(array $hourly): array
+    {
+        $totals = $this->fold($hourly, 'G');
+
+        return array_map(fn (array $moment) => [
+            'name' => $moment[0],
+            'detail' => sprintf('%d h – %d h', $moment[1], $moment[2]),
+            'value' => array_sum(array_map(fn (int $hour) => $totals[(string) $hour] ?? 0, range($moment[1], $moment[2] - 1))),
+        ], self::MOMENTS);
     }
 
     /**

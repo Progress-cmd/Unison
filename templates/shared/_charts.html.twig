@@ -1,7 +1,7 @@
 {# Charts of the dashboard, drawn in HTML and CSS (no library), animated by chart_controller.js.
    One series each, in the accent colour: the title above says what is drawn. #}
 
-{# Columns over time: series = [{label, title, value}] (App\Admin\Stats\LocalCalendar).
+{# Columns over time: series = [{label, title, value}] (App\Shared\Stats\LocalCalendar).
    labelEvery: one axis label every N columns; phoneLabelEvery: the same on a phone. #}
 {% macro columns(series, singular, plural, labelEvery = 1, phoneLabelEvery = null) %}
     {% set max = max(series|map(point => point.value)) %}
@@ -51,21 +51,22 @@
     {% endif %}
 {% endmacro %}
 
-{# A ranking: rows = [{name, detail (optional), value}], highest first. The value is written on
-   each row: a ranking is read as numbers. #}
+{# A ranking: rows = [{name, detail (optional), url (optional), value}], usually highest first; the
+   bars are measured against the highest value wherever it is (the moments of the day keep the
+   order of the day). The value is written on each row: a ranking is read as numbers. #}
 {% macro ranking(rows, empty) %}
-    {% if rows is empty or rows|first.value == 0 %}
+    {% set max = rows is empty ? 0 : max(rows|map(row => row.value)) %}
+    {% if max == 0 %}
         <p class="chart-empty">
             {{ ux_icon('material-symbols:query-stats') }}
             {{ empty }}
         </p>
     {% else %}
-        {% set max = rows|first.value %}
         <ol class="ranking">
             {% for row in rows %}
                 <li class="ranking-item">
                     <span class="ranking-name">
-                        {{ row.name }}
+                        {% if row.url ?? null %}<a href="{{ row.url }}">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}
                         {% if row.detail ?? null %}<small>{{ row.detail }}</small>{% endif %}
                     </span>
                     <span class="ranking-value">{{ row.value|number_format(0, ',', ' ') }}</span>

@@ -13,3 +13,25 @@
 .track-list > li.history-day:first-child {
     padding-top: 0;
 }
+
+/* --- « Mes écoutes »: the figures above the history --- */
+
+.listens-section {
+    margin-bottom: 32px;
+}
+
+.listens-section .chart-grid {
+    margin-top: 12px;
+}
+
+/* The top tracks: the usual rows, inside their card. */
+.listens-top {
+    margin-top: 10px;
+}
+
+.listens-history-title {
+    margin: 0 0 12px;
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 500;
+}

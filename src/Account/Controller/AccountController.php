@@ -7,7 +7,6 @@ use App\Account\Form\AccountType;
 use App\Account\Form\ChangePasswordType;
 use App\Account\Form\ThemeType;
 use App\History\Repository\ListenRepository;
-use App\Library\Repository\FavoriteTrackRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,7 +18,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 final class AccountController extends AbstractController
 {
     #[Route('/account', name: 'app_account')]
-    public function index(#[CurrentUser] User $user, Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher, ListenRepository $listenRepository, FavoriteTrackRepository $favoriteTrackRepository): Response
+    public function index(#[CurrentUser] User $user, Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher, ListenRepository $listenRepository): Response
     {
         $accountForm = $this->createForm(AccountType::class, $user);
         $passwordForm = $this->createForm(ChangePasswordType::class);
@@ -65,8 +64,9 @@ final class AccountController extends AbstractController
             'accountForm' => $accountForm,
             'passwordForm' => $passwordForm,
             'themeForm' => $themeForm,
-            'recentListens' => $listenRepository->findRecent($user, 5),
-            'favoriteIds' => $favoriteTrackRepository->findTrackIds($user),
+            // The link to « Mes écoutes ».
+            'nbListens' => $listenRepository->count(['user' => $user]),
+            'listenedSeconds' => $listenRepository->listenedSeconds(null, $user),
         ]);
     }
 }
