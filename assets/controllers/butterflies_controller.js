@@ -52,7 +52,8 @@ export default class extends Controller
         this.schedule(NEXT);
     }
 
-    // A cloud of butterflies across the whole screen (100 hours of listening: player_controller.js).
+    // A cloud of butterflies across the whole screen (100 hours of listening: player_controller.js;
+    // a secret word of the search bar: magic_words_controller.js).
     // Above everything for once, still unclickable; waits for the tab to be seen.
     swarm()
     {

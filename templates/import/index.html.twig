@@ -12,9 +12,9 @@
 
 <div class="import-layout">
     <div class="import-main">
-        <form class="search-bar" action="{{ path('app_import') }}" method="get" role="search">
+        <form class="search-bar" action="{{ path('app_import') }}" method="get" role="search" data-controller="magic-words" data-action="submit->magic-words#check">
             {{ ux_icon('material-symbols:search', {class: 'search-bar-icon'}) }}
-            <input type="search" name="q" value="{{ q }}" placeholder="Titre ou artiste" aria-label="Rechercher" autocomplete="off" enterkeyhint="search">
+            <input type="search" name="q" value="{{ q }}" placeholder="Titre ou artiste" aria-label="Rechercher" autocomplete="off" enterkeyhint="search" data-magic-words-target="input">
             <button type="submit" class="search-bar-submit" aria-label="Rechercher">
                 {{ ux_icon('material-symbols:arrow-forward') }}
             </button>
