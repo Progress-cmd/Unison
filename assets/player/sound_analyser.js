@@ -45,7 +45,8 @@ export default class SoundAnalyser
             this.audio.addEventListener('playing', () => this.listen());
             this.listen();
         } else {
-            // No copy possible (Firefox): the old way, the sound goes through the analyser to the speakers.
+            // No copy possible (Firefox before 149, Safari): the old way, the sound goes through the
+            // analyser to the speakers. The audio output can't be chosen then (audio_settings_controller.js).
             const source = this.context.createMediaElementSource(this.audio);
 
             source.connect(this.analyser);
