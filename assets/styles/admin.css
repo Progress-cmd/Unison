@@ -1045,3 +1045,143 @@ a.error-context:hover {
         white-space: nowrap;
     }
 }
+
+/* --- Announcements page: the form, then one card per announcement --- */
+
+.announcement-form {
+    margin-bottom: 24px;
+}
+
+.announcement-form-intro {
+    margin: -8px 0 16px;
+}
+
+/* The heading of the list, under the form. */
+.announcement-heading {
+    margin-top: 0;
+}
+
+.announcement-list {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.announcement-item {
+    padding: 14px 16px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+}
+
+/* Withdrawn: still there to put back, but clearly out of play. */
+.announcement-item.is-withdrawn {
+    background: transparent;
+    border-style: dashed;
+}
+
+.announcement-item.is-withdrawn .announcement-item-title,
+.announcement-item.is-withdrawn .announcement-item-content {
+    color: var(--color-text-muted);
+}
+
+/* Type on the left, date pushed to the right; they wrap on a very narrow screen. */
+.announcement-item-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+}
+
+.announcement-kind {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.announcement-kind svg {
+    width: 18px;
+    height: 18px;
+    color: var(--color-accent);
+}
+
+.announcement-date {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.announcement-item-title {
+    margin: 10px 0 0;
+    font-size: 16px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+/* The message as the accounts read it: line breaks kept. */
+.announcement-item-content {
+    margin: 8px 0 0;
+    padding: 10px 12px;
+    background: var(--color-bg);
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+}
+
+/* "Vue par" on the left, the buttons on the right; the buttons go under it on a phone. */
+.announcement-item-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 12px;
+    margin-top: 12px;
+}
+
+.announcement-views {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.announcement-views svg {
+    width: 18px;
+    height: 18px;
+}
+
+.announcement-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.announcement-actions form {
+    margin: 0;
+}
+
+.announcement-actions .error-action:hover {
+    background: var(--color-accent-soft);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+.announcement-actions .announcement-action--delete:hover {
+    background: var(--color-error-bg);
+    border-color: var(--color-error);
+    color: var(--color-error);
+}
+
+.announcement-empty svg {
+    color: var(--color-text-muted);
+}

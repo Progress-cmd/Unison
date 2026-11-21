@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - Annonces{% endblock %}
+
+{% block section %}admin{% endblock %}
+
+{% block body %}
+<header class="admin-header">
+    <h1>Administration</h1>
+    <p class="admin-subtitle">Un message montré une fois à chaque compte, à sa prochaine page.</p>
+</header>
+{% include 'admin/_tabs.html.twig' with {active: 'announcements'} %}
+
+<section class="admin-card content-form announcement-form" aria-labelledby="announcement-form-title">
+    <h2 class="content-form-title" id="announcement-form-title">Nouvelle annonce</h2>
+    <p class="help-text announcement-form-intro">
+        Une fois lue, elle ne revient pas, même retirée puis remise. Un compte créé après sa publication ne la voit pas.
+    </p>
+
+    {{ form_start(form, {attr: {class: 'form'}}) }}
+        {{ form_row(form.kind, {attr: {class: 'segmented'}}) }}
+        {{ form_row(form.title) }}
+        {{ form_row(form.content) }}
+
+        <div class="content-form-actions">
+            <button type="submit" class="btn">Publier</button>
+        </div>
+    {{ form_end(form) }}
+</section>
+
+<h2 class="admin-heading announcement-heading">
+    Annonces
+    <span class="admin-count">{{ rows|length }}</span>
+</h2>
+
+<ul class="announcement-list">
+    {% for row in rows %}
+        {% set announcement = row[0] %}
+        <li class="announcement-item{{ announcement.active ? '' : ' is-withdrawn' }}">
+            <div class="announcement-item-head">
+                <span class="announcement-kind">
+                    {{ ux_icon(announcement.kind.icon) }}
+                    {{ announcement.kind.label }}
+                </span>
+                {% if not announcement.active %}
+                    <span class="account-badge account-badge--off">Retirée</span>
+                {% endif %}
+                <time class="announcement-date" datetime="{{ announcement.createdAt|date('c') }}">{{ announcement.createdAt|date('d/m/Y à H:i') }}</time>
+            </div>
+
+            <h3 class="announcement-item-title">{{ announcement.title }}</h3>
+            <p class="announcement-item-content">{{ announcement.content }}</p>
+
+            <div class="announcement-item-foot">
+                {# Accounts still enabled that existed when it was published. #}
+                <span class="announcement-views">
+                    {{ ux_icon('material-symbols:visibility-outline') }}
+                    Vue par {{ row.views }} / {{ row.recipients }}
+                </span>
+
+                <div class="announcement-actions">
+                    <form method="post" action="{{ path('app_admin_announcements_toggle', {id: announcement.id}) }}">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('announcement_toggle') }}">
+                        <button type="submit" class="error-action">
+                            {% if announcement.active %}
+                                {{ ux_icon('material-symbols:visibility-off-outline') }}
+                                Retirer
+                            {% else %}
+                                {{ ux_icon('material-symbols:visibility-outline') }}
+                                Remettre
+                            {% endif %}
+                        </button>
+                    </form>
+                    <form method="post" action="{{ path('app_admin_announcements_delete', {id: announcement.id}) }}" data-turbo-confirm="Supprimer « {{ announcement.title }} » ? Publiée de nouveau, elle s'afficherait à tout le monde.">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('announcement_delete') }}">
+                        <button type="submit" class="error-action announcement-action--delete">
+                            {{ ux_icon('material-symbols:delete-outline') }}
+                            Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </li>
+    {% else %}
+        <li class="error-empty announcement-empty">
+            {{ ux_icon('material-symbols:campaign-outline') }}
+            Aucune annonce pour le moment.
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}
