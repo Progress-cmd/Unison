@@ -1,5 +1,5 @@
 # Trois étapes :
-#   base       : PHP, Apache, ffmpeg, yt-dlp, communs au dev et à la prod
+#   base       : PHP, Apache, ffmpeg, communs au dev et à la prod
 #   dev        : ton conteneur de travail (code monté depuis le PC, Composer)
 #   production : l'image du serveur (code copié dedans, dépendances sans les outils de dev)
 # compose.yaml (dev) construit la cible « dev » ; deploy/compose.yaml (serveur) la cible « production ».
@@ -18,11 +18,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       ffmpeg python3 quickjs curl \
  && docker-php-ext-install pdo_mysql intl zip \
  && rm -rf /var/lib/apt/lists/*
-
-# on prend la release GitHub plutôt que le paquet Debian, parce que yt-dlp doit suivre les changements de YouTube de très près.
-RUN curl -fL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
-    -o /usr/local/bin/yt-dlp \
-    && chmod +x /usr/local/bin/yt-dlp
 
 # La racine web est public/ : le reste du projet n'est jamais servi en HTTP.
 # FallbackResource envoie toute URL qui n'est pas un fichier vers index.php,
@@ -48,6 +43,9 @@ ARG GID=1000
 
 # Apache tourne sous l'identité de ton utilisateur.
 RUN groupmod -g ${GID} www-data && usermod -u ${UID} www-data
+
+# yt-dlp : voir la même ligne en bas de la cible production.
+ADD --chmod=755 https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp /usr/local/bin/yt-dlp
 
 
 FROM base AS production
@@ -86,6 +84,12 @@ RUN printf 'APP_ENV=prod\nDEFAULT_URI=https://unison.pi5.ovh\nMUSIC_DIR=/data/mu
 
 COPY docker/entrypoint.sh /usr/local/bin/unison-entrypoint
 RUN chmod +x /usr/local/bin/unison-entrypoint
+
+# yt-dlp, la dernière version de GitHub (pas le paquet Debian : il doit suivre les changements de
+# YouTube de très près). Avec ADD, Docker revérifie le fichier à chaque construction et le reprend
+# dès qu'une version est sortie ; avec un RUN curl, il gardait en cache la première téléchargée.
+# En dernier : une nouvelle version ne refait que cette étape.
+ADD --chmod=755 https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp /usr/local/bin/yt-dlp
 
 ENTRYPOINT ["unison-entrypoint"]
 CMD ["apache2-foreground"]

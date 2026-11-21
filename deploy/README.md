@@ -21,7 +21,14 @@
 
 ## Mettre à jour
 
-L'image se **reconstruit** sur place depuis `./app` (cible `production` du `Dockerfile`). Au démarrage, `unison-app` applique seul les migrations de la base.
+| Ce qui change | Commande |
+| --- | --- |
+| **Unison** (nouvelle version, un tag) | `checkout` du tag, puis `sudo update.sh unison --build` |
+| **yt-dlp** (l'onglet Maintenance donne sa version et son âge) | `sudo update.sh unison --build`, sans changer de tag |
+| **Le compose seul** (variables, Traefik, limites) | `sudo update.sh unison` |
+| **MariaDB** (épinglée par digest) | changer son tag et son digest dans le compose, puis `sudo update.sh unison` |
+
+Pourquoi `--build` : le code d'Unison, ses dépendances et yt-dlp sont **dans l'image** `unison-app:v2`, construite sur place depuis `./app` (cible `production` du `Dockerfile`). Un `checkout` ne change que les fichiers de `./app` : sans reconstruction, les conteneurs repartent avec l'ancienne image, donc l'ancien code. La reconstruction reprend du cache ce qui n'a pas changé (les dépendances, si `composer.lock` est le même) : elle reste rapide. yt-dlp est revérifié sur GitHub à chaque reconstruction, et repris seulement s'il en est sorti une nouvelle version. Au démarrage, `unison-app` applique seul les migrations de la base.
 
 ```bash
 git -C /srv/stacks/unison/app fetch --tags
@@ -29,11 +36,9 @@ git -C /srv/stacks/unison/app checkout v2.x.y        # la version voulue
 sudo update.sh unison --build                       # dump de la base, reconstruction, attente de la santé
 ```
 
+Si le `README.md` ou le `compose.yaml` de `app/deploy/` ont changé, les copier dans `/srv/stacks/unison/` et les commiter **avant** `update.sh` (sans `sudo` : `/srv/stacks` t'appartient) ; sinon `update.sh` refuse de démarrer.
+
 Revenir en arrière : `checkout` du tag précédent, puis `sudo update.sh unison --build`. Si la version abandonnée avait migré la base, recharger d'abord le dump pris par `update.sh` (`RESTORE.md` §3 et §4).
-
-MariaDB est épinglée par digest : change son tag, puis `sudo update.sh unison`.
-
-Mettre yt-dlp à jour (YouTube change souvent) : reconstruire l'image, `sudo update.sh unison --build`, qui retélécharge la dernière version.
 
 ## Restaurer
 
