@@ -1,0 +1,128 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Unison - Maintenance{% endblock %}
+
+{% block section %}admin{% endblock %}
+
+{% block body %}
+<header class="admin-header">
+    <h1>Administration</h1>
+    <p class="admin-subtitle">Les fichiers sur le disque, yt-dlp et les cookies YouTube.</p>
+</header>
+{% include 'admin/_tabs.html.twig' with {active: 'maintenance'} %}
+
+{# A few titles of a list, and how many more. #}
+{% macro titles(items) %}
+    {% if items is not empty %}
+        <p class="maintenance-names">
+            {{ items|slice(0, 6)|map(item => item.title)|join(' · ') }}
+            {%- if items|length > 6 %} · et {{ items|length - 6 }} autre{{ items|length - 6 > 1 ? 's' }}{% endif %}
+        </p>
+    {% endif %}
+{% endmacro %}
+
+<section class="admin-group" aria-labelledby="maintenance-files">
+    <h2 class="admin-heading" id="maintenance-files">Fichiers</h2>
+    <div class="maintenance-grid">
+        {# What the library lacks: the worker downloads it again. #}
+        <section class="admin-card maintenance-card">
+            <h3 class="maintenance-title">
+                {{ ux_icon(nbToRepair ? 'material-symbols:build-outline' : 'material-symbols:check-circle-outline', {class: nbToRepair ? 'maintenance-icon--todo' : 'maintenance-icon--ok'}) }}
+                À réparer
+            </h3>
+            <dl class="maintenance-figures">
+                <div>
+                    <dt>Titres sans fichier audio</dt>
+                    <dd>{{ report.missingAudio|length }}</dd>
+                </div>
+                <div>
+                    <dt>Pochettes manquantes ou chez YouTube</dt>
+                    <dd>{{ report.brokenCovers|length + report.brokenAlbumCovers|length }}</dd>
+                </div>
+            </dl>
+            {{ _self.titles(report.missingAudio) }}
+            <p class="help-text">Le worker retélécharge l'audio ou la pochette qui manque ; le reste (playlists, favoris, écoutes) ne bouge pas.</p>
+            <form method="post" action="{{ path('app_admin_maintenance_repair') }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('maintenance_repair') }}">
+                <button type="submit" class="btn" {{ nbToRepair or report.brokenAlbumCovers is not empty ? '' : 'disabled' }}>Réparer{{ nbToRepair ? ' (' ~ nbToRepair ~ ')' }}</button>
+            </form>
+        </section>
+
+        {# What nothing uses any more: room to free. #}
+        {% set nbOrphans = report.orphanMusic|length + report.orphanCovers|length %}
+        {% set orphanSize = report.orphanBytes|file_size %}
+        <section class="admin-card maintenance-card">
+            <h3 class="maintenance-title">
+                {{ ux_icon(nbOrphans ? 'material-symbols:folder-delete-outline' : 'material-symbols:check-circle-outline', {class: nbOrphans ? 'maintenance-icon--todo' : 'maintenance-icon--ok'}) }}
+                Fichiers orphelins
+            </h3>
+            <dl class="maintenance-figures">
+                <div>
+                    <dt>Musiques</dt>
+                    <dd>{{ report.orphanMusic|length }}</dd>
+                </div>
+                <div>
+                    <dt>Pochettes</dt>
+                    <dd>{{ report.orphanCovers|length }}</dd>
+                </div>
+            </dl>
+            <p class="help-text">Des fichiers qu'aucun titre ni album n'utilise{{ nbOrphans ? ' : ' ~ orphanSize.value ~ ' ' ~ orphanSize.unit ~ ' à libérer' }}. Ceux de moins d'une heure sont laissés (un téléchargement peut être en cours).</p>
+            <form method="post" action="{{ path('app_admin_maintenance_orphans') }}" data-turbo-confirm="Supprimer {{ nbOrphans }} fichier{{ nbOrphans > 1 ? 's' }} orphelin{{ nbOrphans > 1 ? 's' }} ? C'est définitif.">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('maintenance_orphans') }}">
+                <button type="submit" class="btn btn-danger" {{ nbOrphans ? '' : 'disabled' }}>Supprimer</button>
+            </form>
+        </section>
+    </div>
+</section>
+
+<section class="admin-group" aria-labelledby="maintenance-tools">
+    <h2 class="admin-heading" id="maintenance-tools">Téléchargement</h2>
+    <div class="maintenance-grid">
+        <section class="admin-card maintenance-card">
+            <h3 class="maintenance-title">
+                {{ ux_icon(ytDlpOld or not ytDlpVersion ? 'material-symbols:update' : 'material-symbols:check-circle-outline', {class: ytDlpOld or not ytDlpVersion ? 'maintenance-icon--todo' : 'maintenance-icon--ok'}) }}
+                yt-dlp
+            </h3>
+            {% if ytDlpVersion %}
+                <p class="maintenance-value">Version {{ ytDlpVersion }}{% if ytDlpAge is not null %} · il y a {{ ytDlpAge }} jour{{ ytDlpAge > 1 ? 's' }}{% endif %}</p>
+                <p class="help-text">
+                    {% if ytDlpOld %}<strong>Plus d'un mois et demi :</strong>{% endif %}
+                    YouTube change souvent ; reconstruire l'image prend la dernière version (<code>sudo update.sh unison --build</code> sur le serveur).
+                </p>
+            {% else %}
+                <p class="maintenance-value">yt-dlp ne répond pas sur ce serveur.</p>
+            {% endif %}
+        </section>
+
+        <section class="admin-card maintenance-card">
+            <h3 class="maintenance-title">
+                {{ ux_icon(cookies.present ? 'material-symbols:cookie-outline' : 'material-symbols:info-outline', {class: cookies.present ? 'maintenance-icon--ok' : 'maintenance-icon--muted'}) }}
+                Cookies YouTube
+            </h3>
+            {% if not cookies.configured %}
+                <p class="maintenance-value">Non configurés sur ce serveur (YTDLP_COOKIES).</p>
+            {% else %}
+                <p class="maintenance-value">
+                    {% if cookies.present %}
+                        {{ cookies.cookies }} cookie{{ cookies.cookies > 1 ? 's' }}, envoyés le {{ cookies.modifiedAt|date('d/m/Y à H:i') }}
+                    {% else %}
+                        Aucun : yt-dlp travaille sans compte.
+                    {% endif %}
+                </p>
+                <p class="help-text">Pour les vidéos qui demandent de se connecter (vérification d'âge). Un fichier cookies.txt au format Netscape, exporté du navigateur d'un compte YouTube secondaire.</p>
+                <form class="maintenance-upload" method="post" action="{{ path('app_admin_maintenance_cookies') }}" enctype="multipart/form-data">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('maintenance_cookies') }}">
+                    <input type="file" name="cookies" accept=".txt,text/plain" required aria-label="Fichier cookies.txt">
+                    <button type="submit" class="btn btn-secondary">{{ cookies.present ? 'Remplacer' : 'Envoyer' }}</button>
+                </form>
+                {% if cookies.present %}
+                    <form method="post" action="{{ path('app_admin_maintenance_cookies_delete') }}" data-turbo-confirm="Retirer les cookies ? Les vidéos avec vérification d'âge ne s'importeront plus.">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('maintenance_cookies_delete') }}">
+                        <button type="submit" class="maintenance-link">Retirer les cookies</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+        </section>
+    </div>
+</section>
+{% endblock %}

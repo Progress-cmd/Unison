@@ -1128,3 +1128,135 @@ a.error-context:hover {
 .announcement-empty svg {
     color: var(--color-text-muted);
 }
+
+/* --- Maintenance page --- */
+
+.maintenance-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+}
+
+.maintenance-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.maintenance-card form {
+    margin: 0;
+}
+
+.maintenance-card .help-text {
+    margin: 0;
+    font-size: 13px;
+}
+
+.maintenance-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.maintenance-title svg {
+    flex: none;
+    width: 22px;
+    height: 22px;
+}
+
+.maintenance-icon--ok {
+    color: var(--color-success);
+}
+
+.maintenance-icon--todo {
+    color: var(--color-warning);
+}
+
+.maintenance-icon--muted {
+    color: var(--color-text-muted);
+}
+
+/* Two figures side by side. */
+.maintenance-figures {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 0;
+}
+
+/* Figures on one line even when a label takes two. */
+.maintenance-figures > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.maintenance-figures dt {
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.maintenance-figures dd {
+    margin: 4px 0 0;
+    font-family: var(--serif);
+    font-size: 30px;
+    line-height: 1;
+}
+
+.maintenance-names {
+    margin: 0;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.maintenance-value {
+    margin: 0;
+    font-size: 15px;
+}
+
+.maintenance-card code {
+    font-size: 12px;
+}
+
+.maintenance-upload {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.maintenance-upload input[type="file"] {
+    flex: 1 1 200px;
+    min-width: 0;
+    font: inherit;
+    font-size: 13px;
+}
+
+.maintenance-link {
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    font: inherit;
+    font-size: 13px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.maintenance-link:hover {
+    color: var(--color-error);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+@media (min-width: 900px) {
+    .maintenance-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

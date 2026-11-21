@@ -15,9 +15,9 @@
 
 - État : `sudo docker compose ps` ; journaux : `sudo docker logs --tail 50 unison-app` (ou `unison-worker`).
 - Commandes Symfony : `sudo docker exec -u www-data unison-app php bin/console <commande>`.
-- Cookies YouTube (vidéos avec vérification d'âge) : `/srv/data/unison/youtube/cookies.txt`, format Netscape, compte secondaire, propriétaire `www-data` (le conteneur corrige le propriétaire du dossier au démarrage), droits 600.
+- Cookies YouTube (vidéos avec vérification d'âge) : à envoyer depuis **Administration → Maintenance** (cookies.txt au format Netscape, d'un compte secondaire). Ils sont rangés dans `/srv/data/unison/youtube/cookies.txt`, propriétaire `www-data`, droits 600.
 - Les erreurs des imports, des recherches et du serveur sont sur la page **Erreurs** de l'administration.
-- Pochettes encore lues chez YouTube (le tableau de bord en donne le nombre) : `sudo docker exec -u www-data unison-app php bin/console app:covers:localize`. Relançable.
+- Fichiers audio ou pochettes manquants, pochettes encore chez YouTube, fichiers orphelins, version de yt-dlp : **Administration → Maintenance** (« Réparer » passe par le worker). En ligne de commande, pour les seules pochettes : `sudo docker exec -u www-data unison-app php bin/console app:covers:localize`.
 
 ## Mettre à jour
 
