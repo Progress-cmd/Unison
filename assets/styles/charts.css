@@ -71,11 +71,16 @@
 
 .chart-grid {
     display: grid;
+    /* minmax(0, …): a column never grows to its content (a long track row would push the page
+       wider than the phone). */
+    grid-template-columns: minmax(0, 1fr);
     gap: 12px;
 }
 
 .chart-title {
     margin: 0;
+    /* Also when it's an h2, which has the serif font. */
+    font-family: var(--sans);
     font-size: 15px;
     font-weight: 600;
 }
@@ -269,6 +274,15 @@
     font-size: 14px;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.ranking-name a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.ranking-name a:hover {
+    text-decoration: underline;
 }
 
 .ranking-name small {

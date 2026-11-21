@@ -40,6 +40,10 @@
         {% if user is defined %}
             <span class="track-user">{{ user }}</span>
         {% endif %}
+        {# A word about the row, drawn like the name above (« 8 écoutes » in « Mes écoutes »). #}
+        {% if note is defined %}
+            <span class="track-user">{{ note }}</span>
+        {% endif %}
     </div>
 
     <span class="track-duration">{{ track.duration|duration }}</span>
