@@ -46,7 +46,7 @@
 <section class="account-section">
     <h2>Thème</h2>
     {{ form_start(themeForm, {attr: {class: 'form', 'data-controller': 'theme', 'data-action': 'change->theme#apply'}}) }}
-        {{ form_row(themeForm.theme, {attr: {class: 'theme-choice'}}) }}
+        {{ form_row(themeForm.theme, {attr: {class: 'segmented'}}) }}
     {{ form_end(themeForm) }}
 </section>
 
