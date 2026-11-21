@@ -22,4 +22,5 @@ import './styles/home.css';
 import './styles/imports.css';
 import './styles/account.css';
 import './styles/history.css';
+import './styles/charts.css';
 import './styles/admin.css';
