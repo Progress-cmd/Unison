@@ -28,6 +28,7 @@ export default class extends Controller
         'queueToggle',
         'toast',
         'options',
+        'volume',
     ];
 
     static values = {
@@ -57,6 +58,7 @@ export default class extends Controller
 
     initialize()
     {
+        this.restoreVolume();
         this.sound = new SoundAnalyser(this.audioTarget, 120);
         this.restoreState();
 
@@ -133,6 +135,18 @@ export default class extends Controller
     setVolume(event)
     {
         this.audioTarget.volume = event.target.value;
+    }
+
+    // From the bar or from « Paramètres audio »: both sliders show it, and it's kept for next time.
+    volumeChanged()
+    {
+        this.volumeTarget.value = this.audioTarget.volume;
+
+        try {
+            localStorage.setItem('unison.volume', String(this.audioTarget.volume));
+        } catch {
+            // Storage blocked: the volume lasts for this visit only.
+        }
     }
 
     toggleExpanded()
@@ -1082,5 +1096,20 @@ export default class extends Controller
             body: JSON.stringify({'track': this.queue[this.index].id, '_token': this.listenTokenValue}),
             keepalive: true,
         }).catch(() => {});
+    }
+
+    restoreVolume()
+    {
+        let saved = null;
+
+        try {
+            saved = parseFloat(localStorage.getItem('unison.volume'));
+        } catch {
+            return;
+        }
+
+        if (saved >= 0 && saved <= 1) {
+            this.audioTarget.volume = saved;
+        }
     }
 }

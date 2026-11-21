@@ -167,6 +167,7 @@
             step="0.01"
             value="1"
             aria-label="Volume"
+            data-player-target="volume"
             data-action="input->player#setVolume"
         >
     </div>
@@ -206,6 +207,7 @@
     <audio
         data-player-target="audio"
         data-action="
+            volumechange->player#volumeChanged
             play->player#showPlaying
             pause->player#showPaused
             loadedmetadata->player#updateDuration
