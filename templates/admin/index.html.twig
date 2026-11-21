@@ -129,4 +129,96 @@
         </div>
     </dl>
 </div>
+
+{% import 'admin/_charts.html.twig' as charts %}
+
+<section class="admin-group" aria-labelledby="admin-listens">
+    <h2 class="admin-heading" id="admin-listens">Écoutes</h2>
+    <dl class="stat-grid stat-grid--three">
+        <div class="stat">
+            <dt>Écoutes</dt>
+            <dd>{{ nbListens|number_format(0, ',', ' ') }}</dd>
+            <p class="stat-note">Depuis le début, tous comptes</p>
+        </div>
+        <div class="stat">
+            <dt>30 derniers jours</dt>
+            <dd>{{ nbListensMonth|number_format(0, ',', ' ') }}</dd>
+            <p class="stat-note">Soit {{ (nbListensMonth / 30)|number_format(1, ',', ' ') }} par jour</p>
+        </div>
+        {# Length of the tracks listened to: a listen counts after 30 s, so it's an upper bound. #}
+        <div class="stat stat--wide">
+            <dt>Temps d'écoute</dt>
+            <dd>{{ listenedSecondsMonth // 3600 }}<small>h</small>{{ '%02d'|format(listenedSecondsMonth % 3600 // 60) }}</dd>
+            <p class="stat-note">Sur 30 jours</p>
+        </div>
+    </dl>
+
+    <div class="chart-grid">
+        <section class="admin-card chart-card" aria-labelledby="chart-days">
+            <h3 class="chart-title" id="chart-days">Par jour</h3>
+            <p class="chart-subtitle">Les 30 derniers jours</p>
+            {{ charts.columns(listensByDay, 'écoute', 'écoutes', 5, 10) }}
+        </section>
+        <section class="admin-card chart-card" aria-labelledby="chart-hours">
+            <h3 class="chart-title" id="chart-hours">Au fil de la journée</h3>
+            <p class="chart-subtitle">Toutes les écoutes, par heure</p>
+            {{ charts.columns(listensByHour, 'écoute', 'écoutes', 3, 6) }}
+        </section>
+    </div>
+</section>
+
+<section class="admin-group" aria-labelledby="admin-rankings">
+    <h2 class="admin-heading" id="admin-rankings">Palmarès</h2>
+    <div class="chart-grid chart-grid--three">
+        <section class="admin-card chart-card" aria-labelledby="ranking-tracks">
+            <h3 class="chart-title" id="ranking-tracks">Titres les plus écoutés</h3>
+            {{ charts.ranking(topTracks|map(row => {
+                name: row[0].title,
+                detail: row[0].artists|map(artist => artist.name)|join(', '),
+                value: row.listens,
+            }), 'Aucune écoute pour l\'instant.') }}
+        </section>
+        <section class="admin-card chart-card" aria-labelledby="ranking-artists">
+            <h3 class="chart-title" id="ranking-artists">Artistes les plus écoutés</h3>
+            {{ charts.ranking(topArtists|map(row => {name: row[0].name, value: row.listens}), 'Aucune écoute pour l\'instant.') }}
+        </section>
+        <section class="admin-card chart-card" aria-labelledby="ranking-accounts">
+            <h3 class="chart-title" id="ranking-accounts">Écoutes par compte</h3>
+            {{ charts.ranking(listensPerAccount|map(row => {name: row[0].username, value: row.listens}), 'Aucune écoute pour l\'instant.') }}
+        </section>
+    </div>
+</section>
+
+<section class="admin-group" aria-labelledby="admin-growth">
+    <h2 class="admin-heading" id="admin-growth">Croissance et disque</h2>
+    <div class="admin-columns">
+        <section class="admin-card chart-card" aria-labelledby="chart-months">
+            <h3 class="chart-title" id="chart-months">Titres ajoutés par mois</h3>
+            <p class="chart-subtitle">Les 12 derniers mois</p>
+            {{ charts.columns(tracksByMonth, 'titre', 'titres', 1, 2) }}
+        </section>
+
+        {% set music = disk.music|file_size %}
+        {% set covers = disk.covers|file_size %}
+        <dl class="stat-grid stat-grid--side">
+            <div class="stat">
+                <dt>Musiques</dt>
+                <dd>{{ music.value }}<small>{{ music.unit }}</small></dd>
+            </div>
+            <div class="stat">
+                <dt>Pochettes</dt>
+                <dd>{{ covers.value }}<small>{{ covers.unit }}</small></dd>
+            </div>
+            <div class="stat stat--wide">
+                <dt>Libre sur le disque</dt>
+                {% if disk.free is not null %}
+                    {% set free = disk.free|file_size %}
+                    <dd>{{ free.value }}<small>{{ free.unit }}</small></dd>
+                {% else %}
+                    <dd>–</dd>
+                {% endif %}
+            </div>
+        </dl>
+    </div>
+</section>
 {% endblock %}

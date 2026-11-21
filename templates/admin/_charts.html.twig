@@ -1,0 +1,79 @@
+{# Charts of the dashboard, drawn in HTML and CSS (no library), animated by chart_controller.js.
+   One series each, in the accent colour: the title above says what is drawn. #}
+
+{# Columns over time: series = [{label, title, value}] (App\Admin\Stats\LocalCalendar).
+   labelEvery: one axis label every N columns; phoneLabelEvery: the same on a phone. #}
+{% macro columns(series, singular, plural, labelEvery = 1, phoneLabelEvery = null) %}
+    {% set max = max(series|map(point => point.value)) %}
+    {% if max == 0 %}
+        <p class="chart-empty">
+            {{ ux_icon('material-symbols:query-stats') }}
+            Rien sur cette période.
+        </p>
+    {% else %}
+        <div class="chart" data-controller="chart">
+            <div class="chart-plot" data-action="pointermove->chart#show pointerdown->chart#show pointerleave->chart#hide">
+                {# The top line is the highest value: the one number written on the chart. #}
+                <span class="chart-max" aria-hidden="true">{{ max|number_format(0, ',', ' ') }}</span>
+                <ol class="chart-columns" aria-hidden="true">
+                    {% for point in series %}
+                        <li class="chart-column" data-chart-label="{{ point.title }}" data-chart-value="{{ point.value|number_format(0, ',', ' ') }} {{ point.value > 1 ? plural : singular }}">
+                            {% if point.value > 0 %}
+                                <span class="chart-bar" style="height: {{ (point.value / max * 100)|round(2) }}%"></span>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ol>
+                <p class="chart-tooltip" data-chart-target="tooltip" hidden><strong></strong><span></span></p>
+            </div>
+            <ol class="chart-axis" aria-hidden="true">
+                {% for point in series %}
+                    {% set shown = loop.index0 % labelEvery == 0 %}
+                    {% set phoneHidden = phoneLabelEvery and loop.index0 % phoneLabelEvery != 0 %}
+                    <li{% if phoneHidden %} class="chart-axis-wide"{% endif %}>{{ shown ? point.label }}</li>
+                {% endfor %}
+            </ol>
+            {# Every value without hovering: the table twin of the chart. #}
+            <details class="chart-table">
+                <summary>Voir les chiffres</summary>
+                <table>
+                    <tbody>
+                        {% for point in series %}
+                            <tr>
+                                <th scope="row">{{ point.title }}</th>
+                                <td>{{ point.value|number_format(0, ',', ' ') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </details>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{# A ranking: rows = [{name, detail (optional), value}], highest first. The value is written on
+   each row: a ranking is read as numbers. #}
+{% macro ranking(rows, empty) %}
+    {% if rows is empty or rows|first.value == 0 %}
+        <p class="chart-empty">
+            {{ ux_icon('material-symbols:query-stats') }}
+            {{ empty }}
+        </p>
+    {% else %}
+        {% set max = rows|first.value %}
+        <ol class="ranking">
+            {% for row in rows %}
+                <li class="ranking-item">
+                    <span class="ranking-name">
+                        {{ row.name }}
+                        {% if row.detail ?? null %}<small>{{ row.detail }}</small>{% endif %}
+                    </span>
+                    <span class="ranking-value">{{ row.value|number_format(0, ',', ' ') }}</span>
+                    <span class="ranking-track" aria-hidden="true">
+                        {% if row.value > 0 %}<span class="ranking-bar" style="width: {{ (row.value / max * 100)|round(2) }}%"></span>{% endif %}
+                    </span>
+                </li>
+            {% endfor %}
+        </ol>
+    {% endif %}
+{% endmacro %}
