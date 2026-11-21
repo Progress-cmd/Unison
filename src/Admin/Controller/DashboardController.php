@@ -59,6 +59,7 @@ final class DashboardController extends AbstractController
             'listensPerAccount' => $listenRepository->perAccount(),
             'tracksByMonth' => $calendar->lastMonths($trackRepository->countAddedPerHour($calendar->monthsAgo(12)), 12),
             'disk' => $diskUsage->measure(),
+            'nbRemoteCovers' => $trackRepository->countRemoteCovers() + $albumRepository->countRemoteCovers(),
         ]);
     }
 }
