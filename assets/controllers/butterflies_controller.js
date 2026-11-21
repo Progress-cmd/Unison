@@ -10,6 +10,8 @@ const NEXT = [240, 600];
 const LATER = [30, 90];
 const COLOURS = 3;
 
+const random = (min, max) => min + Math.random() * (max - min);
+
 export default class extends Controller
 {
     static targets = ['template'];
@@ -29,12 +31,12 @@ export default class extends Controller
 
     schedule([min, max])
     {
-        this.timer = setTimeout(() => this.fly(), (min + Math.random() * (max - min)) * 1000);
+        this.timer = setTimeout(() => this.fly(), random(min, max) * 1000);
     }
 
     fly()
     {
-        if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        if (this.reducedMotion()) {
             return;
         }
 
@@ -46,36 +48,124 @@ export default class extends Controller
             return;
         }
 
+        this.launch({ band: [0.12, 0.6], duration: random(11000, 16000) });
+        this.schedule(NEXT);
+    }
+
+    // One butterfly, from one side to the other within a band of the screen's height.
+    launch({ band, duration, delay = 0, leftToRight = Math.random() < 0.5 })
+    {
         const butterfly = this.templateTarget.content.firstElementChild.cloneNode(true);
+        const flap = random(0.11, 0.18);
+
         butterfly.classList.add(`butterfly--${1 + Math.floor(Math.random() * COLOURS)}`);
+        const size = random(0.8, 1.15);
 
-        // From one side to the other, somewhere in the upper half, fluttering up and down.
-        const leftToRight = Math.random() < 0.5;
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        const startY = height * (0.12 + Math.random() * 0.4);
-        const endY = startY + (Math.random() - 0.5) * height * 0.3;
-        const waves = 2 + Math.random() * 2;
-        const steps = 24;
-
-        butterfly.classList.toggle('is-flying-left', !leftToRight);
-
-        const frames = Array.from({ length: steps + 1 }, (_, i) => {
-            const t = i / steps;
-            const x = leftToRight ? -40 + t * (width + 80) : width + 40 - t * (width + 80);
-            const y = startY + (endY - startY) * t + Math.sin(t * Math.PI * 2 * waves) * 28;
-            const tilt = Math.cos(t * Math.PI * 2 * waves) * 12;
-
-            return { transform: `translate(${x}px, ${y}px) rotate(${tilt}deg)` };
-        });
+        butterfly.style.setProperty('--flap', `${flap}s`);
 
         this.element.append(butterfly);
 
-        butterfly.animate(frames, { duration: 11000 + Math.random() * 5000, easing: 'linear' })
-            .finished
-            .catch(() => {})
-            .finally(() => butterfly.remove());
+        const animation = butterfly.animate(this.path(leftToRight, band, duration, flap, size), {
+            duration,
+            delay,
+            easing: 'linear',
+            fill: 'backwards',
+        });
 
-        this.schedule(NEXT);
+        this.glideNowAndThen(butterfly, animation);
+
+        animation.finished.catch(() => {}).finally(() => butterfly.remove());
+
+        return animation;
+    }
+
+    // A wandering path: a few random points joined by a smooth curve, crossed at an uneven
+    // speed, the body bobbing a little at each wingbeat and pointing where it goes.
+    path(leftToRight, [top, bottom], duration, flap, size)
+    {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const anchors = [];
+        const count = 7 + Math.floor(Math.random() * 3);
+        let y = height * random(top, bottom);
+
+        for (let i = 0; i < count; i++) {
+            const t = i / (count - 1);
+
+            anchors.push({ x: -50 + t * (width + 100), y });
+            y = Math.min(height * bottom, Math.max(height * top, y + random(-110, 110)));
+        }
+
+        if (!leftToRight) {
+            anchors.reverse().forEach(point => { point.x = width - point.x; });
+        }
+
+        // Uneven speed: each stretch gets its own share of the time.
+        const shares = anchors.slice(1).map(() => random(0.6, 1.5));
+        const total = shares.reduce((sum, share) => sum + share, 0);
+        const beats = duration / 1000 / (flap * 2);
+        const frames = [];
+        const steps = 16;
+        let elapsed = 0;
+
+        for (let i = 0; i < anchors.length - 1; i++) {
+            for (let step = 0; step < steps; step++) {
+                const local = step / steps;
+                const offset = (elapsed + shares[i] * local) / total;
+                const point = this.catmullRom(anchors, i, local);
+                const ahead = this.catmullRom(anchors, i, Math.min(1, local + 0.08));
+                const heading = Math.atan2(ahead.y - point.y, ahead.x - point.x) * 180 / Math.PI;
+                const bob = Math.sin(offset * beats * Math.PI * 2) * 3;
+
+                frames.push({
+                    offset,
+                    transform: `translate(${point.x}px, ${point.y + bob}px) rotate(${heading + 90}deg) scale(${size})`,
+                });
+            }
+
+            elapsed += shares[i];
+        }
+
+        const end = anchors.at(-1);
+        frames.push({ offset: 1, transform: `translate(${end.x}px, ${end.y}px) rotate(${leftToRight ? 90 : -90}deg) scale(${size})` });
+
+        return frames;
+    }
+
+    // The point at `t` (0 to 1) between anchors[i] and anchors[i + 1], on a curve through them all.
+    catmullRom(points, i, t)
+    {
+        const p0 = points[Math.max(0, i - 1)];
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const p3 = points[Math.min(points.length - 1, i + 2)];
+        const t2 = t * t;
+        const t3 = t2 * t;
+        const at = (a, b, c, d) => 0.5 * ((2 * b) + (-a + c) * t + (2 * a - 5 * b + 4 * c - d) * t2 + (-a + 3 * b - 3 * c + d) * t3);
+
+        return { x: at(p0.x, p1.x, p2.x, p3.x), y: at(p0.y, p1.y, p2.y, p3.y) };
+    }
+
+    // Now and then the wings stop, half open, for a short glide.
+    glideNowAndThen(butterfly, animation)
+    {
+        const glide = () => {
+            if (!butterfly.isConnected) {
+                return;
+            }
+
+            butterfly.classList.add('is-gliding');
+            setTimeout(() => {
+                butterfly.classList.remove('is-gliding');
+                setTimeout(glide, random(1200, 3200));
+            }, random(250, 650));
+        };
+
+        setTimeout(glide, random(1500, 3000) + (animation.effect.getTiming().delay ?? 0));
+    }
+
+    reducedMotion()
+    {
+        return matchMedia('(prefers-reduced-motion: reduce)').matches;
     }
 }

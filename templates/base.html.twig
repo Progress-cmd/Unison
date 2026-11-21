@@ -69,16 +69,15 @@
                the player, so the time between two goes on while browsing. #}
             <div id="butterflies" class="butterflies" aria-hidden="true" data-turbo-permanent data-controller="butterflies">
                 <template data-butterflies-target="template">
+                    {# Seen from above, head forward: two wings that beat in relief on either side of the body. #}
                     <span class="butterfly">
-                        <svg viewBox="0 0 24 20" focusable="false">
-                            <g class="butterfly-wings">
-                                <path d="M12 10 C7 1 1 2 2 7 C3 11 8 11 12 10 Z"/>
-                                <path d="M12 10 C8 12 3 15 5 18 C7 20 11 15 12 10 Z"/>
-                                <path d="M12 10 C17 1 23 2 22 7 C21 11 16 11 12 10 Z"/>
-                                <path d="M12 10 C16 12 21 15 19 18 C17 20 13 15 12 10 Z"/>
-                            </g>
-                            <path class="butterfly-body" d="M12 5.5 L12 15.5"/>
-                        </svg>
+                        <span class="butterfly-wing butterfly-wing--left">
+                            <svg viewBox="0 0 12 20" focusable="false"><path d="M12 9 C7 0 0 1 1 6 C2 10 7 11 12 10 Z"/><path d="M12 10.5 C8 12 2 15 4 18 C6 20 10 15 12 11.5 Z"/></svg>
+                        </span>
+                        <span class="butterfly-wing butterfly-wing--right">
+                            <svg viewBox="0 0 12 20" focusable="false"><path d="M12 9 C7 0 0 1 1 6 C2 10 7 11 12 10 Z"/><path d="M12 10.5 C8 12 2 15 4 18 C6 20 10 15 12 11.5 Z"/></svg>
+                        </span>
+                        <svg class="butterfly-body" viewBox="0 0 24 20" focusable="false"><path d="M12 5 L12 16"/><path d="M12 5.5 Q11 2.5 9.5 1.2 M12 5.5 Q13 2.5 14.5 1.2"/></svg>
                     </span>
                 </template>
             </div>
