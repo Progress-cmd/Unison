@@ -7,7 +7,8 @@
     <h1>Unison</h1>
     {% if error %}
         {% if error.messageKey starts with 'Too many' %}
-            <p class="alert alert-error">Trop de tentatives de connexion. Réessayez dans {{ error.messageData['%minutes%'] }} minute(s).</p>
+            {% set minutes = error.messageData['%minutes%'] %}
+            <p class="alert alert-error">Trop de tentatives de connexion. Réessaie dans {{ minutes }} minute{{ minutes > 1 ? 's' }}.</p>
         {% elseif error.messageKey == constant('App\\Account\\Security\\UserChecker::DISABLED_MESSAGE') %}
             <p class="alert alert-error">{{ error.messageKey }}</p>
         {% else %}

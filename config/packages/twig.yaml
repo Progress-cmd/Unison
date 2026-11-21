@@ -1,10 +1,6 @@
 twig:
     file_name_pattern: '*.twig'
     date: { timezone: Europe/Paris }
-    globals:
-        # In production the admin lives on its own address, reachable through Netbird only
-        # (deploy/README.md). Empty in dev: the menu links to /admin on the same site.
-        admin_url: '%env(default::ADMIN_URL)%'
 
 when@test:
     twig:

@@ -19,7 +19,11 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-            login_throttling: null
+            # 5 failed logins (same account, same address) and the form waits a quarter of an
+            # hour: the administration is on the public address, a robot can't try much.
+            login_throttling:
+                max_attempts: 5
+                interval: '15 minutes'
             # Refuses disabled accounts at login.
             user_checker: App\Account\Security\UserChecker
 

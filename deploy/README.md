@@ -4,7 +4,7 @@
 
 | | |
 | --- | --- |
-| Adresses | https://unison.pi5.ovh (public, **sans** `/admin`) ; https://unison-admin.pi5.ovh (privé, Netbird : tout, administration comprise) |
+| Adresse | https://unison.pi5.ovh (public ; l'administration `/admin` est réservée aux comptes admin, la connexion se bloque 15 min après 5 échecs) |
 | Conteneurs | `unison-app` (Apache + PHP, image locale `unison-app:v2`), `unison-worker` (imports : yt-dlp, ffmpeg ; même image), `unison-db` (MariaDB 12.2.2) |
 | Code de l'appli | `/srv/stacks/unison/app` : dépôt GitHub `Progress-cmd/Unison`, sur un tag (`v2.x.y`), ignoré par le Git des stacks mais présent dans la sauvegarde |
 | Données | `/srv/data/unison/{db,music,covers,youtube}` |
@@ -61,7 +61,7 @@ Reconstruction complète : `sudo docker compose build app`, puis base et reste c
 4. **Les secrets** : réécrire `/srv/secrets/unison.env` d'après `app/deploy/unison.env.exemple` (droits 600). La clé Resend est celle de la v1 (`unison-v1.env`).
 5. **Les dossiers** : `sudo install -d /srv/data/unison/{db,music,covers,youtube}`. Reprendre les cookies de la v1 : `sudo cp -a /srv/data/unison-v1/music/.config/cookies.txt /srv/data/unison/youtube/`.
 6. **Démarrer** : `cd /srv/stacks/unison && sudo docker compose config -q && sudo docker compose up -d --build`, attendre `healthy` (`sudo docker compose ps`).
-7. **Vérifier** : https://unison-admin.pi5.ovh répond (Netbird), https://unison.pi5.ovh/admin répond 404, `sudo ss -tlnp` ne montre aucun nouveau port.
+7. **Vérifier** : https://unison.pi5.ovh répond, `/admin` renvoie à la connexion tant qu'on n'est pas connecté avec un compte admin, `sudo ss -tlnp` ne montre aucun nouveau port.
 8. **Reprendre les données de la v1** : section suivante.
 9. **Commiter** : `git -C /srv/stacks add -A && git -C /srv/stacks commit -m "unison : v2"`. Dans `/srv/stacks/RESTORE.md`, le dépôt de l'appli devient `Progress-cmd/Unison`.
 
