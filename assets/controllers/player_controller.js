@@ -140,8 +140,14 @@ export default class extends Controller
         this.setExpanded(!this.element.classList.contains('is-expanded'));
     }
 
-    collapse()
+    // Escape with a window open over the player (options, audio settings): that window closes,
+    // the player stays open.
+    collapse(event)
     {
+        if (event?.type === 'keydown' && document.querySelector('dialog[open]')) {
+            return;
+        }
+
         this.setExpanded(false);
     }
 
@@ -166,10 +172,11 @@ export default class extends Controller
             return;
         }
 
-        // The sliders follow the finger sideways; a scrolled queue scrolls back up first.
+        // The sliders follow the finger sideways; a scrolled queue scrolls back up first; a window
+        // over the player (audio settings…) isn't the player.
         const queue = event.target.closest('.player-upcoming');
 
-        if (event.target.closest('input[type="range"]') || (queue && queue.scrollTop > 0)) {
+        if (event.target.closest('input[type="range"], dialog') || (queue && queue.scrollTop > 0)) {
             return;
         }
 
