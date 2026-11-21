@@ -1,7 +1,7 @@
 {# Charts of the dashboard, drawn in HTML and CSS (no library), animated by chart_controller.js.
    One series each, in the accent colour: the title above says what is drawn. #}
 
-{# Columns over time: series = [{label, title, value}] (App\Admin\Stats\LocalCalendar).
+{# Columns over time: series = [{label, title, value}] (App\Shared\Stats\LocalCalendar).
    labelEvery: one axis label every N columns; phoneLabelEvery: the same on a phone. #}
 {% macro columns(series, singular, plural, labelEvery = 1, phoneLabelEvery = null) %}
     {% set max = max(series|map(point => point.value)) %}

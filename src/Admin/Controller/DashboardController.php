@@ -6,7 +6,7 @@ use App\Account\Repository\UserRepository;
 use App\Admin\Repository\ErrorReportRepository;
 use App\Admin\Repository\SearchTimingRepository;
 use App\Admin\Stats\DiskUsage;
-use App\Admin\Stats\LocalCalendar;
+use App\Shared\Stats\LocalCalendar;
 use App\History\Repository\ListenRepository;
 use App\Import\Enum\ImportStatus;
 use App\Import\Repository\ImportJobRepository;
@@ -51,7 +51,7 @@ final class DashboardController extends AbstractController
 
             'nbListens' => $listenRepository->count(),
             'nbListensMonth' => array_sum(array_column($listensByDay, 'value')),
-            'listenedSecondsMonth' => $listenRepository->listenedSecondsSince($calendar->daysAgo(30)),
+            'listenedSecondsMonth' => $listenRepository->listenedSeconds($calendar->daysAgo(30)),
             'listensByDay' => $listensByDay,
             'listensByHour' => $calendar->hoursOfDay($listenRepository->countPerHour()),
             'topTracks' => $listenRepository->topTracks(8),
