@@ -13,12 +13,11 @@ services:
     env_file: /srv/secrets/unison.env     # base, APP_SECRET, clé Resend
     environment: &environment
       DEFAULT_URI: https://unison.pi5.ovh
-      ADMIN_URL: https://unison-admin.pi5.ovh/admin
       MUSIC_DIR: /data/music
       YTDLP_COOKIES: /data/youtube/cookies.txt
       MESSENGER_TRANSPORT_DSN: doctrine://default?auto_setup=0
       # Seules ces adresses sont acceptées (les liens des e-mails ne dépendent jamais de la requête).
-      SYMFONY_TRUSTED_HOSTS: '^unison(-admin)?\.pi5\.ovh$$'
+      SYMFONY_TRUSTED_HOSTS: '^unison\.pi5\.ovh$$'
       # Traefik, sur un réseau Docker privé : Symfony lit la vraie IP du visiteur dans
       # X-Forwarded-For (limite de « Mot de passe oublié ? », journaux).
       SYMFONY_TRUSTED_PROXIES: private_ranges
@@ -40,17 +39,13 @@ services:
       traefik.enable: "true"
       traefik.docker.network: edge
       traefik.http.services.unison.loadbalancer.server.port: "80"
-      # Public : l'application, sans l'administration
-      traefik.http.routers.unison.rule: Host(`unison.pi5.ovh`) && !PathPrefix(`/admin`)
+      # Public : toute l'application. L'administration (/admin) n'est ouverte qu'aux comptes admin,
+      # et la connexion se bloque un quart d'heure après 5 échecs (config/packages/security.yaml).
+      traefik.http.routers.unison.rule: Host(`unison.pi5.ovh`)
       traefik.http.routers.unison.entrypoints: public
       traefik.http.routers.unison.tls: "true"
       traefik.http.routers.unison.service: unison
       traefik.http.routers.unison.middlewares: unison-rl,unison-sec
-      # Privé (Netbird) : tout, y compris l'administration
-      traefik.http.routers.unison-admin.rule: Host(`unison-admin.pi5.ovh`)
-      traefik.http.routers.unison-admin.entrypoints: private
-      traefik.http.routers.unison-admin.tls: "true"
-      traefik.http.routers.unison-admin.service: unison
       # Middlewares
       traefik.http.middlewares.unison-rl.ratelimit.average: "30"
       traefik.http.middlewares.unison-rl.ratelimit.burst: "100"
