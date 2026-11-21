@@ -52,13 +52,50 @@ export default class extends Controller
         this.schedule(NEXT);
     }
 
+    // A cloud of butterflies across the whole screen (100 hours of listening: player_controller.js).
+    // Above everything for once, still unclickable; waits for the tab to be seen.
+    swarm()
+    {
+        if (this.reducedMotion()) {
+            return;
+        }
+
+        if (document.hidden) {
+            document.addEventListener('visibilitychange', () => this.swarm(), { once: true });
+
+            return;
+        }
+
+        this.element.classList.add('is-swarming');
+
+        const leftToRight = Math.random() < 0.5;
+
+        for (let i = 0; i < 34; i++) {
+            const flight = this.launch({
+                band: [0.05, 0.9],
+                duration: random(6500, 9500),
+                delay: random(0, 3200),
+                leftToRight,
+                inSwarm: true,
+            });
+
+            // Back behind the player once the last one of the cloud has gone.
+            flight.finished.catch(() => {}).finally(() => {
+                if (!this.element.querySelector('.butterfly.in-swarm')) {
+                    this.element.classList.remove('is-swarming');
+                }
+            });
+        }
+    }
+
     // One butterfly, from one side to the other within a band of the screen's height.
-    launch({ band, duration, delay = 0, leftToRight = Math.random() < 0.5 })
+    launch({ band, duration, delay = 0, leftToRight = Math.random() < 0.5, inSwarm = false })
     {
         const butterfly = this.templateTarget.content.firstElementChild.cloneNode(true);
         const flap = random(0.11, 0.18);
 
         butterfly.classList.add(`butterfly--${1 + Math.floor(Math.random() * COLOURS)}`);
+        butterfly.classList.toggle('in-swarm', inSwarm);
         const size = random(0.8, 1.15);
 
         butterfly.style.setProperty('--flap', `${flap}s`);
@@ -74,6 +111,7 @@ export default class extends Controller
 
         this.glideNowAndThen(butterfly, animation);
 
+        // Removed first, so the swarm's own callbacks (added after) see it gone.
         animation.finished.catch(() => {}).finally(() => butterfly.remove());
 
         return animation;

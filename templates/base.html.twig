@@ -67,7 +67,7 @@
 
             {# Now and then, a butterfly (butterflies_controller.js). Kept from page to page, like
                the player, so the time between two goes on while browsing. #}
-            <div id="butterflies" class="butterflies" aria-hidden="true" data-turbo-permanent data-controller="butterflies">
+            <div id="butterflies" class="butterflies" aria-hidden="true" data-turbo-permanent data-controller="butterflies" data-action="unison:milestone@window->butterflies#swarm">
                 <template data-butterflies-target="template">
                     {# Seen from above, head forward: two wings that beat in relief on either side of the body. #}
                     <span class="butterfly">

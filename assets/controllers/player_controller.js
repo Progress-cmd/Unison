@@ -1095,7 +1095,24 @@ export default class extends Controller
             method: 'POST',
             body: JSON.stringify({'track': this.queue[this.index].id, '_token': this.listenTokenValue}),
             keepalive: true,
-        }).catch(() => {});
+        })
+            .then(response => response.status === 200 ? response.json() : null)
+            .then(data => data?.milestone && this.celebrate(data.milestone))
+            .catch(() => {});
+    }
+
+    // A new hundred hours of listening: a word, and a cloud of butterflies (butterflies_controller.js).
+    // With the tab hidden (music in the background), it waits to be seen.
+    celebrate(hours)
+    {
+        if (document.hidden) {
+            document.addEventListener('visibilitychange', () => this.celebrate(hours), { once: true });
+
+            return;
+        }
+
+        this.notify(`${hours} heures d'écoute !`);
+        window.dispatchEvent(new CustomEvent('unison:milestone', { detail: { hours } }));
     }
 
     restoreVolume()

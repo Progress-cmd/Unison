@@ -101,6 +101,11 @@
     pointer-events: none;
 }
 
+/* The cloud of the 100 hours: above everything, for a few seconds. */
+.butterflies.is-swarming {
+    z-index: 30;
+}
+
 /* Seen from above, head up in the drawing; the flight turns it towards where it goes. */
 .butterfly {
     position: absolute;
