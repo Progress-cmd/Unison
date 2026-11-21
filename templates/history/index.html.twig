@@ -1,11 +1,73 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Unison - Historique{% endblock %}
+{% block title %}Unison - Mes écoutes{% endblock %}
 
 {% block section %}account{% endblock %}
 
+{% import 'shared/_charts.html.twig' as charts %}
+
 {% block body %}
-<h1>Historique</h1>
+<h1>Mes écoutes</h1>
+
+{# The figures only once there is something to count: the history says « Aucune écoute » otherwise. #}
+{% if nbListens > 0 %}
+    <section class="listens-section" aria-label="En chiffres">
+        <dl class="stat-grid">
+            <div class="stat">
+                <dt>Écoutes</dt>
+                <dd>{{ nbListens|number_format(0, ',', ' ') }}</dd>
+            </div>
+            {# Length of the tracks listened to: a listen counts after 30 s, so it's an upper bound. #}
+            <div class="stat">
+                <dt>Temps d'écoute</dt>
+                <dd>{{ listenedSeconds // 3600 }}<small>h</small>{{ '%02d'|format(listenedSeconds % 3600 // 60) }}</dd>
+            </div>
+            <div class="stat">
+                <dt>Titres différents</dt>
+                <dd>{{ nbDistinctTracks|number_format(0, ',', ' ') }}</dd>
+            </div>
+            <div class="stat">
+                <dt>7 derniers jours</dt>
+                <dd>{{ nbListensWeek|number_format(0, ',', ' ') }}</dd>
+            </div>
+        </dl>
+
+        <div class="chart-grid">
+            <section class="chart-card" aria-labelledby="chart-week">
+                <h2 class="chart-title" id="chart-week">Cette semaine</h2>
+                <p class="chart-subtitle">Tes écoutes des 7 derniers jours</p>
+                {{ charts.columns(week, 'écoute', 'écoutes') }}
+            </section>
+            <section class="chart-card" aria-labelledby="chart-moments">
+                <h2 class="chart-title" id="chart-moments">Moments de la journée</h2>
+                <p class="chart-subtitle">Quand tu écoutes, depuis le début</p>
+                {{ charts.ranking(moments, 'Aucune écoute pour l\'instant.') }}
+            </section>
+        </div>
+
+        <div class="chart-grid">
+            <section class="chart-card" aria-labelledby="top-tracks">
+                <h2 class="chart-title" id="top-tracks">Tes titres les plus écoutés</h2>
+                <ul class="track-list listens-top" data-controller="track-list" data-action="player:change@window->track-list#highlight">
+                    {% for row in topTracks %}
+                        {% include 'library/_track.html.twig' with {track: row[0], note: row.listens ~ (row.listens > 1 ? ' écoutes' : ' écoute')} %}
+                    {% endfor %}
+                </ul>
+            </section>
+            <section class="chart-card" aria-labelledby="top-artists">
+                <h2 class="chart-title" id="top-artists">Tes artistes les plus écoutés</h2>
+                {{ charts.ranking(topArtists|map(row => {
+                    name: row[0].name,
+                    url: path('app_artists_show', {id: row[0].id}),
+                    value: row.listens,
+                }), 'Aucune écoute pour l\'instant.') }}
+            </section>
+        </div>
+    </section>
+
+    <h2 class="listens-history-title">Historique</h2>
+{% endif %}
+
 <ul
     class="track-list"
     data-controller="track-list infinite-scroll"

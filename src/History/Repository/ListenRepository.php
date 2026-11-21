@@ -24,14 +24,6 @@ class ListenRepository extends ServiceEntityRepository
     }
 
     /**
-     * The last listens of the user (account page).
-     */
-    public function findRecent(User $user, int $limit): array
-    {
-        return $this->paginateRecent($user, Window::fromPageNumberAndSize(1, $limit))->getItems();
-    }
-
-    /**
      * One page of the user's listening history, most recent first.
      *
      * @return WindowPage<Listen>
