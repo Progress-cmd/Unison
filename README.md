@@ -52,7 +52,6 @@ Le code est rangé par domaine dans `src/` :
 | `Import` | recherche, téléchargement (yt-dlp), pochettes, nettoyage des titres |
 | `Announcement` | annonces |
 | `Admin` | administration |
-| `Legacy` | reprise des données de la v1 (temporaire) |
 | `Shared` | ce qui sert partout |
 
 ## Lancer en local

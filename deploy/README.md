@@ -40,58 +40,19 @@ Mettre yt-dlp à jour (YouTube change souvent) : reconstruire l'image, `sudo upd
 Base : `RESTORE.md` §4 (`sudo restaurer-db unison-db`, après avoir arrêté `app` et `worker`). Musiques, pochettes et cookies : fichiers de la sauvegarde.
 Reconstruction complète : `sudo docker compose build app`, puis base et reste comme au §6.5 de `RESTORE.md`.
 
-## Installation de la v2 (remplace la v1)
+## Installation neuve
 
-À faire une seule fois. La v1 s'arrête ; ses fichiers restent sur le disque pour revenir en arrière.
+Pour monter la stack sur un serveur qui ne l'a pas (ou la remonter de zéro).
 
-1. **Arrêter la v1**, garder un dump de sa base, et mettre ses données de côté. Le dump quotidien ne suffit pas : il s'appelle `unison-db.sql.gz` comme celui de la v2, qui l'écrasera dès la première nuit.
-   ```bash
-   cd /srv/stacks/unison && sudo docker compose stop app             # plus d'écriture dans la base
-   sudo docker exec unison-db sh -c 'exec mariadb-dump -uroot -p"$MARIADB_ROOT_PASSWORD" --single-transaction "$MARIADB_DATABASE"' \
-     | gzip | sudo tee /srv/data/unison/v1-final.sql.gz >/dev/null
-   sudo chmod 600 /srv/data/unison/v1-final.sql.gz                    # mots de passe (hashés) et e-mails dedans
-   sudo gunzip -c /srv/data/unison/v1-final.sql.gz | grep -c '^INSERT INTO'   # doit afficher un nombre, pas 0
-   sudo docker compose down
-   sudo mv /srv/data/unison /srv/data/unison-v1
-   sudo mv /srv/stacks/unison/app /srv/data/unison-v1/app        # hors de /srv/stacks : son Git ne doit pas le voir
-   sudo cp /srv/secrets/unison.env /srv/secrets/unison-v1.env
-   ```
-2. **Le code de la v2** : `git clone https://github.com/Progress-cmd/Unison.git /srv/stacks/unison/app`, puis `git -C /srv/stacks/unison/app checkout v2.23.0` (la première version qui contient ce dossier `deploy/`, ou une plus récente).
-3. **Les fichiers de la stack** : copier `app/deploy/compose.yaml` en `/srv/stacks/unison/compose.yaml` et `app/deploy/README.md` en `/srv/stacks/unison/README.md`.
-4. **Les secrets** : réécrire `/srv/secrets/unison.env` d'après `app/deploy/unison.env.exemple` (droits 600). La clé Resend est celle de la v1 (`unison-v1.env`).
-5. **Les dossiers** : `sudo install -d /srv/data/unison/{db,music,covers,youtube}`. Reprendre les cookies de la v1 : `sudo cp -a /srv/data/unison-v1/music/.config/cookies.txt /srv/data/unison/youtube/`.
-6. **Démarrer** : `cd /srv/stacks/unison && sudo docker compose config -q && sudo docker compose up -d --build`, attendre `healthy` (`sudo docker compose ps`).
+1. **Le code** : `git clone https://github.com/Progress-cmd/Unison.git /srv/stacks/unison/app`, puis `git -C /srv/stacks/unison/app checkout v2.x.y` (la dernière version).
+2. **Les fichiers de la stack** : copier `app/deploy/compose.yaml` en `/srv/stacks/unison/compose.yaml` et `app/deploy/README.md` en `/srv/stacks/unison/README.md`.
+3. **Les secrets** : écrire `/srv/secrets/unison.env` d'après `app/deploy/unison.env.exemple` (droits 600).
+4. **Les dossiers** : `sudo install -d /srv/data/unison/{db,music,covers,youtube}`.
+5. **Démarrer** : `cd /srv/stacks/unison && sudo docker compose config -q && sudo docker compose up -d --build`, attendre `healthy` (`sudo docker compose ps`). La base se crée au premier démarrage.
+6. **Le premier compte**, admin : `sudo docker exec -u www-data unison-app php bin/console app:user:create <e-mail> <nom> <mot de passe> --admin`. Les suivants se créent depuis **Administration → Comptes** (un lien par e-mail pour choisir leur mot de passe). Les cookies YouTube s'envoient depuis **Administration → Maintenance**.
 7. **Vérifier** : https://unison.pi5.ovh répond, `/admin` renvoie à la connexion tant qu'on n'est pas connecté avec un compte admin, `sudo ss -tlnp` ne montre aucun nouveau port.
-8. **Reprendre les données de la v1** : section suivante.
-9. **Commiter** : `git -C /srv/stacks add -A && git -C /srv/stacks commit -m "unison : v2"`. Dans `/srv/stacks/RESTORE.md`, le dépôt de l'appli devient `Progress-cmd/Unison`.
+8. **Commiter** : `git -C /srv/stacks add -A && git -C /srv/stacks commit -m "unison : installation"`.
 
-Revenir à la v1 : `sudo docker compose down`, puis remettre chaque chose à sa place : le code de la v2 mis de côté, `/srv/data/unison-v1/app` en `/srv/stacks/unison/app`, `/srv/data/unison-v1` en `/srv/data/unison`, `unison-v1.env` en `unison.env`, et l'ancien `compose.yaml` (`git -C /srv/stacks checkout <commit> -- unison/compose.yaml`). Enfin `sudo docker compose up -d`.
+## L'ancienne version
 
-## Reprendre les données de la v1
-
-Repris : les comptes (même e-mail, **même mot de passe**, même thème), tous les titres, les playlists dans leur ordre, les favoris, l'historique d'écoute, et les dates d'origine. Pas repris : le compte `system`, les « Wait Tracks », les messages, annonces, notes et artistes favoris.
-
-Les musiques ne sont pas copiées : elles sont **retéléchargées** (titres et pochettes plus propres). Le site reste utilisable pendant ce temps, la bibliothèque se remplit au fil de l'eau.
-
-1. **Charger le dump** dans la base de la v2, sous le nom `unison_v1`, lisible (seulement) par l'appli :
-   ```bash
-   sudo docker exec unison-db sh -c 'exec mariadb -uroot -p"$MARIADB_ROOT_PASSWORD" -e "CREATE DATABASE unison_v1; GRANT SELECT ON unison_v1.* TO unison@\"%\""'
-   sudo gunzip -c /srv/data/unison-v1/v1-final.sql.gz | sudo docker exec -i unison-db sh -c 'exec mariadb -uroot -p"$MARIADB_ROOT_PASSWORD" unison_v1'
-   ```
-2. **Un raccourci** pour lancer les commandes avec l'adresse de cette base (le mot de passe vient de `DATABASE_URL`, rien à taper) :
-   ```bash
-   legacy() { sudo docker exec -u www-data unison-app sh -c 'LEGACY_DATABASE_URL="${DATABASE_URL%%\?*}_v1?${DATABASE_URL#*\?}" exec php bin/console "$@"' sh "$@"; }
-   ```
-3. **Les comptes, et les titres en file de téléchargement** :
-   ```bash
-   legacy app:legacy:import --admin=<nom> --limit=3   # <nom> : ton nom d'utilisateur de la v1, qui devient admin ; d'abord trois titres, pour voir
-   legacy app:legacy:import --admin=<nom>             # puis tout
-   ```
-   Le worker télécharge un titre à la fois : compter une nuit, voire plus. Suivi : page **Importer**, ou `sudo docker exec -u www-data unison-app php bin/console messenger:stats async`.
-4. **Rattacher** playlists, favoris, écoutes et dates, une fois la file vide (possible aussi en cours de route : il ne rattache que ce qui est téléchargé) :
-   ```bash
-   legacy app:legacy:link
-   ```
-   Il dit combien de titres manquent et pourquoi. **En échec** (YouTube refuse parfois une série de téléchargements, ou une vidéo a disparu) : relancer `legacy app:legacy:import` (il ne redemande que ceux-là), attendre, puis `legacy app:legacy:link` à nouveau. Les deux commandes se relancent sans risque : rien n'est créé en double, et l'ordre d'une playlist réorganisée entre-temps n'est pas touché.
-5. **Prévenir** les comptes : même adresse, même e-mail, même mot de passe.
-6. **Ranger**, quand tout est là : `sudo docker exec unison-db sh -c 'exec mariadb -uroot -p"$MARIADB_ROOT_PASSWORD" -e "DROP DATABASE unison_v1; REVOKE ALL ON unison_v1.* FROM unison@\"%\""'`. Le dump reste dans `/srv/data/unison-v1/v1-final.sql.gz`.
+La v2 a remplacé la v1 en novembre 2026 (v2.23.0) : comptes, mots de passe, playlists, favoris, historique d'écoute et dates repris, musiques retéléchargées. Les commandes de cette reprise ont été retirées ensuite (v2.32.0). De la v1, il reste sur le disque ses données et son code dans `/srv/data/unison-v1` (dont le dump final de sa base, `v1-final.sql.gz`, droits 600), et ses secrets dans `/srv/secrets/unison-v1.env` : à supprimer quand plus rien ne les justifie.
