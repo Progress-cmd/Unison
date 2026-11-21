@@ -59,6 +59,15 @@ export default class extends Controller
         this.backTimer = setTimeout(() => this.hide(), random(2400, 3600));
     }
 
+    // Called (five quick clicks on « Unison »): he comes out now, if he isn't already out.
+    peekNow()
+    {
+        if (!this.out) {
+            clearTimeout(this.timer);
+            this.peek();
+        }
+    }
+
     // Back behind the bar: slowly after a look around, at once when the mouse comes (shy).
     hide(event)
     {

@@ -44,7 +44,7 @@
             {% include 'shared/_announcement.html.twig' %}
             {# Now and then, the little character peeks out from behind the sidebar (computer only,
                peekaboo_controller.js); kept from page to page like the butterflies below. #}
-            <div id="peekaboo" class="peekaboo" aria-hidden="true" data-turbo-permanent data-controller="peekaboo" data-action="mouseenter->peekaboo#hide">
+            <div id="peekaboo" class="peekaboo" aria-hidden="true" data-turbo-permanent data-controller="peekaboo" data-action="mouseenter->peekaboo#hide unison:peek@window->peekaboo#peekNow">
                 <svg viewBox="0 0 48 48" focusable="false">
                     <g class="peekaboo-head">
                         <circle class="peekaboo-skin" cx="24" cy="23" r="12"/>
